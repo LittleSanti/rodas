@@ -1,0 +1,36 @@
+public interface ArithmeticExpression extends Expression
+public interface BooleanExpression extends Expression
+public interface BooleanExpressionFactory
+public interface Executor
+public interface IBooleanExpressionFactory extends IExpressionFactory
+public interface IExpressionFactory
+public interface Prefixed
+public interface Sentence extends Codeable
+public interface Source extends Codeable
+
+public interface Codeable
+public interface Expression extends Codeable
+public interface Cursor
+public interface Engine
+public interface IterableTableData
+public interface TableData extends IterableTableData
+public interface TableMetadata
+public interface Provider
+public interface RowData
+
+
+Paquetes
+--------
+
+rodas-core
+	/:	interfaces Engine, Context, Provider y EvaluatorFactory
+	model -> necesita core y eval
+	eval
+	eval.functions
+
+rodas-sql-parser:
+	parser -> produce model y necesita tokenizer y eval
+	parser.tokenizer
+
+rodas-engine:
+	engine

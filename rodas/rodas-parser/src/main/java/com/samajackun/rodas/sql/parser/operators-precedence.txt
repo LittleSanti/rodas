@@ -1,0 +1,8 @@
+1	+, - (as unary operators), PRIOR, CONNECT_BY_ROOT	identity, negation, location in hierarchy
+2	*, /								multiplication, division
+3	+, - (as binary operators), ||		addition, subtraction, concatenation
+4	=, !=, <, >, <=, >=,				comparison
+5	IS [NOT] NULL, LIKE, BETWEEN, IN, EXISTS, IS OF TYPE	comparison
+6	NOT									exponentiation, logical negation
+7	AND									conjunction
+8	OR									disjunction

@@ -1,0 +1,8 @@
+2017-05-07: En desarrollo.
+2017-07-02: Ya parseo una SELECT completa, con SELECT, FROM, WHERE, GROUP, HAVING y ORDER. Parseo bien LIKE, IN (lista), BETWEEN.
+Siguiente: Me falta contemplar IN (select).
+
+Ideas a futuro:
+-Gracias a la jerarquía de evaluadores, podríamos incluso traducir una expresión a código fuente java y COMPILARLO a bytecode, para optimizar la ejecución.
+-Permitir funciones y evaluadores custom.
+-Permitir operadores custom dado un literal y un nivel de prioridad, y su correspondiente evaluador para una BinaryExpression/UnaryExpression.

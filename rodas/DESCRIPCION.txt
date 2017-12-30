@@ -1,0 +1,11 @@
+Parser para SQL.
+Motor de consultas.
+Futuras aplicaciones:
+	-API JDBC y herramienta de línea de comandos para lanzar SQLs sobre el filesystem.
+	-API JDBC para lanzar SQLs sobre un proveedor XML.
+	-API JDBC combinado: lanzar una misma SQL con joins entre distintos proveedores.
+
+Notas:
+	-Contexto: Hay que distinguir dos ESTADOS diferentes:
+	* El contexto mientras se está construyendo el plan de ejecución: Este debe realizar validaciones ESTRICTAS para detectar errores semánticos en la consulta (si las columnas referenciadas efectivamente pertenecen al prefijo establecido, si el prefijos está definido en la consulta, etc).
+	* El contexto mientras se está ejecutando la consulta: Éste ya tiene que tener, debidamente mapeadas, todas las columnas usadas en la consulta, en su formulación original (las que lleven prefijo, con prefijo; y las que no lleven prefijo, pues sin prefijo). Este no debe realizar ninguna validación, pues ya fueron hechas durante la fase de construcción.
