@@ -15,7 +15,7 @@ import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.RowData;
 
-public class DefaultExecutionContext
+public class DefaultExecutionContext implements ExecutionContext
 {
 	private final Map<String, IdentifierCoordinates> identifierCoordinatesMap=new HashMap<>();
 
@@ -75,10 +75,10 @@ public class DefaultExecutionContext
 		return identifierCoordinates;
 	}
 
+	@Override
 	public Object getColumnByName(String column, String prefix)
 		throws NameNotBoundException
 	{
-
 		IdentifierCoordinates identifierCoordinates=this.identifierCoordinatesMap.get(column);
 		if (identifierCoordinates == null)
 		{
@@ -89,6 +89,7 @@ public class DefaultExecutionContext
 		return value;
 	}
 
+	@Override
 	public Object getColumnByName(String column)
 		throws NameNotBoundException
 	{
@@ -102,6 +103,7 @@ public class DefaultExecutionContext
 		return value;
 	}
 
+	@Override
 	public Object getColumnByIndex(int column)
 		throws IndexNotBoundException
 	{
@@ -115,6 +117,7 @@ public class DefaultExecutionContext
 		return value;
 	}
 
+	@Override
 	public Object getParameter(String name)
 		throws ParameterNotFoundException
 	{

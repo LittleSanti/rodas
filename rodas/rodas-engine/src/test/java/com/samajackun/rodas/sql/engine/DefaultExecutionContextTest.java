@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -13,6 +14,7 @@ import com.samajackun.rodas.sql.eval.ColumnNotFoundException;
 import com.samajackun.rodas.sql.eval.IndexNotBoundException;
 import com.samajackun.rodas.sql.eval.MyCursor;
 import com.samajackun.rodas.sql.eval.NameNotBoundException;
+import com.samajackun.rodas.sql.eval.PrefixedColumn;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.IterableTableData;
@@ -23,18 +25,18 @@ public class DefaultExecutionContextTest
 {
 	@Test
 	public void bindAllColumns()
-		throws ProviderException
+		throws ProviderException,
+		ColumnNotFoundException,
+		CursorException
 	{
 		Map<String, Cursor> cursors=new HashMap<>();
 		Cursor cursor1=createCursor();
 		cursors.put("mes", cursor1);
-		DefaultExecutionContext context=new DefaultExecutionContext(cursors);
+		List<PrefixedColumn> publicColumns=Arrays.asList(new PrefixedColumn(null, "id"), new PrefixedColumn(null, "name"), new PrefixedColumn(null, "days"));
+		List<PrefixedColumn> privateColumns=Arrays.asList();
+		DefaultExecutionContext context=new DefaultExecutionContext(cursors, publicColumns, privateColumns);
 		try
 		{
-			context.bindPublicColumn(null, "id");
-			context.bindPublicColumn(null, "name");
-			context.bindPublicColumn(null, "days");
-
 			cursor1.next();
 			assertEquals(1, context.getColumnByName("id"));
 			assertEquals("enero", context.getColumnByName("name"));
@@ -51,7 +53,7 @@ public class DefaultExecutionContextTest
 			assertEquals("febrero", context.getColumnByIndex(1));
 			assertEquals(28, context.getColumnByIndex(2));
 		}
-		catch (NameNotBoundException | CursorException | ColumnNotFoundException | IndexNotBoundException e)
+		catch (NameNotBoundException | IndexNotBoundException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());
@@ -60,16 +62,18 @@ public class DefaultExecutionContextTest
 
 	@Test
 	public void bindOneColumns()
-		throws ProviderException
+		throws ProviderException,
+		ColumnNotFoundException,
+		CursorException
 	{
 		Map<String, Cursor> cursors=new HashMap<>();
 		Cursor cursor1=createCursor();
 		cursors.put("mes", cursor1);
-		DefaultExecutionContext context=new DefaultExecutionContext(cursors);
+		List<PrefixedColumn> publicColumns=Arrays.asList(new PrefixedColumn(null, "name"));
+		List<PrefixedColumn> privateColumns=Arrays.asList();
+		DefaultExecutionContext context=new DefaultExecutionContext(cursors, publicColumns, privateColumns);
 		try
 		{
-			context.bindPublicColumn(null, "name");
-
 			cursor1.next();
 			try
 			{
@@ -82,7 +86,7 @@ public class DefaultExecutionContextTest
 			assertEquals("enero", context.getColumnByName("name"));
 			assertEquals("enero", context.getColumnByIndex(0));
 		}
-		catch (NameNotBoundException | CursorException | ColumnNotFoundException | IndexNotBoundException e)
+		catch (NameNotBoundException | IndexNotBoundException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());
@@ -91,18 +95,18 @@ public class DefaultExecutionContextTest
 
 	@Test
 	public void bindAllPrefixedColumnsInAliasedCursor()
-		throws ProviderException
+		throws ProviderException,
+		ColumnNotFoundException,
+		CursorException
 	{
 		Map<String, Cursor> cursors=new HashMap<>();
 		Cursor cursor1=createCursor();
 		cursors.put("mes", cursor1);
-		DefaultExecutionContext context=new DefaultExecutionContext(cursors);
+		List<PrefixedColumn> publicColumns=Arrays.asList(new PrefixedColumn("mes", "id"), new PrefixedColumn("mes", "name"), new PrefixedColumn("mes", "days"));
+		List<PrefixedColumn> privateColumns=Arrays.asList();
+		DefaultExecutionContext context=new DefaultExecutionContext(cursors, publicColumns, privateColumns);
 		try
 		{
-			context.bindPublicColumn("mes", "id");
-			context.bindPublicColumn("mes", "name");
-			context.bindPublicColumn("mes", "days");
-
 			cursor1.next();
 			assertEquals(1, context.getColumnByName("id"));
 			assertEquals("enero", context.getColumnByName("name"));
@@ -119,7 +123,7 @@ public class DefaultExecutionContextTest
 			assertEquals("febrero", context.getColumnByIndex(1));
 			assertEquals(28, context.getColumnByIndex(2));
 		}
-		catch (NameNotBoundException | CursorException | ColumnNotFoundException | IndexNotBoundException e)
+		catch (NameNotBoundException | IndexNotBoundException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());
