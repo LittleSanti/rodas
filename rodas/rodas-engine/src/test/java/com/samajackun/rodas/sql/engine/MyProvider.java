@@ -38,7 +38,7 @@ public class MyProvider implements Provider
 
 	private Map<String, Integer> map(List<String> list)
 	{
-		Map<String, Integer> map=new HashMap<String, Integer>((int)(1.7d * list.size()));
+		Map<String, Integer> map=new HashMap<>((int)(1.7d * list.size()));
 		int i=0;
 		for (String s : list)
 		{
@@ -49,7 +49,20 @@ public class MyProvider implements Provider
 
 	private Object[] countryToArray(int idCountry, String name, double area)
 	{
-		return new Object[] { idCountry, name, area };
+		return new Object[] {
+			idCountry,
+			name,
+			area
+		};
+	}
+
+	private Object[] cityToArray(int idCity, int idCountry, String name)
+	{
+		return new Object[] {
+			idCity,
+			idCountry,
+			name,
+		};
 	}
 
 	@Override
@@ -61,6 +74,9 @@ public class MyProvider implements Provider
 		{
 			case "country":
 				tableData=new MyTableData(Arrays.asList(countryToArray(1, "spain", 121.1), countryToArray(2, "portugal", 122.2), countryToArray(3, "italy", 123.3)));
+				break;
+			case "city":
+				tableData=new MyTableData(Arrays.asList(cityToArray(1, 1, "madrid"), cityToArray(2, 1, "bibo"), cityToArray(3, 1, "zevilla"), cityToArray(1, 2, "lisboa"), cityToArray(2, 2, "são vicente")));
 				break;
 			default:
 				throw new ProviderException("Table '" + table + "' not found");

@@ -1,5 +1,6 @@
 package com.samajackun.rodas.sql.model;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +26,11 @@ public interface Cursor
 	public Map<String, Integer> getColumnMap()
 		throws CursorException;
 
+	public List<ColumnMetadata> getMetadata()
+		throws CursorException;
+
 	public void reset()
 		throws CursorException;
+
+	public int getNumberOfColumns();
 }

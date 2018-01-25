@@ -10,7 +10,7 @@ import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.RowData;
 
-public class DefaultContext // implements Context
+public class DefaultContext implements Context
 {
 	// private final Map<String, RowData> subcontexts=new HashMap<>();
 
@@ -28,6 +28,7 @@ public class DefaultContext // implements Context
 		this.cursors=cursors;
 	}
 
+	@Override
 	public void bindPublicColumn(String prefix, String column)
 		throws CursorException,
 		ColumnNotFoundException
@@ -36,6 +37,7 @@ public class DefaultContext // implements Context
 		this.identifierCoordinatesIndex.add(identifierCoordinates);
 	}
 
+	@Override
 	public void bindPrivateColumn(String prefix, String column)
 		throws CursorException,
 		ColumnNotFoundException
@@ -76,10 +78,10 @@ public class DefaultContext // implements Context
 		return identifierCoordinates;
 	}
 
+	@Override
 	public Object getColumnByName(String column, String prefix)
 		throws NameNotBoundException
 	{
-
 		IdentifierCoordinates identifierCoordinates=this.identifierCoordinatesMap.get(column);
 		if (identifierCoordinates == null)
 		{
@@ -90,6 +92,7 @@ public class DefaultContext // implements Context
 		return value;
 	}
 
+	@Override
 	public Object getColumnByName(String column)
 		throws NameNotBoundException
 	{
@@ -103,6 +106,19 @@ public class DefaultContext // implements Context
 		return value;
 	}
 
+	@Override
+	public int getColumnIndexByName(String column, String prefix)
+		throws NameNotBoundException
+	{
+		IdentifierCoordinates identifierCoordinates=this.identifierCoordinatesMap.get(column);
+		if (identifierCoordinates == null)
+		{
+			throw new NameNotBoundException(column);
+		}
+		return identifierCoordinates.getColumnIndex();
+	}
+
+	@Override
 	public Object getColumnByIndex(int column)
 		throws IndexNotBoundException
 	{
@@ -116,6 +132,7 @@ public class DefaultContext // implements Context
 		return value;
 	}
 
+	@Override
 	public Object getParameter(String name)
 		throws ParameterNotFoundException
 	{

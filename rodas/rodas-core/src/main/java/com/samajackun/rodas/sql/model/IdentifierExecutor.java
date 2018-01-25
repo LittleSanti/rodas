@@ -9,8 +9,6 @@ import com.samajackun.rodas.sql.eval.NameNotBoundException;
 
 public class IdentifierExecutor extends AbstractExecutor
 {
-	private final Context subContext;
-
 	private final int index;
 
 	// private final String alias;
@@ -24,17 +22,16 @@ public class IdentifierExecutor extends AbstractExecutor
 		super(context, evaluatorFactory);
 		// this.alias=alias;
 		// this.identifier=identifier;
-		this.subContext=(alias != null
-			? context.getSubcontext(alias)
-			: context.findIdentifier(identifier));
-		this.index=this.subContext.getColumn(identifier);
+		this.index=getContext().getColumnIndexByName(identifier, (alias != null)
+			? alias
+			: identifier);
 	}
 
 	@Override
 	public Object evaluate()
 		throws EvaluationException
 	{
-		return this.subContext.getValue(this.index);
+		return getContext().getColumnByIndex(this.index);
 	}
 
 	@Override

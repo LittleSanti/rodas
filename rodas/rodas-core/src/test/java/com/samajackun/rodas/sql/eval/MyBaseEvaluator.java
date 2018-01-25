@@ -25,7 +25,7 @@ public class MyBaseEvaluator extends AbstractEvaluator implements BaseEvaluator
 	public Object evaluate(Context context, IdentifierExpression expression)
 		throws EvaluationException
 	{
-		Object value=context.getSubcontext(expression.getPrefix()).lookup(expression.getIdentifier());
+		Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
 		if (value == null)
 		{
 			throw new NameNotBoundException(expression.getIdentifier(), expression.getPrefix());
@@ -66,7 +66,7 @@ public class MyBaseEvaluator extends AbstractEvaluator implements BaseEvaluator
 		throws EvaluationException
 	{
 		Object value=expression.evaluate(context, getEvaluatorFactory());
-		context.getResult().addAlias(expression.getAlias(), value);
+		// context.getResult().addAlias(expression.getAlias(), value);
 		return value;
 	}
 
@@ -90,11 +90,8 @@ public class MyBaseEvaluator extends AbstractEvaluator implements BaseEvaluator
 	{
 		try
 		{
-			Context subContext=expression.getPrefix() == null
-				? context
-				: context.getSubcontext(expression.getPrefix());
-			int column=subContext.getColumn(expression.getName());
-			Object value=subContext.getValue(column);
+			// TODO La determinación de tipos habrá que hacerla a priori.
+			Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
 			return guessDatatype(value);
 		}
 		catch (NameNotBoundException e)

@@ -10,6 +10,7 @@ import com.samajackun.rodas.sql.model.BooleanConstantExpression;
 import com.samajackun.rodas.sql.model.IdentifierExpression;
 import com.samajackun.rodas.sql.model.NullConstantExpression;
 import com.samajackun.rodas.sql.model.NumericConstantExpression;
+import com.samajackun.rodas.sql.model.TestUtils;
 import com.samajackun.rodas.sql.model.TextConstantExpression;
 
 public class MyBaseEvaluatorTest
@@ -19,7 +20,7 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateNumericExpression()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		NumericConstantExpression expression=new NumericConstantExpression("120", 120);
 		try
 		{
@@ -35,7 +36,7 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateTextExpression()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		TextConstantExpression expression=new TextConstantExpression("enero");
 		try
 		{
@@ -51,7 +52,7 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateBooleanTrueExpression()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		BooleanConstantExpression expression=BooleanConstantExpression.createTrueConstrantExpression("true");
 		try
 		{
@@ -67,7 +68,7 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateBooleanFalseExpression()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		BooleanConstantExpression expression=BooleanConstantExpression.createFalseConstrantExpression("false");
 		try
 		{
@@ -83,9 +84,8 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateExistingIdentifierExpression()
 	{
-		MyContext context=new MyContext();
-		context.bind("mes", "enero");
-		IdentifierExpression expression=new IdentifierExpression("mes");
+		Context context=TestUtils.createContext();
+		IdentifierExpression expression=new IdentifierExpression("name");
 		try
 		{
 			assertEquals("enero", this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression));
@@ -100,9 +100,8 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateUnexistingIdentifierExpression()
 	{
-		MyContext context=new MyContext();
-		context.bind("mes", "enero");
-		IdentifierExpression expression=new IdentifierExpression("dia");
+		Context context=TestUtils.createContext();
+		IdentifierExpression expression=new IdentifierExpression("wrong");
 		try
 		{
 			this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression);
@@ -111,7 +110,7 @@ public class MyBaseEvaluatorTest
 		catch (NameNotBoundException e)
 		{
 			assertNull(e.getContext());
-			assertEquals("dia", e.getName());
+			assertEquals("wrong", e.getName());
 		}
 		catch (EvaluationException e)
 		{
@@ -123,7 +122,7 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateNullConstantExpression()
 	{
-		MyContext context=new MyContext();
+		Context context=TestUtils.createContext();
 		NullConstantExpression expression=new NullConstantExpression("xnul");
 		try
 		{

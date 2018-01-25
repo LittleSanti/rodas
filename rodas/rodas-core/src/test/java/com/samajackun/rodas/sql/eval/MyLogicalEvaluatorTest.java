@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.samajackun.rodas.sql.model.BooleanConstantExpression;
 import com.samajackun.rodas.sql.model.NotExpression;
+import com.samajackun.rodas.sql.model.TestUtils;
 
 public class MyLogicalEvaluatorTest
 {
@@ -15,7 +16,7 @@ public class MyLogicalEvaluatorTest
 	@Test
 	public void notBooleanTrue()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		NotExpression expression=new NotExpression("not", BooleanConstantExpression.createTrueConstrantExpression("true"));
 		try
 		{

@@ -1,9 +1,12 @@
 package com.samajackun.rodas.sql.engine;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
+import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.IterableTableData;
 import com.samajackun.rodas.sql.model.ProviderException;
 import com.samajackun.rodas.sql.model.RowData;
@@ -113,7 +116,8 @@ public class DefaultCursor implements Cursor
 
 	private RowData rowData;
 
-	public DefaultCursor(Map<String, Integer> columnMap, IterableTableData iterable) throws ProviderException
+	public DefaultCursor(Map<String, Integer> columnMap, IterableTableData iterable)
+		throws ProviderException
 	{
 		super();
 		this.columnMap=columnMap;
@@ -155,5 +159,18 @@ public class DefaultCursor implements Cursor
 	public Map<String, Integer> getColumnMap()
 	{
 		return this.columnMap;
+	}
+
+	@Override
+	public List<ColumnMetadata> getMetadata()
+		throws CursorException
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public int getNumberOfColumns()
+	{
+		return this.columnMap.size();
 	}
 }

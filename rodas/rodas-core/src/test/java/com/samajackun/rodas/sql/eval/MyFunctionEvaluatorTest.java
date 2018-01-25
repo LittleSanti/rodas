@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.samajackun.rodas.sql.model.FunctionExpression;
 import com.samajackun.rodas.sql.model.NumericConstantExpression;
+import com.samajackun.rodas.sql.model.TestUtils;
 import com.samajackun.rodas.sql.model.TextConstantExpression;
 
 public class MyFunctionEvaluatorTest
@@ -16,7 +17,7 @@ public class MyFunctionEvaluatorTest
 	@Test
 	public void minWithTwoIntArguments()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		FunctionExpression expression=new FunctionExpression("min");
 		expression.getArguments().add(new NumericConstantExpression("120", 120));
 		expression.getArguments().add(new NumericConstantExpression("130", 130));
@@ -34,7 +35,7 @@ public class MyFunctionEvaluatorTest
 	@Test
 	public void minWithTwoStringArguments()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		FunctionExpression expression=new FunctionExpression("min");
 		expression.getArguments().add(new TextConstantExpression("enero"));
 		expression.getArguments().add(new TextConstantExpression("febrero"));
@@ -52,7 +53,7 @@ public class MyFunctionEvaluatorTest
 	@Test
 	public void maxWithTwoStringArguments()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		FunctionExpression expression=new FunctionExpression("max");
 		expression.getArguments().add(new TextConstantExpression("enero"));
 		expression.getArguments().add(new TextConstantExpression("febrero"));
@@ -70,7 +71,7 @@ public class MyFunctionEvaluatorTest
 	@Test
 	public void maxWithTwoIntArguments()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		FunctionExpression expression=new FunctionExpression("max");
 		expression.getArguments().add(new NumericConstantExpression("120", 120));
 		expression.getArguments().add(new NumericConstantExpression("130", 130));
@@ -88,7 +89,7 @@ public class MyFunctionEvaluatorTest
 	@Test
 	public void minWithOneArguments()
 	{
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		FunctionExpression expression=new FunctionExpression("min");
 		expression.getArguments().add(new NumericConstantExpression("120", 120));
 		try

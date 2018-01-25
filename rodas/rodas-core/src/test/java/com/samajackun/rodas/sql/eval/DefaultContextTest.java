@@ -101,16 +101,31 @@ public class DefaultContextTest
 
 			cursor1.next();
 			assertEquals(1, context.getColumnByName("id"));
+			assertEquals(1, context.getColumnByName("id", "mes"));
+			assertEquals("enero", context.getColumnByName("name", "mes"));
 			assertEquals("enero", context.getColumnByName("name"));
+			try
+			{
+				context.getColumnByName("wrong");
+				fail("Expected NameNotBoundException");
+			}
+			catch (NameNotBoundException e)
+			{
+				assertEquals("wrong", e.getName());
+			}
 			assertEquals(31, context.getColumnByName("days"));
+			assertEquals(31, context.getColumnByName("days", "mes"));
 			assertEquals(1, context.getColumnByIndex(0));
 			assertEquals("enero", context.getColumnByIndex(1));
 			assertEquals(31, context.getColumnByIndex(2));
 
 			cursor1.next();
 			assertEquals(2, context.getColumnByName("id"));
+			assertEquals(2, context.getColumnByName("id", "mes"));
 			assertEquals("febrero", context.getColumnByName("name"));
+			assertEquals("febrero", context.getColumnByName("name", "mes"));
 			assertEquals(28, context.getColumnByName("days"));
+			assertEquals(28, context.getColumnByName("days", "mes"));
 			assertEquals(2, context.getColumnByIndex(0));
 			assertEquals("febrero", context.getColumnByIndex(1));
 			assertEquals(28, context.getColumnByIndex(2));

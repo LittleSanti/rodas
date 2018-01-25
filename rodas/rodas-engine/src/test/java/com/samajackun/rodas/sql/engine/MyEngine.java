@@ -50,14 +50,14 @@ public class MyEngine implements Engine
 				BooleanExpression booleanExpression=(BooleanExpression)source.getWhereExpression();
 				List<Object[]> output=new ArrayList<>(100);
 				Cursor sourceCursor1=source.getSourceDeclarations().get(0).execute(this, provider, context);
-				Context context1=context.getSubcontext(source.getAlias());
+				Context context1=null;// TODO context.getSubcontext(source.getAlias());
 				while (sourceCursor1.hasNext())
 				{
 					sourceCursor1.next();
 					for (Map.Entry<String, Integer> entry : sourceCursor1.getColumnMap().entrySet())
 					{
 						// Object value=sourceCursor1.getRowData().get(entry.getValue());
-						context.putSubcontext(entry.getKey(), context1);
+						// context.putSubcontext(entry.getKey(), context1);
 					}
 					if (booleanExpression == null || booleanExpression.evaluate(context1, this.evaluatorFactory))
 					{

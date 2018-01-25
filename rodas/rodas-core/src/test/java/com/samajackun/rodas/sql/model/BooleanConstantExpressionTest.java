@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import com.samajackun.rodas.sql.eval.Context;
 import com.samajackun.rodas.sql.eval.EvaluatorFactory;
-import com.samajackun.rodas.sql.eval.MyContext;
 import com.samajackun.rodas.sql.eval.MyEvaluatorFactory;
 
 public class BooleanConstantExpressionTest
@@ -16,7 +15,7 @@ public class BooleanConstantExpressionTest
 	public void test()
 	{
 		BooleanConstantExpression expression=new BooleanConstantExpression("true", true);
-		Context context=new MyContext();
+		Context context=TestUtils.createContext();
 		EvaluatorFactory evaluatorFactory=new MyEvaluatorFactory();
 		try
 		{
@@ -28,5 +27,4 @@ public class BooleanConstantExpressionTest
 			fail(e.toString());
 		}
 	}
-
 }

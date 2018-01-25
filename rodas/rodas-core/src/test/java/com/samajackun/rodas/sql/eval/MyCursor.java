@@ -1,9 +1,13 @@
 package com.samajackun.rodas.sql.eval;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
+import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.IterableTableData;
 import com.samajackun.rodas.sql.model.ProviderException;
 import com.samajackun.rodas.sql.model.RowData;
@@ -114,6 +118,8 @@ public class MyCursor implements Cursor
 	// }
 	//
 	// private final Context context=new ContextFacade();
+	private final List<ColumnMetadata> metadata;
+
 	private final Map<String, Integer> columnMap;
 
 	private final IterableTableData iterable;
@@ -124,19 +130,30 @@ public class MyCursor implements Cursor
 
 	private RowData srcRowData;
 
-	public MyCursor(Map<String, Integer> columnMap, IterableTableData iterable)
+	public MyCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
 		throws ProviderException
 	{
 		super();
-		this.columnMap=columnMap;
+		this.metadata=metadata;
+		this.columnMap=toColumnMap(metadata);
 		this.iterable=iterable;
-		this.iterator=iterable.iterator();
+		reset();
+	}
+
+	private static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
+	{
+		Map<String, Integer> map=new HashMap<>((int)(1.7 * metadata.size()));
+		int i=0;
+		for (ColumnMetadata column : metadata)
+		{
+			map.put(column.getName(), i++);
+		}
+		return map;
 	}
 
 	@Override
 	public void close()
 	{
-		// TODO
 	}
 
 	@Override
@@ -155,6 +172,9 @@ public class MyCursor implements Cursor
 	public void reset()
 	{
 		this.iterator=this.iterable.iterator();
+		this.srcRowData=(this.iterator.hasNext())
+			? this.iterator.next()
+			: null;
 	}
 
 	@Override
@@ -167,5 +187,18 @@ public class MyCursor implements Cursor
 	public Map<String, Integer> getColumnMap()
 	{
 		return this.columnMap;
+	}
+
+	@Override
+	public List<ColumnMetadata> getMetadata()
+		throws CursorException
+	{
+		return this.metadata;
+	}
+
+	@Override
+	public int getNumberOfColumns()
+	{
+		return this.columnMap.size();
 	}
 }
