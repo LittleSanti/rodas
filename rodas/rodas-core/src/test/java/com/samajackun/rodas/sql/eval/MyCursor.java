@@ -14,6 +14,12 @@ import com.samajackun.rodas.sql.model.RowData;
 
 public class MyCursor implements Cursor
 {
+	private enum IterationState {
+		RESET, ITERATING, EXAHUSTED
+	};
+
+	private IterationState iterationState;
+
 	public class PrivateRowData implements RowData
 	{
 		@Override
@@ -172,9 +178,8 @@ public class MyCursor implements Cursor
 	public void reset()
 	{
 		this.iterator=this.iterable.iterator();
-		this.srcRowData=(this.iterator.hasNext())
-			? this.iterator.next()
-			: null;
+		this.iterationState=IterationState.RESET;
+		this.srcRowData=null;
 	}
 
 	@Override

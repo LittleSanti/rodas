@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +85,7 @@ public class MyCursorTest
 		MyCursor cursor=createCursor1();
 		RowData rowData;
 		assertTrue(cursor.hasNext());
+		cursor.next();
 		rowData=cursor.getRowData();
 		assertEquals("enero", rowData.get(1));
 
@@ -120,36 +122,14 @@ public class MyCursorTest
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=createMetadata();
-		List<Object[]> data=new ArrayList<>();
-		data.add(new Object[] {
-			1,
-			"enero",
-			31,
-			0.1d
-		});
-		data.add(new Object[] {
-			2,
-			"febrero",
-			28,
-			0.2d
-		});
-		data.add(new Object[] {
-			3,
-			"marzo",
-			31,
-			0.3d
-		});
-		data.add(new Object[] {
-			4,
-			"abril",
-			30,
-			0.4d
-		});
-		data.add(new Object[] {
-			5,
-			"mayo",
-			31,
-			0.5d
+		List<Object[]> data=Arrays.asList(new Object[][] {
+			// @formatter:off
+			new Object[] {1, "enero", 31, 0.1d},
+			new Object[] {2, "febrero", 28, 0.2d},
+			new Object[] {3, "marzo", 31, 0.3d},
+			new Object[] {4, "abril", 30, 0.4d},
+			new Object[] {5, "mayo", 31, 0.5d},
+			// @formatter:on
 		});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
 		MyCursor cursor=new MyCursor(metadata, iterableTableData);
@@ -172,9 +152,7 @@ public class MyCursorTest
 		CursorException
 	{
 		MyCursor cursor=createCursor0();
-		RowData rowData;
 		assertFalse(cursor.hasNext());
-
 	}
 
 	@Test
@@ -185,6 +163,7 @@ public class MyCursorTest
 		MyCursor cursor=createCursor1();
 		RowData rowData;
 		assertTrue(cursor.hasNext());
+		cursor.next();
 		rowData=cursor.getRowData();
 		assertEquals("enero", rowData.get(1));
 
@@ -194,7 +173,7 @@ public class MyCursorTest
 		cursor.reset();
 
 		assertTrue(cursor.hasNext());
-		rowData=cursor.getRowData();
+		cursor.next();
 		assertEquals("enero", rowData.get(1));
 
 		assertTrue(cursor.hasNext());
@@ -225,6 +204,7 @@ public class MyCursorTest
 		RowData rowData;
 		assertTrue(cursor.hasNext());
 		rowData=cursor.getRowData();
+		cursor.next();
 		assertEquals("enero", rowData.get(1));
 
 		assertTrue(cursor.hasNext());

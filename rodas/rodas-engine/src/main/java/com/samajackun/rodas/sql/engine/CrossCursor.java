@@ -1,106 +1,255 @@
 package com.samajackun.rodas.sql.engine;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
+import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.RowData;
 
 public class CrossCursor implements Cursor
 {
+	public class CombinedRowData implements RowData
+	{
+		private final CursorColumn[] map;
+
+		public CombinedRowData(List<Cursor> cursors)
+			throws CursorException
+		{
+			this.map=new CursorColumn[getNumberOfColumns()];
+			int i=0;
+			for (Cursor cursor : cursors)
+			{
+				for (int j=0; j < cursor.getNumberOfColumns(); j++)
+				{
+					this.map[i++]=new CursorColumn(cursor.getRowData(), j);
+				}
+			}
+		}
+
+		@Override
+		public Object get(int column)
+		{
+			CursorColumn cursorColumn=this.map[column];
+			return cursorColumn.getRowData().get(cursorColumn.getColumn());
+		}
+
+		private class CursorColumn
+		{
+			private final RowData rowData;
+
+			private final int column;
+
+			public CursorColumn(RowData rowData, int column)
+			{
+				super();
+				this.rowData=rowData;
+				this.column=column;
+			}
+
+			public RowData getRowData()
+			{
+				return this.rowData;
+			}
+
+			public int getColumn()
+			{
+				return this.column;
+			}
+		}
+	}
+
 	private final List<Cursor> cursors;
 
-	private int currentIndex;
+	private final List<ColumnMetadata> metadata;
 
-	private RowData rowData;
+	private final Map<String, Integer> columnMap;
+
+	private final RowData rowData;
+
+	private boolean justReset=true;
 
 	public CrossCursor(List<Cursor> cursors)
+		throws CursorException
 	{
 		super();
 		this.cursors=cursors;
+		this.metadata=concatMetadata(cursors);
+		this.columnMap=toColumnMap(this.metadata);
+		this.rowData=combineCursors();
+	}
+
+	private static List<ColumnMetadata> concatMetadata(List<Cursor> cursors)
+		throws CursorException
+	{
+		int numberOfColumns=0;
+		for (Cursor cursor : cursors)
+		{
+			numberOfColumns+=cursor.getNumberOfColumns();
+		}
+		List<ColumnMetadata> metadata=new ArrayList<>(numberOfColumns);
+		for (Cursor cursor : cursors)
+		{
+			metadata.addAll(cursor.getMetadata());
+		}
+		return metadata;
+	}
+
+	private static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
+	{
+		Map<String, Integer> columnMap=new HashMap<>((int)(1.7d * metadata.size()));
+		int i=0;
+		for (ColumnMetadata column : metadata)
+		{
+			// FIXME Machaca columnas con nombre repetido:
+			columnMap.put(column.getName(), i++);
+		}
+		return columnMap;
 	}
 
 	@Override
 	public boolean hasNext()
 		throws CursorException
 	{
-		return currentAndAllFollowingHaveNext();
-	}
-
-	private boolean currentAndAllFollowingHaveNext()
-		throws CursorException
-	{
-		boolean x=false;
-		for (int i=this.currentIndex; i < this.cursors.size(); i++)
+		boolean hasNext=false;
+		for (int i=this.cursors.size() - 1; i >= 0; i--)
 		{
 			Cursor cursor=this.cursors.get(i);
-			x=cursor.hasNext();
+			hasNext=hasNext || cursor.hasNext();
 		}
-		return x;
+		return hasNext;
+		// return currentAndAllFollowingHaveNext();
 	}
+
+	// private boolean currentAndAllFollowingHaveNext()
+	// throws CursorException
+	// {
+	// boolean x=false;
+	// for (int i=this.currentIndex; i < this.cursors.size(); i++)
+	// {
+	// Cursor cursor=this.cursors.get(i);
+	// x=cursor.hasNext();
+	// }
+	// return x;
+	// }
+
+	// @Override
+	// public void next()
+	// throws CursorException
+	// {
+	// if (!currentAndAllFollowingHaveNext())
+	// {
+	// throw new NoSuchElementException();
+	// }
+	// Cursor cursor=this.cursors.get(this.currentIndex);
+	// if (cursor.hasNext())
+	// {
+	// cursor.next();
+	// }
+	// else
+	// {
+	// for (int i=0; i <= this.currentIndex; i++)
+	// {
+	// this.cursors.get(i).reset();
+	// }
+	// this.currentIndex++;
+	// this.cursors.get(this.currentIndex).next();
+	// }
+	// }
 
 	@Override
 	public void next()
 		throws CursorException
 	{
-		if (!currentAndAllFollowingHaveNext())
+		boolean iterate=true;
+		if (this.justReset)
 		{
-			throw new NoSuchElementException();
-		}
-		Cursor cursor=this.cursors.get(this.currentIndex);
-		if (cursor.hasNext())
-		{
-			cursor.next();
+			for (int i=this.cursors.size() - 1; iterate && i >= 0; i--)
+			{
+				Cursor cursor=this.cursors.get(i);
+				if (cursor.hasNext())
+				{
+					cursor.next();
+				}
+			}
+			this.justReset=false;
 		}
 		else
 		{
-			for (int i=0; i <= this.currentIndex; i++)
+			for (int i=this.cursors.size() - 1; iterate && i >= 0; i--)
 			{
-				this.cursors.get(i).reset();
+				Cursor cursor=this.cursors.get(i);
+				if (cursor.hasNext())
+				{
+					iterate=false;
+				}
+				else
+				{
+					cursor.reset();
+				}
+				if (cursor.hasNext())
+				{
+					cursor.next();
+				}
 			}
-			this.currentIndex++;
-			this.cursors.get(this.currentIndex).next();
 		}
-		this.rowData=combineCursors();
 	}
 
 	private RowData combineCursors()
+		throws CursorException
 	{
-		return this.rowData;
+		return new CombinedRowData(this.cursors);
 	}
 
 	@Override
 	public void close()
 		throws CursorException
 	{
-		// TODO Auto-generated method stub
-
+		for (Cursor cursor : this.cursors)
+		{
+			cursor.close();
+		}
 	}
 
 	@Override
 	public RowData getRowData()
 		throws CursorException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return this.rowData;
 	}
 
 	@Override
 	public void reset()
 		throws CursorException
 	{
-		// TODO Auto-generated method stub
-
+		for (Cursor cursor : this.cursors)
+		{
+			cursor.close();
+		}
+		this.justReset=true;
 	}
 
 	@Override
 	public Map<String, Integer> getColumnMap()
 		throws CursorException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return this.columnMap;
+	}
+
+	@Override
+	public List<ColumnMetadata> getMetadata()
+		throws CursorException
+	{
+		return this.metadata;
+	}
+
+	@Override
+	public int getNumberOfColumns()
+	{
+		return this.metadata.size();
 	}
 
 	// private class Wrapper implements Comparable<Wrapper>
