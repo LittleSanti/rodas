@@ -54,7 +54,9 @@ public class JoinedSource implements Source
 		EvaluationException,
 		ProviderException
 	{
-		return new JoinedCursor(this.left.execute(engine, provider, context), this.right.execute(engine, provider, context), this.condition, context, this.evaluatorFactory);
+		JoinedCursor cursor=new JoinedCursor(this.left.execute(engine, provider, context), this.right.execute(engine, provider, context), this.condition, this.evaluatorFactory);
+		cursor.initContext(context);
+		return cursor;
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class JoinedSource implements Source
 	{
 		List<String> leftColumns=this.left.getColumnNames(provider);
 		List<String> rightColumns=this.left.getColumnNames(provider);
-		List<String> columnNames=new ArrayList<String>(leftColumns.size() + rightColumns.size());
+		List<String> columnNames=new ArrayList<>(leftColumns.size() + rightColumns.size());
 		columnNames.addAll(leftColumns);
 		columnNames.addAll(rightColumns);
 		return columnNames;

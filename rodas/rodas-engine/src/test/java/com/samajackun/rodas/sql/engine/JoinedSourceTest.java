@@ -5,9 +5,9 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import com.samajackun.rodas.sql.eval.Context;
+import com.samajackun.rodas.sql.eval.DefaultContext;
 import com.samajackun.rodas.sql.eval.EvaluationException;
 import com.samajackun.rodas.sql.eval.EvaluatorFactory;
-import com.samajackun.rodas.sql.eval.MyContext;
 import com.samajackun.rodas.sql.model.BooleanExpression;
 import com.samajackun.rodas.sql.model.Engine;
 import com.samajackun.rodas.sql.model.EngineException;
@@ -27,7 +27,7 @@ public class JoinedSourceTest
 		JoinedSource joinedSource=new JoinedSource(left, right, condition, evaluatorFactory);
 		Engine engine=new MyEngine();
 		MyProvider provider=new MyProvider();
-		Context context=new MyContext();
+		Context context=new DefaultContext(cursors);
 		try
 		{
 			joinedSource.execute(engine, provider, context);

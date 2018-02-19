@@ -14,7 +14,7 @@ import com.samajackun.rodas.sql.eval.MyCursor;
 
 public class TestUtils
 {
-	private static Cursor createCursor()
+	public static Cursor createCursor()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();

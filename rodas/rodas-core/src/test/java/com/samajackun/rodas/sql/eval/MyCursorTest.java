@@ -212,4 +212,35 @@ public class MyCursorTest
 		assertEquals("febrero", rowData.get(1));
 		cursor.close();
 	}
+
+	@Test
+	public void metadataFromEmptyCursor()
+		throws ProviderException,
+		CursorException
+	{
+		MyCursor cursor=createCursor0();
+		List<ColumnMetadata> metadata=cursor.getMetadata();
+		assertEquals(4, metadata.size());
+		ColumnMetadata columnMetadata;
+
+		columnMetadata=metadata.get(0);
+		assertEquals("id", columnMetadata.getName());
+		assertEquals(Datatype.INTEGER_NUMBER, columnMetadata.getDatatype());
+		assertFalse(columnMetadata.isNullable());
+
+		columnMetadata=metadata.get(1);
+		assertEquals("name", columnMetadata.getName());
+		assertEquals(Datatype.TEXT, columnMetadata.getDatatype());
+		assertFalse(columnMetadata.isNullable());
+
+		columnMetadata=metadata.get(2);
+		assertEquals("days", columnMetadata.getName());
+		assertEquals(Datatype.INTEGER_NUMBER, columnMetadata.getDatatype());
+		assertTrue(columnMetadata.isNullable());
+
+		columnMetadata=metadata.get(3);
+		assertEquals("amount", columnMetadata.getName());
+		assertEquals(Datatype.DECIMAL_NUMBER, columnMetadata.getDatatype());
+		assertTrue(columnMetadata.isNullable());
+	}
 }

@@ -14,116 +14,21 @@ import com.samajackun.rodas.sql.model.RowData;
 
 public class MyCursor implements Cursor
 {
-	private enum IterationState {
-		RESET, ITERATING, EXAHUSTED
-	};
+	// private enum IterationState {
+	// RESET, ITERATING, EXAHUSTED
+	// };
 
-	private IterationState iterationState;
+	// private IterationState iterationState;
 
 	public class PrivateRowData implements RowData
 	{
 		@Override
 		public Object get(int column)
 		{
-			return MyCursor.this.srcRowData.get(column);
+			return getSrcRowData().get(column);
 		}
 	}
 
-	// public class ContextFacade implements Context
-	// {
-	//
-	// @Override
-	// public void putSubcontext(String name, Context context)
-	// throws NameAlreadyBoundException
-	// {
-	// throw new IllegalArgumentException();
-	// }
-	//
-	// @Override
-	// public Context getSubcontext(String prefix)
-	// throws ObjectNotBoundException
-	// {
-	// throw new ObjectNotBoundException(prefix, "?");
-	// }
-	//
-	// @Override
-	// public Object lookup(String name)
-	// throws ObjectNotBoundException
-	// {
-	// return getRowData().get(DefaultCursor.this.columnMap.get(name));
-	// }
-	//
-	// @Override
-	// public void bind(String alias, Object value)
-	// throws NameAlreadyBoundException
-	// {
-	// // TODO
-	// }
-	//
-	// @Override
-	// public RowResult getResult()
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Object getParameter(String name)
-	// throws ParameterNotFoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Object getValue(int index)
-	// throws ObjectNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context findIdentifier(String identifier)
-	// throws ObjectNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context fork()
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context addCursor(Cursor cursor)
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context getContextForAlias(String alias)
-	// throws NameNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public int getColumn(String name)
-	// throws NameNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return 0;
-	// }
-	//
-	// }
-	//
-	// private final Context context=new ContextFacade();
 	private final List<ColumnMetadata> metadata;
 
 	private final Map<String, Integer> columnMap;
@@ -135,6 +40,15 @@ public class MyCursor implements Cursor
 	private final RowData rowData=new PrivateRowData();
 
 	private RowData srcRowData;
+
+	private final RowData getSrcRowData()
+	{
+		if (this.srcRowData == null)
+		{
+			throw new IllegalStateException("A previous call to next is required");
+		}
+		return this.srcRowData;
+	}
 
 	public MyCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
 		throws ProviderException
@@ -178,7 +92,7 @@ public class MyCursor implements Cursor
 	public void reset()
 	{
 		this.iterator=this.iterable.iterator();
-		this.iterationState=IterationState.RESET;
+		// this.iterationState=IterationState.RESET;
 		this.srcRowData=null;
 	}
 

@@ -1,7 +1,12 @@
 package com.samajackun.rodas.sql.engine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import static com.samajackun.rodas.sql.engine.CursorsUtils.combineCursors;
+import static com.samajackun.rodas.sql.engine.CursorsUtils.concatMetadata;
+import static com.samajackun.rodas.sql.engine.CursorsUtils.toColumnMap;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,57 +17,9 @@ import com.samajackun.rodas.sql.model.RowData;
 
 public class CrossCursor implements Cursor
 {
-	public class CombinedRowData implements RowData
-	{
-		private final CursorColumn[] map;
-
-		public CombinedRowData(List<Cursor> cursors)
-			throws CursorException
-		{
-			this.map=new CursorColumn[getNumberOfColumns()];
-			int i=0;
-			for (Cursor cursor : cursors)
-			{
-				for (int j=0; j < cursor.getNumberOfColumns(); j++)
-				{
-					this.map[i++]=new CursorColumn(cursor.getRowData(), j);
-				}
-			}
-		}
-
-		@Override
-		public Object get(int column)
-		{
-			CursorColumn cursorColumn=this.map[column];
-			return cursorColumn.getRowData().get(cursorColumn.getColumn());
-		}
-
-		private class CursorColumn
-		{
-			private final RowData rowData;
-
-			private final int column;
-
-			public CursorColumn(RowData rowData, int column)
-			{
-				super();
-				this.rowData=rowData;
-				this.column=column;
-			}
-
-			public RowData getRowData()
-			{
-				return this.rowData;
-			}
-
-			public int getColumn()
-			{
-				return this.column;
-			}
-		}
-	}
-
 	private final List<Cursor> cursors;
+
+	private final Deque<Cursor> cursorsInReverse;
 
 	private final List<ColumnMetadata> metadata;
 
@@ -77,51 +34,14 @@ public class CrossCursor implements Cursor
 	{
 		super();
 		this.cursors=cursors;
+		this.cursorsInReverse=new ArrayDeque<>(cursors.size());
+		for (Cursor cursor : cursors)
+		{
+			this.cursorsInReverse.push(cursor);
+		}
 		this.metadata=concatMetadata(cursors);
 		this.columnMap=toColumnMap(this.metadata);
-		this.rowData=combineCursors();
-	}
-
-	private static List<ColumnMetadata> concatMetadata(List<Cursor> cursors)
-		throws CursorException
-	{
-		int numberOfColumns=0;
-		for (Cursor cursor : cursors)
-		{
-			numberOfColumns+=cursor.getNumberOfColumns();
-		}
-		List<ColumnMetadata> metadata=new ArrayList<>(numberOfColumns);
-		for (Cursor cursor : cursors)
-		{
-			metadata.addAll(cursor.getMetadata());
-		}
-		return metadata;
-	}
-
-	private static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
-	{
-		Map<String, Integer> columnMap=new HashMap<>((int)(1.7d * metadata.size()));
-		int i=0;
-		for (ColumnMetadata column : metadata)
-		{
-			// FIXME Machaca columnas con nombre repetido:
-			columnMap.put(column.getName(), i++);
-		}
-		return columnMap;
-	}
-
-	@Override
-	public boolean hasNext()
-		throws CursorException
-	{
-		boolean hasNext=false;
-		for (int i=this.cursors.size() - 1; i >= 0; i--)
-		{
-			Cursor cursor=this.cursors.get(i);
-			hasNext=hasNext || cursor.hasNext();
-		}
-		return hasNext;
-		// return currentAndAllFollowingHaveNext();
+		this.rowData=combineCursors(this.cursors);
 	}
 
 	// private boolean currentAndAllFollowingHaveNext()
@@ -160,16 +80,79 @@ public class CrossCursor implements Cursor
 	// }
 	// }
 
+	// @Override
+	// public void next()
+	// throws CursorException
+	// {
+	// boolean iterate=true;
+	// if (this.justReset)
+	// {
+	// for (int i=this.cursors.size() - 1; i >= 0; i--)
+	// {
+	// Cursor cursor=this.cursors.get(i);
+	// if (cursor.hasNext())
+	// {
+	// cursor.next();
+	// }
+	// }
+	// this.justReset=false;
+	// }
+	// else
+	// {
+	// for (int i=this.cursors.size() - 1; iterate && i >= 0; i--)
+	// {
+	// Cursor cursor=this.cursors.get(i);
+	// if (cursor.hasNext())
+	// {
+	// iterate=false;
+	// }
+	// else
+	// {
+	// cursor.reset();
+	// }
+	// if (cursor.hasNext())
+	// {
+	// cursor.next();
+	// }
+	// }
+	// }
+	// }
+
+	@Override
+	public boolean hasNext()
+		throws CursorException
+	{
+		boolean hasNext;
+		if (this.justReset)
+		{
+			hasNext=true;
+			for (Iterator<Cursor> iterator=this.cursorsInReverse.iterator(); iterator.hasNext();)
+			{
+				Cursor cursor=iterator.next();
+				hasNext=hasNext && cursor.hasNext();
+			}
+		}
+		else
+		{
+			hasNext=false;
+			for (Iterator<Cursor> iterator=this.cursorsInReverse.iterator(); !hasNext && iterator.hasNext();)
+			{
+				Cursor cursor=iterator.next();
+				hasNext=cursor.hasNext();
+			}
+		}
+		return hasNext;
+	}
+
 	@Override
 	public void next()
 		throws CursorException
 	{
-		boolean iterate=true;
 		if (this.justReset)
 		{
-			for (int i=this.cursors.size() - 1; iterate && i >= 0; i--)
+			for (Iterator<Cursor> iterator=this.cursorsInReverse.iterator(); iterator.hasNext();)
 			{
-				Cursor cursor=this.cursors.get(i);
+				Cursor cursor=iterator.next();
 				if (cursor.hasNext())
 				{
 					cursor.next();
@@ -179,29 +162,24 @@ public class CrossCursor implements Cursor
 		}
 		else
 		{
-			for (int i=this.cursors.size() - 1; iterate && i >= 0; i--)
+			boolean hasNext=false;
+			for (Iterator<Cursor> iterator=this.cursorsInReverse.iterator(); !hasNext && iterator.hasNext();)
 			{
-				Cursor cursor=this.cursors.get(i);
-				if (cursor.hasNext())
+				Cursor cursor=iterator.next();
+				if (hasNext=cursor.hasNext())
 				{
-					iterate=false;
+					cursor.next();
 				}
 				else
 				{
 					cursor.reset();
-				}
-				if (cursor.hasNext())
-				{
-					cursor.next();
+					if (cursor.hasNext())
+					{
+						cursor.next();
+					}
 				}
 			}
 		}
-	}
-
-	private RowData combineCursors()
-		throws CursorException
-	{
-		return new CombinedRowData(this.cursors);
 	}
 
 	@Override

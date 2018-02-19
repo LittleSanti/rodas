@@ -146,6 +146,12 @@ public class DefaultContext implements Context
 		}
 	}
 
+	@Override
+	public void setParameter(String name, Object value)
+	{
+		this.parameters.put(name, value);
+	}
+
 	private class IdentifierCoordinates
 	{
 		private final RowData rowData;

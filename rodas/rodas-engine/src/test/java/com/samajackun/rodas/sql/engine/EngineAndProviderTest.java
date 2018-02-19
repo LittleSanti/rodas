@@ -6,8 +6,8 @@ import org.junit.Test;
 
 import com.samajackun.rodas.sql.RodasSqlException;
 import com.samajackun.rodas.sql.eval.Context;
+import com.samajackun.rodas.sql.eval.DefaultContext;
 import com.samajackun.rodas.sql.eval.EvaluationException;
-import com.samajackun.rodas.sql.eval.MyContext;
 import com.samajackun.rodas.sql.eval.ParameterNotFoundException;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.Engine;
@@ -33,7 +33,7 @@ public class EngineAndProviderTest
 		EvaluationException,
 		ProviderException
 	{
-		Context context=new MyContext();
+		Context context=new DefaultContext();
 		TableSource tableSource=new TableSource("country");
 		Cursor cursor=this.engine.execute(tableSource, this.provider, context);
 		while (cursor.hasNext())
@@ -48,7 +48,7 @@ public class EngineAndProviderTest
 	private void executeQuery(String sql)
 		throws RodasSqlException
 	{
-		executeQuery(sql, new MyContext());
+		executeQuery(sql, new DefaultContext());
 	}
 
 	private void executeQuery(String sql, Context context)
@@ -159,7 +159,7 @@ public class EngineAndProviderTest
 		throws RodasSqlException
 	{
 		String sql="SELECT idCountry, name, area FROM country WHERE idCountry=:ID";
-		MyContext context=new MyContext();
+		DefaultContext context=new DefaultContext();
 		context.putParameter("ID", 2);
 		executeQuery(sql, context);
 	}
@@ -169,7 +169,7 @@ public class EngineAndProviderTest
 		throws RodasSqlException
 	{
 		String sql="SELECT idCountry, name, len(name) FROM (SELECT idCountry, name, area FROM country WHERE idCountry=:ID)";
-		MyContext context=new MyContext();
+		DefaultContext context=new DefaultContext();
 		context.putParameter("ID", 2);
 		executeQuery(sql, context);
 	}

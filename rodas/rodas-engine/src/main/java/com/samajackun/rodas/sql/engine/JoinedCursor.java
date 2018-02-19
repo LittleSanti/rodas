@@ -1,39 +1,54 @@
 package com.samajackun.rodas.sql.engine;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.samajackun.rodas.sql.eval.Context;
 import com.samajackun.rodas.sql.eval.EvaluationException;
 import com.samajackun.rodas.sql.eval.EvaluatorFactory;
 import com.samajackun.rodas.sql.model.BooleanExpression;
+import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.RowData;
 
 public class JoinedCursor implements Cursor
 {
-	private final Cursor left;
-
-	private final Cursor right;
-
 	private final BooleanExpression condition;
 
-	private final Context context;
-
-	private boolean canIterate;
+	private Context context;
 
 	private final EvaluatorFactory evaluatorFactory;
 
 	private boolean closed;
 
-	public JoinedCursor(Cursor left, Cursor right, BooleanExpression condition, Context context, EvaluatorFactory evaluatorFactory) throws CursorException
+	private final CrossCursor crossCursor;
+
+	private boolean canIterate;
+
+	private final MemoryRowData rowData;
+
+	private final Object[] fetched;
+
+	private final Object[] currentRow;
+
+	public JoinedCursor(Cursor left, Cursor right, BooleanExpression condition, EvaluatorFactory evaluatorFactory)
+		throws CursorException
 	{
-		this.left=left;
-		this.right=right;
 		this.condition=condition;
 		this.evaluatorFactory=evaluatorFactory;
-		this.context=context.fork().addCursor(this.left).addCursor(this.right);
-		reset();
+		this.crossCursor=new CrossCursor(Arrays.asList(left, right));
+		this.fetched=new Object[this.crossCursor.getNumberOfColumns()];
+		this.currentRow=new Object[this.crossCursor.getNumberOfColumns()];
+		this.rowData=new MemoryRowData();
+	}
+
+	public void initContext(Context context)
+		throws CursorException
+	{
+		this.context=context;
+		fetch();
 	}
 
 	private void fetch()
@@ -42,27 +57,36 @@ public class JoinedCursor implements Cursor
 		try
 		{
 			boolean x=false;
-			while (!x && this.canIterate)
+			do
 			{
-				this.right.next();
-				x=this.condition.evaluate(this.context, this.evaluatorFactory);
-				if (!this.right.hasNext())
+				fetchRawRow();
+				if (this.canIterate)
 				{
-					if (this.left.hasNext())
-					{
-						this.left.next();
-						this.right.reset();
-					}
-					else
-					{
-						this.canIterate=false;
-					}
+					x=this.condition.evaluate(this.context, this.evaluatorFactory);
 				}
+			}
+			while (!x && this.canIterate);
+			if (x)
+			{
+				load(this.crossCursor.getRowData());
+			}
+			else
+			{
+				this.canIterate=false;
 			}
 		}
 		catch (EvaluationException e)
 		{
 			throw new CursorException(e);
+		}
+	}
+
+	private void fetchRawRow()
+		throws CursorException
+	{
+		if (this.canIterate=this.crossCursor.hasNext())
+		{
+			this.crossCursor.next();
 		}
 	}
 
@@ -87,12 +111,13 @@ public class JoinedCursor implements Cursor
 		throws CursorException
 	{
 		checkOpen();
-		if (!this.canIterate)
+		if (!this.crossCursor.hasNext())
 		{
 			throw new CursorException("Ended");
 		}
 		else
 		{
+			System.arraycopy(this.fetched, 0, this.currentRow, 0, this.fetched.length);
 			fetch();
 		}
 	}
@@ -110,16 +135,14 @@ public class JoinedCursor implements Cursor
 		throws CursorException
 	{
 		checkOpen();
-		// TODO Auto-generated method stub
-		return null;
+		return this.rowData;
 	}
 
 	@Override
 	public Map<String, Integer> getColumnMap()
 		throws CursorException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return this.crossCursor.getColumnMap();
 	}
 
 	@Override
@@ -127,12 +150,42 @@ public class JoinedCursor implements Cursor
 		throws CursorException
 	{
 		checkOpen();
-		this.canIterate=this.left.hasNext() && this.right.hasNext();
-		if (this.canIterate)
+		this.crossCursor.reset();
+	}
+
+	@Override
+	public List<ColumnMetadata> getMetadata()
+		throws CursorException
+	{
+		return this.crossCursor.getMetadata();
+	}
+
+	@Override
+	public int getNumberOfColumns()
+	{
+		return this.crossCursor.getNumberOfColumns();
+	}
+
+	private void load(RowData rowData)
+	{
+		for (int i=0; i < JoinedCursor.this.fetched.length; i++)
 		{
-			this.left.next();
-			this.right.reset();
+			this.fetched[i]=rowData.get(i);
 		}
+	}
+
+	private class MemoryRowData implements RowData
+	{
+		@Override
+		public Object get(int column)
+		{
+			return JoinedCursor.this.currentRow[column];
+		}
+	}
+
+	public Cursor getInnerCursor()
+	{
+		return this.crossCursor;
 	}
 
 }

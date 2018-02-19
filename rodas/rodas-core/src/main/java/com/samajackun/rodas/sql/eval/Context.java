@@ -36,4 +36,5 @@ public interface Context
 	Object getParameter(String name)
 		throws ParameterNotFoundException;
 
+	public void setParameter(String name, Object value);
 }

@@ -3,6 +3,7 @@ package com.samajackun.rodas.sql.engine;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +16,10 @@ import com.samajackun.rodas.sql.eval.IndexNotBoundException;
 import com.samajackun.rodas.sql.eval.MyCursor;
 import com.samajackun.rodas.sql.eval.NameNotBoundException;
 import com.samajackun.rodas.sql.eval.PrefixedColumn;
+import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
+import com.samajackun.rodas.sql.model.Datatype;
 import com.samajackun.rodas.sql.model.IterableTableData;
 import com.samajackun.rodas.sql.model.MyIterableTableData;
 import com.samajackun.rodas.sql.model.ProviderException;
@@ -133,10 +136,6 @@ public class DefaultExecutionContextTest
 	private Cursor createCursor()
 		throws ProviderException
 	{
-		Map<String, Integer> columnMap=new HashMap<>();
-		columnMap.put("id", 0);
-		columnMap.put("name", 1);
-		columnMap.put("days", 2);
 		IterableTableData iterable=new MyIterableTableData(Arrays.asList(new Object[][] {
 			// @formatter:off
 			new Object[] {1,"enero",31},
@@ -154,7 +153,19 @@ public class DefaultExecutionContextTest
 			new Object[] {13,"triciembre",41},
 			// @formatter:on
 		}));
-		Cursor cursor=new MyCursor(columnMap, iterable);
+		List<ColumnMetadata> metadata=createMetadata();
+		Cursor cursor=new MyCursor(metadata, iterable);
 		return cursor;
 	}
+
+	private List<ColumnMetadata> createMetadata()
+	{
+		List<ColumnMetadata> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
+		metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
+		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
+		return metadata;
+	}
+
 }
