@@ -1,5 +1,6 @@
 package com.samajackun.rodas.sql.engine;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -116,13 +117,27 @@ public class DefaultCursor implements Cursor
 
 	private RowData rowData;
 
-	public DefaultCursor(Map<String, Integer> columnMap, IterableTableData iterable)
+	private final List<ColumnMetadata> metadata;
+
+	public DefaultCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
 		throws ProviderException
 	{
 		super();
-		this.columnMap=columnMap;
+		this.metadata=metadata;
+		this.columnMap=toColumnMap(metadata);
 		this.iterable=iterable;
 		this.iterator=iterable.iterator();
+	}
+
+	private static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
+	{
+		Map<String, Integer> map=new HashMap<>((int)(1.7d * metadata.size()));
+		int i=0;
+		for (ColumnMetadata column : metadata)
+		{
+			map.put(column.getName(), i++);
+		}
+		return map;
 	}
 
 	@Override
@@ -165,7 +180,7 @@ public class DefaultCursor implements Cursor
 	public List<ColumnMetadata> getMetadata()
 		throws CursorException
 	{
-		throw new UnsupportedOperationException();
+		return this.metadata;
 	}
 
 	@Override

@@ -16,7 +16,6 @@ import com.samajackun.rodas.sql.model.TableMetadata;
 
 public class MyProvider implements Provider
 {
-
 	@Override
 	public Map<String, Integer> getColumnMapFromTable(String tableName)
 		throws ProviderException
@@ -88,38 +87,58 @@ public class MyProvider implements Provider
 	public Cursor openCursor(String table)
 		throws ProviderException
 	{
-		Map<String, Integer> columnNames=getColumnMapFromTable(table);
 		IterableTableData iterableData=getTableData(table);
-		return new DefaultCursor(columnNames, iterableData);
+		return new DefaultCursor(getColumnsMetadataFromTable(table).getListOfColumnMetadata(), iterableData);
 	}
 
 	@Override
 	public TableMetadata getColumnsMetadataFromTable(String table)
 		throws ProviderException
 	{
-		TableMetadata tableMetadata=new MyTableMetadata();
+		TableMetadata tableMetadata=new MyTableMetadata(table);
 		return tableMetadata;
 	}
 
 	public class MyTableMetadata implements TableMetadata
 	{
-		private final ColumnMetadata[] columns=createColumns();
+		private final String name;
+
+		private final List<ColumnMetadata> columns=createColumns();
+
+		public MyTableMetadata(String name)
+		{
+			super();
+			this.name=name;
+		}
 
 		@Override
 		public ColumnMetadata getColumnMetadata(int column)
 		{
-			return this.columns[column];
+			return this.columns.get(column);
 		}
 
-		private ColumnMetadata[] createColumns()
+		private List<ColumnMetadata> createColumns()
 		{
 			// @formatter:off
 			ColumnMetadata[] columns= {
 				new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false),
 				new ColumnMetadata("name", Datatype.TEXT, true),
+				new ColumnMetadata("area", Datatype.DECIMAL_NUMBER, true),
 			};
 			// @formatter:oh
-			return columns;
+			return Arrays.asList(columns);
+		}
+
+		@Override
+		public String getName()
+		{
+			return this.name;
+		}
+
+		@Override
+		public List<ColumnMetadata> getListOfColumnMetadata()
+		{
+			return this.columns;
 		}
 	}
 }

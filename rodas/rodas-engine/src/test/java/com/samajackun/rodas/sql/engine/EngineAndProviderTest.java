@@ -2,6 +2,8 @@ package com.samajackun.rodas.sql.engine;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 import com.samajackun.rodas.sql.RodasSqlException;
@@ -33,7 +35,7 @@ public class EngineAndProviderTest
 		EvaluationException,
 		ProviderException
 	{
-		Context context=new DefaultContext();
+		Context context=new DefaultContext(Collections.emptyMap());
 		TableSource tableSource=new TableSource("country");
 		Cursor cursor=this.engine.execute(tableSource, this.provider, context);
 		while (cursor.hasNext())
@@ -48,7 +50,7 @@ public class EngineAndProviderTest
 	private void executeQuery(String sql)
 		throws RodasSqlException
 	{
-		executeQuery(sql, new DefaultContext());
+		executeQuery(sql, new DefaultContext(Collections.emptyMap()));
 	}
 
 	private void executeQuery(String sql, Context context)
@@ -159,8 +161,8 @@ public class EngineAndProviderTest
 		throws RodasSqlException
 	{
 		String sql="SELECT idCountry, name, area FROM country WHERE idCountry=:ID";
-		DefaultContext context=new DefaultContext();
-		context.putParameter("ID", 2);
+		DefaultContext context=new DefaultContext(Collections.emptyMap());
+		context.setParameter("ID", 2);
 		executeQuery(sql, context);
 	}
 
@@ -169,8 +171,8 @@ public class EngineAndProviderTest
 		throws RodasSqlException
 	{
 		String sql="SELECT idCountry, name, len(name) FROM (SELECT idCountry, name, area FROM country WHERE idCountry=:ID)";
-		DefaultContext context=new DefaultContext();
-		context.putParameter("ID", 2);
+		DefaultContext context=new DefaultContext(Collections.emptyMap());
+		context.setParameter("ID", 2);
 		executeQuery(sql, context);
 	}
 

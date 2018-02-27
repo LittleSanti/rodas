@@ -1,6 +1,7 @@
 package com.samajackun.rodas.sql.engine;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class JoinedCursor implements Cursor
 {
 	private final BooleanExpression condition;
 
-	private Context context;
+	private final Context context;
 
 	private final EvaluatorFactory evaluatorFactory;
 
@@ -33,7 +34,7 @@ public class JoinedCursor implements Cursor
 
 	private final Object[] currentRow;
 
-	public JoinedCursor(Cursor left, Cursor right, BooleanExpression condition, EvaluatorFactory evaluatorFactory)
+	public JoinedCursor(Cursor left, Cursor right, BooleanExpression condition, EvaluatorFactory evaluatorFactory, Context context)
 		throws CursorException
 	{
 		this.condition=condition;
@@ -42,12 +43,9 @@ public class JoinedCursor implements Cursor
 		this.fetched=new Object[this.crossCursor.getNumberOfColumns()];
 		this.currentRow=new Object[this.crossCursor.getNumberOfColumns()];
 		this.rowData=new MemoryRowData();
-	}
-
-	public void initContext(Context context)
-		throws CursorException
-	{
-		this.context=context;
+		Map<String, Cursor> cursors=new HashMap<>();
+		cursors.put(null, this.crossCursor);
+		this.context=context.fork(cursors);
 		fetch();
 	}
 
@@ -182,10 +180,4 @@ public class JoinedCursor implements Cursor
 			return JoinedCursor.this.currentRow[column];
 		}
 	}
-
-	public Cursor getInnerCursor()
-	{
-		return this.crossCursor;
-	}
-
 }

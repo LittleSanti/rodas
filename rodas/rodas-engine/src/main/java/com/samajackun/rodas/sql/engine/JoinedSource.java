@@ -54,8 +54,9 @@ public class JoinedSource implements Source
 		EvaluationException,
 		ProviderException
 	{
-		JoinedCursor cursor=new JoinedCursor(this.left.execute(engine, provider, context), this.right.execute(engine, provider, context), this.condition, this.evaluatorFactory);
-		cursor.initContext(context);
+		Cursor cursorLeft=this.left.execute(engine, provider, context);
+		Cursor cursorRight=this.right.execute(engine, provider, context);
+		JoinedCursor cursor=new JoinedCursor(cursorLeft, cursorRight, this.condition, this.evaluatorFactory, context);
 		return cursor;
 	}
 

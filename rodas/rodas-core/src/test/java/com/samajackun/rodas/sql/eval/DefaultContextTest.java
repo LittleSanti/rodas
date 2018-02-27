@@ -23,7 +23,8 @@ public class DefaultContextTest
 {
 	@Test
 	public void bindAllColumns()
-		throws ProviderException
+		throws ProviderException,
+		PrefixNotFoundException
 	{
 		Map<String, Cursor> cursors=new HashMap<>();
 		Cursor cursor1=createCursor();
@@ -60,7 +61,8 @@ public class DefaultContextTest
 
 	@Test
 	public void bindOneColumns()
-		throws ProviderException
+		throws ProviderException,
+		PrefixNotFoundException
 	{
 		Map<String, Cursor> cursors=new HashMap<>();
 		Cursor cursor1=createCursor();
@@ -91,7 +93,8 @@ public class DefaultContextTest
 
 	@Test
 	public void bindAllPrefixedColumnsInAliasedCursor()
-		throws ProviderException
+		throws ProviderException,
+		PrefixNotFoundException
 	{
 		Map<String, Cursor> cursors=new HashMap<>();
 		Cursor cursor1=createCursor();

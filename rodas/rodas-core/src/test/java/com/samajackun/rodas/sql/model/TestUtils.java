@@ -11,6 +11,7 @@ import com.samajackun.rodas.sql.eval.ColumnNotFoundException;
 import com.samajackun.rodas.sql.eval.Context;
 import com.samajackun.rodas.sql.eval.DefaultContext;
 import com.samajackun.rodas.sql.eval.MyCursor;
+import com.samajackun.rodas.sql.eval.PrefixNotFoundException;
 
 public class TestUtils
 {
@@ -57,7 +58,7 @@ public class TestUtils
 			cursor1.next();
 			return context;
 		}
-		catch (CursorException | ColumnNotFoundException | ProviderException e)
+		catch (CursorException | ColumnNotFoundException | ProviderException | PrefixNotFoundException e)
 		{
 			throw new ServiceConfigurationError(e.toString(), e);
 		}

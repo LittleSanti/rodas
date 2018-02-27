@@ -1,5 +1,8 @@
 package com.samajackun.rodas.sql.eval;
 
+import java.util.Map;
+
+import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
 
 /**
@@ -15,11 +18,13 @@ public interface Context
 {
 	void bindPublicColumn(String prefix, String column)
 		throws CursorException,
-		ColumnNotFoundException;
+		ColumnNotFoundException,
+		PrefixNotFoundException;
 
 	void bindPrivateColumn(String prefix, String column)
 		throws CursorException,
-		ColumnNotFoundException;
+		ColumnNotFoundException,
+		PrefixNotFoundException;
 
 	Object getColumnByName(String column, String prefix)
 		throws NameNotBoundException;
@@ -36,5 +41,7 @@ public interface Context
 	Object getParameter(String name)
 		throws ParameterNotFoundException;
 
-	public void setParameter(String name, Object value);
+	void setParameter(String name, Object value);
+
+	Context fork(Map<String, Cursor> cursors);
 }

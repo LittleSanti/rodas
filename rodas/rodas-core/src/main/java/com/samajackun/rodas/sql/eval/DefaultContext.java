@@ -12,8 +12,6 @@ import com.samajackun.rodas.sql.model.RowData;
 
 public class DefaultContext implements Context
 {
-	// private final Map<String, RowData> subcontexts=new HashMap<>();
-
 	private final Map<String, IdentifierCoordinates> identifierCoordinatesMap=new HashMap<>();
 
 	private final List<IdentifierCoordinates> identifierCoordinatesIndex=new ArrayList<>();
@@ -28,10 +26,22 @@ public class DefaultContext implements Context
 		this.cursors=cursors;
 	}
 
+	public void addCursor(String name, Cursor cursor)
+		throws NameAlreadyBoundException
+	{
+		Cursor old=this.cursors.put(name, cursor);
+		if (old != null)
+		{
+			throw new NameAlreadyBoundException(name);
+		}
+
+	}
+
 	@Override
 	public void bindPublicColumn(String prefix, String column)
 		throws CursorException,
-		ColumnNotFoundException
+		ColumnNotFoundException,
+		PrefixNotFoundException
 	{
 		IdentifierCoordinates identifierCoordinates=bindColumn(prefix, column);
 		this.identifierCoordinatesIndex.add(identifierCoordinates);
@@ -40,7 +50,8 @@ public class DefaultContext implements Context
 	@Override
 	public void bindPrivateColumn(String prefix, String column)
 		throws CursorException,
-		ColumnNotFoundException
+		ColumnNotFoundException,
+		PrefixNotFoundException
 	{
 		bindColumn(prefix, column);
 	}
@@ -67,12 +78,21 @@ public class DefaultContext implements Context
 
 	private IdentifierCoordinates bindColumn(String prefix, String column)
 		throws ColumnNotFoundException,
-		CursorException
+		CursorException,
+		PrefixNotFoundException
 	{
 		Cursor cursor=(prefix != null)
 			? this.cursors.get(prefix)
 			: lookupColumn(column);
+		if (cursor == null)
+		{
+			throw new PrefixNotFoundException(prefix);
+		}
 		Integer index=cursor.getColumnMap().get(column);
+		if (index == null)
+		{
+			throw new ColumnNotFoundException(column, prefix);
+		}
 		IdentifierCoordinates identifierCoordinates=new IdentifierCoordinates(cursor.getRowData(), index);
 		this.identifierCoordinatesMap.put(column, identifierCoordinates);
 		return identifierCoordinates;
@@ -174,5 +194,11 @@ public class DefaultContext implements Context
 		{
 			return this.columnIndex;
 		}
+	}
+
+	@Override
+	public Context fork(Map<String, Cursor> cursors)
+	{
+		return new CompoundContext(new DefaultContext(cursors), this);
 	}
 }
