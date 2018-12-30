@@ -37,8 +37,12 @@ public class JoinedSource implements Source
 	@Override
 	public String toCode()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return this.left.toCode() + joinTypeToCode() + this.right.toCode() + " ON " + this.condition.toCode();
+	}
+
+	protected String joinTypeToCode()
+	{
+		return " INNER JOIN ";
 	}
 
 	@Override

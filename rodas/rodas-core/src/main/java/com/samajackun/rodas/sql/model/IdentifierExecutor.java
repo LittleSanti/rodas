@@ -31,7 +31,14 @@ public class IdentifierExecutor extends AbstractExecutor
 	public Object evaluate()
 		throws EvaluationException
 	{
-		return getContext().getColumnByIndex(this.index);
+		try
+		{
+			return getContext().getColumnByIndex(this.index);
+		}
+		catch (CursorException e)
+		{
+			throw new EvaluationException(e);
+		}
 	}
 
 	@Override

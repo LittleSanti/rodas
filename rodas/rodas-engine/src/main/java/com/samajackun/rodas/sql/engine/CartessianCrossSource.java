@@ -17,7 +17,7 @@ import com.samajackun.rodas.sql.model.Source;
 
 public class CartessianCrossSource implements Source
 {
-	private final List<Source> sources=new ArrayList<Source>();
+	private final List<Source> sources=new ArrayList<>();
 
 	// private enum IterationAction {
 	// KEEP, ITERATE, RESET
@@ -60,7 +60,7 @@ public class CartessianCrossSource implements Source
 		throws ProviderException
 	{
 		int totalSize=0;
-		List<List<String>> allColumnNames=new ArrayList<List<String>>(this.sources.size());
+		List<List<String>> allColumnNames=new ArrayList<>(this.sources.size());
 		for (Source source : this.sources)
 		{
 			List<String> c=source.getColumnNames(provider);

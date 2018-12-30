@@ -5,9 +5,9 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.samajackun.rodas.sql.context.TestUtils;
 import com.samajackun.rodas.sql.model.BooleanConstantExpression;
 import com.samajackun.rodas.sql.model.NotExpression;
-import com.samajackun.rodas.sql.model.TestUtils;
 
 public class MyLogicalEvaluatorTest
 {

@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 import com.samajackun.rodas.sql.model.AliasedExpression;
 import com.samajackun.rodas.sql.model.BooleanConstantExpression;
+import com.samajackun.rodas.sql.model.CursorException;
 import com.samajackun.rodas.sql.model.Datatype;
 import com.samajackun.rodas.sql.model.DatetimeConstantExpression;
 import com.samajackun.rodas.sql.model.Expression;
@@ -25,12 +26,19 @@ public class MyBaseEvaluator extends AbstractEvaluator implements BaseEvaluator
 	public Object evaluate(Context context, IdentifierExpression expression)
 		throws EvaluationException
 	{
-		Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
-		if (value == null)
+		try
 		{
-			throw new NameNotBoundException(expression.getIdentifier(), expression.getPrefix());
+			Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
+			if (value == null)
+			{
+				throw new NameNotBoundException(expression.getIdentifier(), expression.getPrefix());
+			}
+			return value;
 		}
-		return value;
+		catch (CursorException e)
+		{
+			throw new EvaluationException(e);
+		}
 	}
 
 	@Override
@@ -94,7 +102,7 @@ public class MyBaseEvaluator extends AbstractEvaluator implements BaseEvaluator
 			Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
 			return guessDatatype(value);
 		}
-		catch (NameNotBoundException e)
+		catch (NameNotBoundException | CursorException e)
 		{
 			throw new MetadataException(e);
 		}

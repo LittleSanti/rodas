@@ -5,9 +5,9 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.samajackun.rodas.sql.context.TestUtils;
 import com.samajackun.rodas.sql.model.FunctionExpression;
 import com.samajackun.rodas.sql.model.NumericConstantExpression;
-import com.samajackun.rodas.sql.model.TestUtils;
 import com.samajackun.rodas.sql.model.TextConstantExpression;
 
 public class MyFunctionEvaluatorTest

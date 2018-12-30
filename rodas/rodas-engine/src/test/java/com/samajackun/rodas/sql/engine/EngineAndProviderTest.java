@@ -7,13 +7,14 @@ import java.util.Collections;
 import org.junit.Test;
 
 import com.samajackun.rodas.sql.RodasSqlException;
-import com.samajackun.rodas.sql.eval.Context;
-import com.samajackun.rodas.sql.eval.DefaultContext;
+import com.samajackun.rodas.sql.context.Context;
+import com.samajackun.rodas.sql.context.DefaultBuildingContext;
 import com.samajackun.rodas.sql.eval.EvaluationException;
 import com.samajackun.rodas.sql.eval.ParameterNotFoundException;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.Engine;
 import com.samajackun.rodas.sql.model.EngineException;
+import com.samajackun.rodas.sql.model.MyProvider;
 import com.samajackun.rodas.sql.model.Provider;
 import com.samajackun.rodas.sql.model.ProviderException;
 import com.samajackun.rodas.sql.model.RowData;
@@ -35,7 +36,7 @@ public class EngineAndProviderTest
 		EvaluationException,
 		ProviderException
 	{
-		Context context=new DefaultContext(Collections.emptyMap());
+		Context context=new DefaultBuildingContext(Collections.emptyMap());
 		TableSource tableSource=new TableSource("country");
 		Cursor cursor=this.engine.execute(tableSource, this.provider, context);
 		while (cursor.hasNext())
@@ -50,7 +51,7 @@ public class EngineAndProviderTest
 	private void executeQuery(String sql)
 		throws RodasSqlException
 	{
-		executeQuery(sql, new DefaultContext(Collections.emptyMap()));
+		executeQuery(sql, new DefaultBuildingContext(Collections.emptyMap()));
 	}
 
 	private void executeQuery(String sql, Context context)
@@ -161,7 +162,7 @@ public class EngineAndProviderTest
 		throws RodasSqlException
 	{
 		String sql="SELECT idCountry, name, area FROM country WHERE idCountry=:ID";
-		DefaultContext context=new DefaultContext(Collections.emptyMap());
+		DefaultBuildingContext context=new DefaultBuildingContext(Collections.emptyMap());
 		context.setParameter("ID", 2);
 		executeQuery(sql, context);
 	}
@@ -171,7 +172,7 @@ public class EngineAndProviderTest
 		throws RodasSqlException
 	{
 		String sql="SELECT idCountry, name, len(name) FROM (SELECT idCountry, name, area FROM country WHERE idCountry=:ID)";
-		DefaultContext context=new DefaultContext(Collections.emptyMap());
+		DefaultBuildingContext context=new DefaultBuildingContext(Collections.emptyMap());
 		context.setParameter("ID", 2);
 		executeQuery(sql, context);
 	}

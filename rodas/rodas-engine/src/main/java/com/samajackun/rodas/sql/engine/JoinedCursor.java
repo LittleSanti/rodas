@@ -1,13 +1,13 @@
 package com.samajackun.rodas.sql.engine;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.samajackun.rodas.sql.eval.Context;
 import com.samajackun.rodas.sql.eval.EvaluationException;
 import com.samajackun.rodas.sql.eval.EvaluatorFactory;
+import com.samajackun.rodas.sql.eval.MapList;
 import com.samajackun.rodas.sql.model.BooleanExpression;
 import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
@@ -43,9 +43,9 @@ public class JoinedCursor implements Cursor
 		this.fetched=new Object[this.crossCursor.getNumberOfColumns()];
 		this.currentRow=new Object[this.crossCursor.getNumberOfColumns()];
 		this.rowData=new MemoryRowData();
-		Map<String, Cursor> cursors=new HashMap<>();
+		MapList<String, Cursor> cursors=new MapList<>();
 		cursors.put(null, this.crossCursor);
-		this.context=context.fork(cursors);
+		this.context=context;
 		fetch();
 	}
 

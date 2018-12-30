@@ -1,5 +1,6 @@
 package com.samajackun.rodas.sql.eval;
 
+
 import com.samajackun.rodas.sql.model.Expression;
 
 public interface RelationalEvaluator

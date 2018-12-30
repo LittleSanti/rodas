@@ -1,16 +1,9 @@
-package com.samajackun.rodas.sql.engine;
+package com.samajackun.rodas.sql.model;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.samajackun.rodas.sql.model.ColumnMetadata;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.CursorException;
-import com.samajackun.rodas.sql.model.IterableTableData;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.RowData;
 
 public class DefaultCursor implements Cursor
 {

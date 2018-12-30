@@ -1,18 +1,9 @@
-package com.samajackun.rodas.sql.engine;
+package com.samajackun.rodas.sql.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.samajackun.rodas.sql.model.ColumnMetadata;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.Datatype;
-import com.samajackun.rodas.sql.model.IterableTableData;
-import com.samajackun.rodas.sql.model.Provider;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.TableData;
-import com.samajackun.rodas.sql.model.TableMetadata;
 
 public class MyProvider implements Provider
 {
@@ -28,6 +19,9 @@ public class MyProvider implements Provider
 				break;
 			case "city":
 				columns=map(Arrays.asList("idCity", "idCountry", "name"));
+				break;
+			case "month":
+				columns=map(Arrays.asList("id", "name", "days"));
 				break;
 			default:
 				throw new ProviderException("Table '" + tableName + "' not found");
@@ -76,6 +70,24 @@ public class MyProvider implements Provider
 				break;
 			case "city":
 				tableData=new MyTableData(Arrays.asList(cityToArray(1, 1, "madrid"), cityToArray(2, 1, "bibo"), cityToArray(3, 1, "zevilla"), cityToArray(1, 2, "lisboa"), cityToArray(2, 2, "são vicente")));
+				break;
+			case "month":
+				tableData=new MyTableData(Arrays.asList(
+				// @formatter:off
+					new Object[] {1,"enero",31},
+					new Object[] {2,"febrero",28},
+					new Object[] {3,"marzo",31},
+					new Object[] {4,"abril",30},
+					new Object[] {5,"mayo",31},
+					new Object[] {6,"junio",30},
+					new Object[] {7,"julio",31},
+					new Object[] {8,"agosto",31},
+					new Object[] {9,"septiembre",30},
+					new Object[] {10,"octubre",31},
+					new Object[] {11,"noviembre",30},
+					new Object[] {12,"diciembre",31},
+					new Object[] {13,"triciembre",41}));
+				// @formatter:on
 				break;
 			default:
 				throw new ProviderException("Table '" + table + "' not found");

@@ -21,5 +21,4 @@ public interface Provider
 
 	public TableMetadata getColumnsMetadataFromTable(String table)
 		throws ProviderException;
-
 }

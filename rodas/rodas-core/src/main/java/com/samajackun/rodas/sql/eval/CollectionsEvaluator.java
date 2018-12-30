@@ -2,6 +2,7 @@ package com.samajackun.rodas.sql.eval;
 
 import java.util.List;
 
+
 import com.samajackun.rodas.sql.model.Expression;
 
 public interface CollectionsEvaluator

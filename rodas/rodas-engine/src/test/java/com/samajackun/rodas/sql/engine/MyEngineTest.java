@@ -12,6 +12,7 @@ import com.samajackun.rodas.sql.eval.Context;
 import com.samajackun.rodas.sql.eval.EvaluationException;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.EngineException;
+import com.samajackun.rodas.sql.model.MyProvider;
 import com.samajackun.rodas.sql.model.Provider;
 import com.samajackun.rodas.sql.model.ProviderException;
 import com.samajackun.rodas.sql.model.TableSource;

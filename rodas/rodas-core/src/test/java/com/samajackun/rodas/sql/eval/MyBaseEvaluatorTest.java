@@ -4,12 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ServiceConfigurationError;
 
 import org.junit.Test;
 
+import com.samajackun.rodas.sql.context.TestUtils;
 import com.samajackun.rodas.sql.model.BooleanConstantExpression;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.CursorException;
@@ -17,8 +16,6 @@ import com.samajackun.rodas.sql.model.IdentifierExpression;
 import com.samajackun.rodas.sql.model.NamedParameterExpression;
 import com.samajackun.rodas.sql.model.NullConstantExpression;
 import com.samajackun.rodas.sql.model.NumericConstantExpression;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.TestUtils;
 import com.samajackun.rodas.sql.model.TextConstantExpression;
 
 public class MyBaseEvaluatorTest
@@ -93,12 +90,14 @@ public class MyBaseEvaluatorTest
 	public void evaluateExistingIdentifierExpression()
 	{
 		Context context=TestUtils.createContext();
+		Cursor cursor1=context.getCursors().get(0);
 		IdentifierExpression expression=new IdentifierExpression("name");
 		try
 		{
+			cursor1.next();
 			assertEquals("enero", this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression));
 		}
-		catch (EvaluationException e)
+		catch (EvaluationException | CursorException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());
@@ -148,23 +147,17 @@ public class MyBaseEvaluatorTest
 	{
 		try
 		{
-			Map<String, Cursor> cursors=new HashMap<>();
-			Cursor cursor1=TestUtils.createCursor();
-			cursors.put("mes", cursor1);
-			DefaultContext context=new DefaultContext(cursors);
-			context.bindPublicColumn(null, "id");
-			context.bindPublicColumn(null, "name");
-			context.bindPublicColumn(null, "days");
-
-			IdentifierExpression expression=new IdentifierExpression("mes", "name");
+			Context context=TestUtils.createContext();
+			Cursor cursor1=context.getCursors().get(0);
 			cursor1.next();
+			IdentifierExpression expression=new IdentifierExpression("mes", "name");
 			assertEquals("enero", this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression));
 		}
-		catch (CursorException | ColumnNotFoundException | ProviderException e)
+		catch (ColumnNotFoundException e)
 		{
 			throw new ServiceConfigurationError(e.toString(), e);
 		}
-		catch (EvaluationException e)
+		catch (EvaluationException | CursorException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());
@@ -176,13 +169,8 @@ public class MyBaseEvaluatorTest
 	{
 		try
 		{
-			Map<String, Cursor> cursors=new HashMap<>();
-			Cursor cursor1=TestUtils.createCursor();
-			cursors.put("mes", cursor1);
-			DefaultContext context=new DefaultContext(cursors);
-			context.bindPublicColumn(null, "id");
-			context.bindPublicColumn(null, "name");
-			context.bindPublicColumn(null, "days");
+			Context context=TestUtils.createContext();
+			Cursor cursor1=context.getCursors().get(0);
 
 			IdentifierExpression expression=new IdentifierExpression("name");
 			cursor1.next();
@@ -192,7 +180,7 @@ public class MyBaseEvaluatorTest
 			cursor1.next();
 			assertEquals("marzo", this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression));
 		}
-		catch (CursorException | ColumnNotFoundException | ProviderException e)
+		catch (CursorException | ColumnNotFoundException e)
 		{
 			throw new ServiceConfigurationError(e.toString(), e);
 		}
@@ -206,7 +194,7 @@ public class MyBaseEvaluatorTest
 	@Test
 	public void evaluateExistingParameterExpression()
 	{
-		DefaultContext context=(DefaultContext)TestUtils.createContext();
+		Context context=TestUtils.createContext();
 		context.setParameter("dia", "lunes");
 		NamedParameterExpression expression=new NamedParameterExpression("dia");
 		try

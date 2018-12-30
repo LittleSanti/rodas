@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import com.samajackun.rodas.sql.context.TestUtils;
 import com.samajackun.rodas.sql.eval.Context;
 import com.samajackun.rodas.sql.eval.EvaluatorFactory;
 import com.samajackun.rodas.sql.eval.MyEvaluatorFactory;

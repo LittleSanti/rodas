@@ -11,6 +11,7 @@ import com.samajackun.rodas.sql.model.AliasedExpression;
 import com.samajackun.rodas.sql.model.ColumnMetadata;
 import com.samajackun.rodas.sql.model.Cursor;
 import com.samajackun.rodas.sql.model.Datatype;
+import com.samajackun.rodas.sql.model.DefaultCursor;
 import com.samajackun.rodas.sql.model.Engine;
 import com.samajackun.rodas.sql.model.EngineException;
 import com.samajackun.rodas.sql.model.IterableTableData;

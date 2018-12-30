@@ -35,7 +35,7 @@ public interface Source extends Codeable
 		throws ProviderException
 	{
 		List<String> names=getColumnNames(provider);
-		Map<String, Integer> map=new HashMap<String, Integer>((int)(1.7d * names.size()));
+		Map<String, Integer> map=new HashMap<>((int)(1.7d * names.size()));
 		AtomicInteger index=new AtomicInteger(-1);
 		names.stream().forEachOrdered(s -> map.put(s, index.incrementAndGet()));
 		return map;
