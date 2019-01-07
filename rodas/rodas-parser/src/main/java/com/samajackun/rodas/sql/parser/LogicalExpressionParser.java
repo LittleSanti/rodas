@@ -1,14 +1,14 @@
 package com.samajackun.rodas.sql.parser;
 
-import com.samajackun.rodas.sql.model.AndExpression;
-import com.samajackun.rodas.sql.model.BetweenExpression;
-import com.samajackun.rodas.sql.model.BinaryExpressionsFactories;
-import com.samajackun.rodas.sql.model.ExistsExpression;
-import com.samajackun.rodas.sql.model.Expression;
-import com.samajackun.rodas.sql.model.IExpressionFactory;
-import com.samajackun.rodas.sql.model.NotExpression;
-import com.samajackun.rodas.sql.model.NullConstantExpression;
-import com.samajackun.rodas.sql.model.OrExpression;
+import com.samajackun.rodas.core.model.AndExpression;
+import com.samajackun.rodas.core.model.BetweenExpression;
+import com.samajackun.rodas.core.model.BinaryExpressionsFactories;
+import com.samajackun.rodas.core.model.ExistsExpression;
+import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.IExpressionFactory;
+import com.samajackun.rodas.core.model.NotExpression;
+import com.samajackun.rodas.core.model.NullConstantExpression;
+import com.samajackun.rodas.core.model.OrExpression;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
 import com.samajackun.rodas.sql.parser.tokenizer.UnexpectedTokenException;

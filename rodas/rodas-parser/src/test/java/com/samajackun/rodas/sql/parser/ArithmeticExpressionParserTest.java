@@ -6,21 +6,21 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.eval.EvaluationException;
-import com.samajackun.rodas.sql.eval.EvaluatorFactory;
-import com.samajackun.rodas.sql.eval.MyEvaluatorFactory;
-import com.samajackun.rodas.sql.model.AddExpression;
-import com.samajackun.rodas.sql.model.AsteriskExpression;
-import com.samajackun.rodas.sql.model.BinaryExpression;
-import com.samajackun.rodas.sql.model.BooleanConstantExpression;
-import com.samajackun.rodas.sql.model.ConstantExpression;
-import com.samajackun.rodas.sql.model.Expression;
-import com.samajackun.rodas.sql.model.IdentifierExpression;
-import com.samajackun.rodas.sql.model.MultiplyExpression;
-import com.samajackun.rodas.sql.model.NumericConstantExpression;
-import com.samajackun.rodas.sql.model.ParehentesizedExpression;
-import com.samajackun.rodas.sql.model.UnitExpression;
-import com.samajackun.rodas.sql.model.UnitMinusExpression;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
+import com.samajackun.rodas.core.model.AddExpression;
+import com.samajackun.rodas.core.model.AsteriskExpression;
+import com.samajackun.rodas.core.model.BinaryExpression;
+import com.samajackun.rodas.core.model.BooleanConstantExpression;
+import com.samajackun.rodas.core.model.ConstantExpression;
+import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.IdentifierExpression;
+import com.samajackun.rodas.core.model.MultiplyExpression;
+import com.samajackun.rodas.core.model.NumericConstantExpression;
+import com.samajackun.rodas.core.model.ParehentesizedExpression;
+import com.samajackun.rodas.core.model.UnitExpression;
+import com.samajackun.rodas.core.model.UnitMinusExpression;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.PushBackTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
@@ -353,7 +353,7 @@ public class ArithmeticExpressionParserTest
 		String src="12+1";
 		Expression expression=parseAddingExpression(src);
 		assertTrue(expression instanceof AddExpression);
-		EvaluatorFactory evaluatorFactory=new MyEvaluatorFactory();
+		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		try
 		{
 			expression=expression.reduce(evaluatorFactory);

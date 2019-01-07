@@ -1,7 +1,7 @@
 package com.samajackun.rodas.sql.parser;
 
-import com.samajackun.rodas.sql.model.Expression;
-import com.samajackun.rodas.sql.model.ExpressionList;
+import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.ExpressionList;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
 

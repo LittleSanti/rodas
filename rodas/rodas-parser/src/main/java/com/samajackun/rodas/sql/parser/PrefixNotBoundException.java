@@ -1,6 +1,6 @@
 package com.samajackun.rodas.sql.parser;
 
-import com.samajackun.rodas.sql.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.EvaluationException;
 
 public class PrefixNotBoundException extends EvaluationException
 {

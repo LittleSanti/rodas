@@ -10,10 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.sql.model.ColumnMetadata;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.CursorException;
-import com.samajackun.rodas.sql.model.RowData;
+import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.model.RowData;
 
 public class CrossCursor implements Cursor
 {

@@ -2,9 +2,9 @@ package com.samajackun.rodas.sql.engine;
 
 import java.util.List;
 
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.CursorException;
-import com.samajackun.rodas.sql.model.RowData;
+import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.model.RowData;
 
 class CombinedRowData implements RowData
 {

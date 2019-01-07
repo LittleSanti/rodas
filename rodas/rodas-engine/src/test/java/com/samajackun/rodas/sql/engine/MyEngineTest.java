@@ -8,14 +8,14 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.eval.Context;
-import com.samajackun.rodas.sql.eval.EvaluationException;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.EngineException;
-import com.samajackun.rodas.sql.model.MyProvider;
-import com.samajackun.rodas.sql.model.Provider;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.TableSource;
+import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.model.EngineException;
+import com.samajackun.rodas.core.model.MyProvider;
+import com.samajackun.rodas.core.model.Provider;
+import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.TableSource;
 
 public class MyEngineTest
 {

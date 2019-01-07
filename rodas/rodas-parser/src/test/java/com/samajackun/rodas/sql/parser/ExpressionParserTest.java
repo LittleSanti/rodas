@@ -5,12 +5,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.model.ConstantExpression;
-import com.samajackun.rodas.sql.model.Expression;
-import com.samajackun.rodas.sql.model.ExpressionList;
-import com.samajackun.rodas.sql.model.FunctionExpression;
-import com.samajackun.rodas.sql.model.IdentifierExpression;
-import com.samajackun.rodas.sql.model.ParehentesizedExpression;
+import com.samajackun.rodas.core.model.ConstantExpression;
+import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.ExpressionList;
+import com.samajackun.rodas.core.model.FunctionExpression;
+import com.samajackun.rodas.core.model.IdentifierExpression;
+import com.samajackun.rodas.core.model.ParehentesizedExpression;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.PushBackTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;

@@ -12,14 +12,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.eval.MyCursor;
-import com.samajackun.rodas.sql.model.ColumnMetadata;
-import com.samajackun.rodas.sql.model.CursorException;
-import com.samajackun.rodas.sql.model.Datatype;
-import com.samajackun.rodas.sql.model.IterableTableData;
-import com.samajackun.rodas.sql.model.MyIterableTableData;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.RowData;
+import com.samajackun.rodas.core.eval.MyCursor;
+import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.model.Datatype;
+import com.samajackun.rodas.core.model.IterableTableData;
+import com.samajackun.rodas.core.model.MyIterableTableData;
+import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.RowData;
 
 public class CrossCursorTest
 {

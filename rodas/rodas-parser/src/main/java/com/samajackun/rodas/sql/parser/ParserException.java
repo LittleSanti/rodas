@@ -1,8 +1,8 @@
 package com.samajackun.rodas.sql.parser;
 
-import com.samajackun.rodas.sql.RodasSqlException;
+import com.samajackun.rodas.core.RodasException;
 
-public class ParserException extends RodasSqlException
+public class ParserException extends RodasException
 {
 	private static final long serialVersionUID=8467630853778732936L;
 

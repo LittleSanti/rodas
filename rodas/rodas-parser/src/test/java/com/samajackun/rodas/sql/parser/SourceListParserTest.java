@@ -9,15 +9,15 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.model.AliasedSource;
-import com.samajackun.rodas.sql.model.EqualsExpression;
-import com.samajackun.rodas.sql.model.GreaterThanExpression;
-import com.samajackun.rodas.sql.model.IdentifierExpression;
-import com.samajackun.rodas.sql.model.OnJoinedSource;
-import com.samajackun.rodas.sql.model.ParehentesizedSource;
-import com.samajackun.rodas.sql.model.Source;
-import com.samajackun.rodas.sql.model.TableSource;
-import com.samajackun.rodas.sql.model.UsingJoinedSource;
+import com.samajackun.rodas.core.model.AliasedSource;
+import com.samajackun.rodas.core.model.EqualsExpression;
+import com.samajackun.rodas.core.model.GreaterThanExpression;
+import com.samajackun.rodas.core.model.IdentifierExpression;
+import com.samajackun.rodas.core.model.OnJoinedSource;
+import com.samajackun.rodas.core.model.ParehentesizedSource;
+import com.samajackun.rodas.core.model.Source;
+import com.samajackun.rodas.core.model.TableSource;
+import com.samajackun.rodas.core.model.UsingJoinedSource;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.PushBackTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;

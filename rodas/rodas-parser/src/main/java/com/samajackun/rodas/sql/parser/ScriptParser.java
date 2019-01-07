@@ -3,9 +3,9 @@ package com.samajackun.rodas.sql.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.samajackun.rodas.sql.model.SelectSentence;
-import com.samajackun.rodas.sql.model.Sentence;
-import com.samajackun.rodas.sql.model.WithDeclaration;
+import com.samajackun.rodas.core.model.SelectSentence;
+import com.samajackun.rodas.core.model.Sentence;
+import com.samajackun.rodas.core.model.WithDeclaration;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.PushBackTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;

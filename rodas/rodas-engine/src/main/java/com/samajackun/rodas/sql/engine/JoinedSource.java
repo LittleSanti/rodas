@@ -3,18 +3,18 @@ package com.samajackun.rodas.sql.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.samajackun.rodas.sql.eval.Context;
-import com.samajackun.rodas.sql.eval.EvaluationException;
-import com.samajackun.rodas.sql.eval.EvaluatorFactory;
-import com.samajackun.rodas.sql.model.BooleanExpression;
-import com.samajackun.rodas.sql.model.ColumnMetadata;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.Engine;
-import com.samajackun.rodas.sql.model.EngineException;
-import com.samajackun.rodas.sql.model.MetadataException;
-import com.samajackun.rodas.sql.model.Provider;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.Source;
+import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.model.BooleanExpression;
+import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.model.Engine;
+import com.samajackun.rodas.core.model.EngineException;
+import com.samajackun.rodas.core.model.MetadataException;
+import com.samajackun.rodas.core.model.Provider;
+import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.Source;
 
 public class JoinedSource implements Source
 {

@@ -13,29 +13,29 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.context.DefaultBuildingContext;
-import com.samajackun.rodas.sql.eval.ColumnNotFoundException;
-import com.samajackun.rodas.sql.eval.Context;
-import com.samajackun.rodas.sql.eval.EvaluatorFactory;
-import com.samajackun.rodas.sql.eval.MapList;
-import com.samajackun.rodas.sql.eval.MyCursor;
-import com.samajackun.rodas.sql.eval.MyEvaluatorFactory;
-import com.samajackun.rodas.sql.eval.PrefixNotFoundException;
-import com.samajackun.rodas.sql.model.BooleanExpression;
-import com.samajackun.rodas.sql.model.ColumnMetadata;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.CursorException;
-import com.samajackun.rodas.sql.model.Datatype;
-import com.samajackun.rodas.sql.model.EqualsExpression;
-import com.samajackun.rodas.sql.model.IdentifierExpression;
-import com.samajackun.rodas.sql.model.IterableTableData;
-import com.samajackun.rodas.sql.model.MyIterableTableData;
-import com.samajackun.rodas.sql.model.MyProvider;
-import com.samajackun.rodas.sql.model.Provider;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.RowData;
-import com.samajackun.rodas.sql.model.Source;
-import com.samajackun.rodas.sql.model.TableSource;
+import com.samajackun.rodas.core.context.DefaultBuildingContext;
+import com.samajackun.rodas.core.eval.ColumnNotFoundException;
+import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.MapList;
+import com.samajackun.rodas.core.eval.MyCursor;
+import com.samajackun.rodas.core.eval.PrefixNotFoundException;
+import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
+import com.samajackun.rodas.core.model.BooleanExpression;
+import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.model.Datatype;
+import com.samajackun.rodas.core.model.EqualsExpression;
+import com.samajackun.rodas.core.model.IdentifierExpression;
+import com.samajackun.rodas.core.model.IterableTableData;
+import com.samajackun.rodas.core.model.MyIterableTableData;
+import com.samajackun.rodas.core.model.MyProvider;
+import com.samajackun.rodas.core.model.Provider;
+import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.RowData;
+import com.samajackun.rodas.core.model.Source;
+import com.samajackun.rodas.core.model.TableSource;
 
 public class JoinedCursorTest
 {
@@ -157,7 +157,7 @@ public class JoinedCursorTest
 		PrefixNotFoundException
 	{
 		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("month_id"), new IdentifierExpression("day_id"));
-		EvaluatorFactory evaluatorFactory=new MyEvaluatorFactory();
+		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		Map<String, Cursor> cursors=new HashMap<>();
 		cursors.put("x1", createCursor1());
 		cursors.put("x2", createCursor2());
@@ -230,7 +230,7 @@ public class JoinedCursorTest
 		PrefixNotFoundException
 	{
 		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("month_id"), new IdentifierExpression("day_id"));
-		EvaluatorFactory evaluatorFactory=new MyEvaluatorFactory();
+		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		Map<String, Cursor> cursors=new HashMap<>();
 		cursors.put("x1", createCursor0());
 		cursors.put("x2", createCursor2());
@@ -309,7 +309,7 @@ public class JoinedCursorTest
 		PrefixNotFoundException
 	{
 		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("month_id"), new IdentifierExpression("day_id"));
-		EvaluatorFactory evaluatorFactory=new MyEvaluatorFactory();
+		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		MapList<String, Cursor> cursorMap=new MapList<>();
 		Cursor cursor1=createCursor2();
 		Cursor cursor2=createCursor0();

@@ -1,0 +1,18 @@
+package com.samajackun.rodas.core.model;
+
+public class Operator
+{
+	private final String image;
+
+	public Operator(String image)
+	{
+		super();
+		this.image=image;
+	}
+
+	public String getImage()
+	{
+		return this.image;
+	}
+
+}

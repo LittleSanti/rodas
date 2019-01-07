@@ -2,24 +2,24 @@ package com.samajackun.rodas.sql.engine;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Collections;
-
 import org.junit.Test;
 
-import com.samajackun.rodas.sql.RodasSqlException;
-import com.samajackun.rodas.sql.context.Context;
-import com.samajackun.rodas.sql.context.DefaultBuildingContext;
-import com.samajackun.rodas.sql.eval.EvaluationException;
-import com.samajackun.rodas.sql.eval.ParameterNotFoundException;
-import com.samajackun.rodas.sql.model.Cursor;
-import com.samajackun.rodas.sql.model.Engine;
-import com.samajackun.rodas.sql.model.EngineException;
-import com.samajackun.rodas.sql.model.MyProvider;
-import com.samajackun.rodas.sql.model.Provider;
-import com.samajackun.rodas.sql.model.ProviderException;
-import com.samajackun.rodas.sql.model.RowData;
-import com.samajackun.rodas.sql.model.SelectSentence;
-import com.samajackun.rodas.sql.model.TableSource;
+import com.samajackun.rodas.core.RodasException;
+import com.samajackun.rodas.core.context.DefaultBuildingContext;
+import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.MapList;
+import com.samajackun.rodas.core.eval.ParameterNotFoundException;
+import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.model.Engine;
+import com.samajackun.rodas.core.model.EngineException;
+import com.samajackun.rodas.core.model.MyProvider;
+import com.samajackun.rodas.core.model.Provider;
+import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.RowData;
+import com.samajackun.rodas.core.model.SelectSentence;
+import com.samajackun.rodas.core.model.Source;
+import com.samajackun.rodas.core.model.TableSource;
 import com.samajackun.rodas.sql.parser.SelectSentenceParser;
 import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
 import com.samajackun.rodas.sql.parser.tokenizer.SqlTokenizer;
@@ -30,13 +30,19 @@ public class EngineAndProviderTest
 
 	private final Provider provider=new MyProvider();
 
+	private Context createContext()
+	{
+		MapList<String, Source> sources=new MapList<>();
+		return new DefaultBuildingContext(this.provider, sources);
+	}
+
 	@Test
 	public void executeTable()
 		throws EngineException,
 		EvaluationException,
 		ProviderException
 	{
-		Context context=new DefaultBuildingContext(Collections.emptyMap());
+		Context context=createContext();
 		TableSource tableSource=new TableSource("country");
 		Cursor cursor=this.engine.execute(tableSource, this.provider, context);
 		while (cursor.hasNext())
@@ -49,13 +55,13 @@ public class EngineAndProviderTest
 	}
 
 	private void executeQuery(String sql)
-		throws RodasSqlException
+		throws RodasException
 	{
-		executeQuery(sql, new DefaultBuildingContext(Collections.emptyMap()));
+		executeQuery(sql, createContext());
 	}
 
 	private void executeQuery(String sql, Context context)
-		throws RodasSqlException
+		throws RodasException
 	{
 		SelectSentence source=SelectSentenceParser.getInstance().parse(new ParserTokenizer(new SqlTokenizer(sql)));
 		Cursor cursor=this.engine.execute(source, this.provider, context);
@@ -72,7 +78,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQuery()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT idCountry, name, 120 FROM country";
 		executeQuery(sql);
@@ -80,7 +86,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithAliasedColumns()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT c.idCountry, c.name, 120 FROM country AS c";
 		executeQuery(sql);
@@ -88,7 +94,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeWithFormulasInSelect()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT 1.1E-2 FROM country";
 		executeQuery(sql);
@@ -96,7 +102,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithWhere()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT idCountry, name, 121 FROM country WHERE name='spain' AND idCountry=1";
 		executeQuery(sql);
@@ -104,7 +110,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryFromSubquery()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT name FROM (SELECT idCountry, name, 121 FROM country WHERE name='spain' OR name='portugal')";
 		executeQuery(sql);
@@ -112,7 +118,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeComplexQuery01()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT area, 2*(area+100) uno, 2*area-1 FROM country WHERE name<'spain'";
 		executeQuery(sql);
@@ -120,7 +126,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithSelectFunction()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT name, area, min(7,len(name),area) FROM country WHERE max(len(name),10)<20";
 		executeQuery(sql);
@@ -128,7 +134,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithAlias()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT country.name FROM country";
 		executeQuery(sql);
@@ -136,7 +142,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithAsterisk()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT * FROM country";
 		executeQuery(sql);
@@ -144,7 +150,7 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithUnexistantParameter()
-		throws RodasSqlException
+		throws RodasException
 	{
 		try
 		{
@@ -159,27 +165,27 @@ public class EngineAndProviderTest
 
 	@Test
 	public void executeQueryWithParameter()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT idCountry, name, area FROM country WHERE idCountry=:ID";
-		DefaultBuildingContext context=new DefaultBuildingContext(Collections.emptyMap());
+		DefaultBuildingContext context=createContext();
 		context.setParameter("ID", 2);
 		executeQuery(sql, context);
 	}
 
 	@Test
 	public void executeInnerQueryWithParameter()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT idCountry, name, len(name) FROM (SELECT idCountry, name, area FROM country WHERE idCountry=:ID)";
-		DefaultBuildingContext context=new DefaultBuildingContext(Collections.emptyMap());
+		DefaultBuildingContext context=createContext();
 		context.setParameter("ID", 2);
 		executeQuery(sql, context);
 	}
 
 	@Test
 	public void executeWhereIn()
-		throws RodasSqlException
+		throws RodasException
 	{
 		String sql="SELECT idCountry, name, area FROM country WHERE idCountry IN (1,2)";
 		executeQuery(sql);
