@@ -2,6 +2,7 @@ package com.samajackun.rodas.core.eval;
 
 public class StrictVariablesContext extends AbstractVariablesContext
 {
+	@Override
 	public Object get(String name)
 		throws VariableNotFoundException
 	{

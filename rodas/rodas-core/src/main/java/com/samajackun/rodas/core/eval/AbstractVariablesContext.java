@@ -28,4 +28,10 @@ public abstract class AbstractVariablesContext implements VariablesContext
 	{
 		return this.map;
 	}
+
+	@Override
+	public boolean contains(String name)
+	{
+		return getMap().containsKey(name);
+	}
 }

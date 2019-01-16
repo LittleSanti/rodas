@@ -1,9 +1,13 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
+
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.ExpressionList;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public final class ExpressionParser extends AbstractParser<Expression>
 {
@@ -11,7 +15,7 @@ public final class ExpressionParser extends AbstractParser<Expression>
 
 	public static ExpressionParser getInstance()
 	{
-		return INSTANCE;
+		return ExpressionParser.INSTANCE;
 	}
 
 	private ExpressionParser()
@@ -23,58 +27,63 @@ public final class ExpressionParser extends AbstractParser<Expression>
 	}
 
 	@Override
-	public Expression parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public Expression parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		// return SelectSentenceParser.getInstance().parse(tokenizer);
 		return LogicalExpressionParser.getInstance().parse(tokenizer);
 	};
 
-	public ExpressionList parseExpressionList(ParserTokenizer tokenizer)
-		throws ParserException
+	public ExpressionList parseExpressionList(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		ExpressionList expressionList=new ExpressionList();
 		State state=State.INITIAL;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
 				case INITIAL:
 					SqlToken token=tokenizer.nextUsefulToken();
-					if (token.getType() == SqlToken.Type.PARENTHESIS_END)
+					if (token != null)
 					{
-						tokenizer.pushBack();
-						state=State.COMPLETE;
-					}
-					else
-					{
-						tokenizer.pushBack();
-						Expression expression=parse(tokenizer);
-						if (expression != null)
+						if (token.getType() == SqlToken.Type.PARENTHESIS_END)
 						{
-							expressionList.add(expression);
+							tokenizer.pushBack(token);
+							state=State.COMPLETE;
+						}
+						else
+						{
+							tokenizer.pushBack(token);
+							Expression expression=parse(tokenizer);
+							if (expression != null)
+							{
+								expressionList.add(expression);
+							}
 						}
 					}
 					state=State.EXPECTING_COMMA;
 					break;
 				case EXPECTING_COMMA:
-					if (tokenizer.hasMoreTokens())
+					SqlToken token2=tokenizer.nextUsefulToken();
+					if (token2 != null)
 					{
-						SqlToken token2=tokenizer.nextUsefulToken();
 						switch (token2.getType())
 						{
 							case COMMA:
 								state=State.INITIAL;
 								break;
 							default:
-								tokenizer.pushBack();
+								tokenizer.pushBack(token2);
 								state=State.COMPLETE;
 						}
 						break;
 					}
 					else
 					{
-						tokenizer.pushBack();
+						tokenizer.pushBack(token2);
 						state=State.COMPLETE;
 					}
 					break;
@@ -82,6 +91,7 @@ public final class ExpressionParser extends AbstractParser<Expression>
 					throw new IllegalStateException();
 			}
 		}
+		while (tokenizer.tokenWasRead() && state != State.COMPLETE);
 		return expressionList;
 	}
 }

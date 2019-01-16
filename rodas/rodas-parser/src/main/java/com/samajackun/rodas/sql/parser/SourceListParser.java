@@ -1,5 +1,6 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +13,12 @@ import com.samajackun.rodas.core.model.ParehentesizedSource;
 import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.TableSource;
 import com.samajackun.rodas.core.model.UsingJoinedSource;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken.Type;
-import com.samajackun.rodas.sql.parser.tokenizer.UnexpectedTokenException;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
 
 public class SourceListParser extends AbstractParser<List<Source>>
 {
@@ -23,7 +26,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 
 	public static SourceListParser getInstance()
 	{
-		return INSTANCE;
+		return SourceListParser.INSTANCE;
 	}
 
 	private SourceListParser()
@@ -35,12 +38,13 @@ public class SourceListParser extends AbstractParser<List<Source>>
 	};
 
 	@Override
-	public List<Source> parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public List<Source> parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
-		List<Source> sources=new ArrayList<Source>();
+		List<Source> sources=new ArrayList<>();
 		State state=State.INITIAL;
-		while (state != State.COMPLETE && tokenizer.hasMoreTokens())
+		do
 		{
 			switch (state)
 			{
@@ -59,19 +63,23 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					break;
 				case EXPECTING_COMMA:
 					SqlToken token=tokenizer.nextUsefulToken();
-					if (token.getType() == SqlToken.Type.COMMA)
+					if (token != null)
 					{
-						state=State.EXPECTING_SOURCE;
-					}
-					else
-					{
-						tokenizer.pushBack();
-						state=State.COMPLETE;
+						if (token.getType() == SqlToken.Type.COMMA)
+						{
+							state=State.EXPECTING_SOURCE;
+						}
+						else
+						{
+							tokenizer.pushBack(token);
+							state=State.COMPLETE;
+						}
 					}
 					break;
 				default: // Ignorar.
 			}
 		}
+		while (state != State.COMPLETE && tokenizer.tokenWasRead());
 		switch (state)
 		{
 			case INITIAL:
@@ -84,117 +92,129 @@ public class SourceListParser extends AbstractParser<List<Source>>
 		return sources;
 	}
 
-	public Source parseSource(ParserTokenizer tokenizer)
-		throws ParserException
+	public Source parseSource(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Source source=null;
 		Source source2=null;
 		State state=State.INITIAL;
 		OnJoinedSource.Type joinType=null;
-		while (state != State.COMPLETE && tokenizer.hasMoreTokens())
+		do
 		{
 			SqlToken token=tokenizer.nextUsefulToken();
-			switch (state)
+			if (token != null)
 			{
-				case INITIAL:
-					switch (token.getType())
-					{
-						case IDENTIFIER:
-						case DOUBLE_QUOTED_TEXT_LITERAL:
-							source=new TableSource(token.getImage());
-							state=State.READ_SOURCE;
-							break;
-						case PARENTHESIS_START:
-							Source source1=SelectSentenceParser.getInstance().parse(tokenizer);
-							tokenizer.matchToken(Type.PARENTHESIS_END);
-							source=new ParehentesizedSource(source1);
-							state=State.READ_SOURCE;
-							break;
-						default:
-							throw new UnexpectedTokenException(token);
-					}
-					break;
-				case READ_SOURCE:
-					switch (token.getType())
-					{
-						case KEYWORD_INNER:
-							joinType=OnJoinedSource.Type.INNER;
-							state=State.EXPECTING_JOIN;
-							break;
-						case KEYWORD_OUTER:
-							joinType=OnJoinedSource.Type.OUTER;
-							state=State.EXPECTING_JOIN;
-							break;
-						case KEYWORD_LEFT:
-							joinType=OnJoinedSource.Type.LEFT;
-							state=State.EXPECTING_JOIN;
-							break;
-						case KEYWORD_RIGHT:
-							joinType=OnJoinedSource.Type.RIGHT;
-							state=State.EXPECTING_JOIN;
-							break;
-						case KEYWORD_AS:
-							state=State.EXPECTING_ALIAS;
-							break;
-						case DOUBLE_QUOTED_TEXT_LITERAL:
-						case IDENTIFIER:
-							source=new AliasedSource(source, token.getImage());
-							state=State.COMPLETE;
-							break;
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
-							break;
-					}
-					break;
-				case EXPECTING_JOIN:
-					switch (token.getType())
-					{
-						case KEYWORD_JOIN:
-							source2=parseSource(tokenizer);
-							state=State.EXPECTING_ON_OR_USING;
-							break;
-						default:
-							throw new UnexpectedTokenException(token);
-					}
-					break;
-				case EXPECTING_ON_OR_USING:
-					switch (token.getType())
-					{
-						case KEYWORD_ON:
-							Expression on=LogicalExpressionParser.getInstance().parse(tokenizer);
-							BooleanExpression booleanOnExpression=toBooleanExpression(on);
-							source=new OnJoinedSource(source, source2, joinType, booleanOnExpression);
-							state=State.COMPLETE;
-							break;
-						case KEYWORD_USING:
-							SqlToken token2=tokenizer.matchToken(Type.IDENTIFIER);
-							IdentifierExpression using=new IdentifierExpression(token2.getImage());
-							source=new UsingJoinedSource(source, source2, joinType, using);
-							state=State.COMPLETE;
-							break;
-						default:
-							throw new UnexpectedTokenException(token);
-					}
-					break;
-				case EXPECTING_ALIAS:
-					switch (token.getType())
-					{
-						case DOUBLE_QUOTED_TEXT_LITERAL:
-						case IDENTIFIER:
-							source=new AliasedSource(source, token.getImage());
-							state=State.COMPLETE;
-							break;
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
-							break;
-					}
-					break;
-				default:
-					break;
+				switch (state)
+				{
+					case INITIAL:
+						switch (token.getType())
+						{
+							case IDENTIFIER:
+							case DOUBLE_QUOTED_TEXT_LITERAL:
+								source=new TableSource(token.getValue());
+								state=State.READ_SOURCE;
+								break;
+							case PARENTHESIS_START:
+								Source source1=SelectSentenceParser.getInstance().parse(tokenizer);
+								tokenizer.matchToken(Type.PARENTHESIS_END);
+								source=new ParehentesizedSource(source1);
+								state=State.READ_SOURCE;
+								break;
+							default:
+								throw new UnexpectedTokenException(token);
+						}
+						break;
+					case READ_SOURCE:
+						switch (token.getType())
+						{
+							case KEYWORD_INNER:
+								joinType=OnJoinedSource.Type.INNER;
+								state=State.EXPECTING_JOIN;
+								break;
+							case KEYWORD_OUTER:
+								joinType=OnJoinedSource.Type.OUTER;
+								state=State.EXPECTING_JOIN;
+								break;
+							case KEYWORD_LEFT:
+								joinType=OnJoinedSource.Type.LEFT;
+								state=State.EXPECTING_JOIN;
+								break;
+							case KEYWORD_RIGHT:
+								joinType=OnJoinedSource.Type.RIGHT;
+								state=State.EXPECTING_JOIN;
+								break;
+							case KEYWORD_AS:
+								state=State.EXPECTING_ALIAS;
+								break;
+							case DOUBLE_QUOTED_TEXT_LITERAL:
+								source=new AliasedSource(source, token.getValue());
+								state=State.COMPLETE;
+								break;
+							case IDENTIFIER:
+								source=new AliasedSource(source, token.getValue());
+								state=State.COMPLETE;
+								break;
+							default:
+								tokenizer.pushBack(token);
+								state=State.COMPLETE;
+								break;
+						}
+						break;
+					case EXPECTING_JOIN:
+						switch (token.getType())
+						{
+							case KEYWORD_JOIN:
+								source2=parseSource(tokenizer);
+								state=State.EXPECTING_ON_OR_USING;
+								break;
+							default:
+								throw new UnexpectedTokenException(token);
+						}
+						break;
+					case EXPECTING_ON_OR_USING:
+						switch (token.getType())
+						{
+							case KEYWORD_ON:
+								Expression on=LogicalExpressionParser.getInstance().parse(tokenizer);
+								BooleanExpression booleanOnExpression=toBooleanExpression(on);
+								source=new OnJoinedSource(source, source2, joinType, booleanOnExpression);
+								state=State.COMPLETE;
+								break;
+							case KEYWORD_USING:
+								SqlToken token2=tokenizer.matchToken(Type.IDENTIFIER);
+								if (token2 == null)
+								{
+									throw new IncompleteExpressionException();
+								}
+								IdentifierExpression using=new IdentifierExpression(token2.getValue());
+								source=new UsingJoinedSource(source, source2, joinType, using);
+								state=State.COMPLETE;
+								break;
+							default:
+								throw new UnexpectedTokenException(token);
+						}
+						break;
+					case EXPECTING_ALIAS:
+						switch (token.getType())
+						{
+							case DOUBLE_QUOTED_TEXT_LITERAL:
+							case IDENTIFIER:
+								source=new AliasedSource(source, token.getValue());
+								state=State.COMPLETE;
+								break;
+							default:
+								tokenizer.pushBack(token);
+								state=State.COMPLETE;
+								break;
+						}
+						break;
+					default:
+						break;
+				}
 			}
 		}
+		while (state != State.COMPLETE && tokenizer.tokenWasRead());
 		switch (state)
 		{
 			case EXPECTING_JOIN:

@@ -14,7 +14,7 @@ public abstract class ConstantExpression implements Expression
 
 	private EvaluationException evaluationException;
 
-	public ConstantExpression(String value)
+	protected ConstantExpression(String value)
 	{
 		super();
 		this.value=value;

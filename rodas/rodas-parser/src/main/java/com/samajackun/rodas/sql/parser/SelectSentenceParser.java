@@ -1,5 +1,6 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +11,12 @@ import com.samajackun.rodas.core.model.ExpressionList;
 import com.samajackun.rodas.core.model.SelectSentence;
 import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.WithDeclaration;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken.Type;
-import com.samajackun.rodas.sql.parser.tokenizer.UnexpectedTokenException;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
 
 public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 {
@@ -21,7 +24,7 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 
 	public static SelectSentenceParser getInstance()
 	{
-		return INSTANCE;
+		return SelectSentenceParser.INSTANCE;
 	}
 
 	private SelectSentenceParser()
@@ -33,13 +36,14 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 	};
 
 	@Override
-	public SelectSentence parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public SelectSentence parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		State state=State.INITIAL;
 		SelectSentence selectSentence=null;
-		List<WithDeclaration> withDeclarations=new ArrayList<WithDeclaration>();
-		while (state != State.COMPLETE && tokenizer.hasMoreTokens())
+		List<WithDeclaration> withDeclarations=new ArrayList<>();
+		do
 		{
 			SqlToken token=tokenizer.nextUsefulToken();
 			switch (state)
@@ -62,7 +66,7 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 				case EXPECTING_WITH_ALIAS:
 					if (token.getType() == SqlToken.Type.IDENTIFIER)
 					{
-						String alias=token.getImage();
+						String alias=token.getValue();
 						tokenizer.matchToken(Type.KEYWORD_AS);
 						tokenizer.matchToken(Type.PARENTHESIS_START);
 						SelectSentence withSentence=parse(tokenizer);
@@ -94,11 +98,11 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 				case READING_OPTIONS:
 					if (token.isKeyword())
 					{
-						selectSentence.getOptions().add(token.getImage());
+						selectSentence.getOptions().add(token.getValue());
 					}
 					else
 					{
-						tokenizer.pushBack();
+						tokenizer.pushBack(token);
 						List<AliasedExpression> selectExpressions=AliasedExpressionListParser.getInstance().parse(tokenizer);
 						selectSentence.addSelectExpressions(selectExpressions);
 						state=State.READ_SELECT_CLAUSE;
@@ -149,7 +153,7 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 							state=State.READING_ORDER_CLAUSE;
 							break;
 						case PARENTHESIS_END:
-							tokenizer.pushBack();
+							tokenizer.pushBack(token);
 							state=State.COMPLETE;
 							break;
 						default:
@@ -166,7 +170,7 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 							state=State.READING_ORDER_CLAUSE;
 							break;
 						default:
-							tokenizer.pushBack();
+							tokenizer.pushBack(token);
 							state=State.COMPLETE;
 					}
 					break;
@@ -226,6 +230,7 @@ public final class SelectSentenceParser extends AbstractParser<SelectSentence>
 					break;
 			}
 		}
+		while (state != State.COMPLETE && tokenizer.tokenWasRead());
 		return selectSentence;
 	}
 }

@@ -7,4 +7,18 @@ public class StrictVariablesManager extends AbstractVariablesManager
 	{
 		return new StrictVariablesContext();
 	}
+
+	@Override
+	protected Object getValueForVariableNotFound(String name)
+		throws VariableNotFoundException
+	{
+		throw new VariableNotFoundException(name);
+	}
+
+	@Override
+	protected VariablesContext getVariablesContextForVariableNotFound(String name)
+		throws VariableNotFoundException
+	{
+		throw new VariableNotFoundException(name);
+	}
 }

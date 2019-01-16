@@ -1,8 +1,8 @@
-package com.samajackun.rodas.sql.parser.tokenizer;
+package com.samajackun.rodas.parsing.parser;
 
 import java.util.Arrays;
 
-import com.samajackun.rodas.sql.parser.ParserException;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public class UnexpectedTokenException extends ParserException
 {
@@ -15,7 +15,7 @@ public class UnexpectedTokenException extends ParserException
 	public UnexpectedTokenException(SqlToken token, SqlToken.Type... expected)
 	{
 		super("Unexpected token " + token + (expected.length > 0
-			? (" instead of one of these: " + Arrays.asList(expected))
+			? " instead of one of these: " + Arrays.asList(expected)
 			: ""));
 		this.token=token;
 		this.expected=expected;

@@ -1,29 +1,39 @@
-package com.samajackun.rodas.sql.parser.tokenizer;
+package com.samajackun.rodas.sql.tokenizer;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken.Type;
+import com.samajackun.rodas.parsing.source.PushBackSource;
+import com.samajackun.rodas.parsing.tokenizer.AbstractTokenizer;
+import com.samajackun.rodas.parsing.tokenizer.IllegalDoubleEException;
+import com.samajackun.rodas.parsing.tokenizer.IllegalDoublePeriodException;
+import com.samajackun.rodas.parsing.tokenizer.IllegalPeriodInExponentException;
+import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
+import com.samajackun.rodas.parsing.tokenizer.UnclosedCommentException;
+import com.samajackun.rodas.parsing.tokenizer.UnclosedTextLiteralException;
+import com.samajackun.rodas.parsing.tokenizer.UnexpectedSymbolException;
+import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
 
 public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettings>
 {
-	private static final Map<String, SqlToken.Type> OPERATORS=createOperatorsMap();
+	private static final Map<String, SqlToken.Type> OPERATORS=SqlTokenizer.createOperatorsMap();
 
-	private static final Map<String, SqlToken.Type> KEYWORDS=createKeywordsMap();
+	private static final Map<String, SqlToken.Type> KEYWORDS=SqlTokenizer.createKeywordsMap();
 
-	public SqlTokenizer(CharSequence src) throws TokenizerException
+	public SqlTokenizer(PushBackSource source) throws TokenizerException, IOException
 	{
-		this(src, new SqlTokenizerSettings());
+		this(source, new SqlTokenizerSettings());
 	}
 
-	public SqlTokenizer(CharSequence src, SqlTokenizerSettings settings) throws TokenizerException
+	public SqlTokenizer(PushBackSource source, SqlTokenizerSettings settings) throws TokenizerException, IOException
 	{
-		super(src, settings);
+		super(source, settings);
 	}
 
 	private static Map<String, Type> createKeywordsMap()
 	{
-		Map<String, Type> map=new HashMap<String, Type>(20);
+		Map<String, Type> map=new HashMap<>(20);
 		map.put("SELECT", SqlToken.Type.KEYWORD_SELECT);
 		map.put("FROM", SqlToken.Type.KEYWORD_FROM);
 		map.put("WHERE", SqlToken.Type.KEYWORD_WHERE);
@@ -55,7 +65,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 
 	private static Map<String, Type> createOperatorsMap()
 	{
-		Map<String, Type> map=new HashMap<String, Type>(20);
+		Map<String, Type> map=new HashMap<>(20);
 		map.put("AND", SqlToken.Type.OPERATOR_AND);
 		map.put("OR", SqlToken.Type.OPERATOR_OR);
 		map.put("NOT", SqlToken.Type.OPERATOR_NOT);
@@ -78,20 +88,20 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 	};
 
 	@Override
-	protected SqlToken fetch(Source source)
-		throws TokenizerException
+	protected SqlToken fetch(PushBackSource source)
+		throws TokenizerException,
+		IOException
 	{
 		State state=State.INITIAL;
 		SqlToken token=null;
-		int initialIndex=source.getCurrentIndex();
+		// source.startRecord();
 		StringBuilder trailingText=new StringBuilder(80);
 
-		while (token == null && source.getCurrentIndex() < source.getCharSequence().length())
+		char c=0;
+		while (token == null && source.hasMoreChars())
 		{
-			char c=source.getCharSequence().charAt(source.getCurrentIndex());
-			char c2=1 + source.getCurrentIndex() < source.getCharSequence().length()
-				? source.getCharSequence().charAt(1 + source.getCurrentIndex())
-				: (char)0;
+			c=(char)source.nextChar();
+			char c2=(char)source.lookahead();
 			switch (state)
 			{
 				case INITIAL:
@@ -111,12 +121,14 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (Character.isLetter(c) || c == '$' || c == '_')
 					{
-						initialIndex=source.getCurrentIndex();
+						source.unget(c);
+						source.startRecord();
 						state=State.READING_LETTERS;
 					}
 					else if (Character.isDigit(c))
 					{
-						initialIndex=source.getCurrentIndex();
+						source.unget(c);
+						source.startRecord();
 						state=State.READING_INTEGER_DIGITS;
 					}
 					else if (c == '*')
@@ -128,8 +140,8 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						if (c2 == '*')
 						{
 							state=State.READING_COMMENT;
-							source.incCurrentIndex();
-							initialIndex=source.getCurrentIndex() + 1;
+							// source.incCurrentIndex();
+							source.startRecord();
 						}
 						else
 						{
@@ -138,17 +150,23 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == '\'')
 					{
-						initialIndex=source.getCurrentIndex();
+						source.unget(c);
+						source.startRecord();
+						source.nextChar();
 						state=State.READING_TEXT_LITERAL;
 					}
 					else if (c == '\"')
 					{
-						initialIndex=source.getCurrentIndex();
+						source.unget(c);
+						source.startRecord();
+						source.nextChar();
 						state=State.READING_DOUBLE_QUOTED_TEXT_LITERAL;
 					}
 					else if (c == ':')
 					{
-						initialIndex=1 + source.getCurrentIndex();
+						source.unget(c);
+						source.startRecord();
+						source.nextChar();
 						state=State.READING_NAMED_PARAMETER;
 					}
 					else if (c == '?')
@@ -187,24 +205,26 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					{
 						if (c2 == '=')
 						{
+							source.nextChar();
 							token=SqlToken.TOKEN_DISTINCT2;
-							source.incCurrentIndex();
+							// source.incCurrentIndex();
 						}
 						else
 						{
-							throw new TokenizerException("Illegal symbol " + c);
+							throw new UnexpectedSymbolException(source, c);
 						}
 					}
 					else if (c == '|')
 					{
 						if (c2 == '|')
 						{
+							source.nextChar();
 							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_CONCATENATION);
-							source.incCurrentIndex();
+							// source.incCurrentIndex();
 						}
 						else
 						{
-							throw new TokenizerException("Illegal symbol " + c);
+							throw new UnexpectedSymbolException(source, c);
 						}
 					}
 					else if (c == '=')
@@ -215,13 +235,15 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					{
 						if (c2 == '>')
 						{
+							source.nextChar();
 							token=SqlToken.TOKEN_DISTINCT1;
-							source.incCurrentIndex();
+							// source.incCurrentIndex();
 						}
 						else if (c2 == '=')
 						{
+							source.nextChar();
 							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_LOWER_OR_EQUALS);
-							source.incCurrentIndex();
+							// source.incCurrentIndex();
 						}
 						else
 						{
@@ -232,8 +254,9 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					{
 						if (c2 == '=')
 						{
+							source.nextChar();
 							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_GREATER_OR_EQUALS);
-							source.incCurrentIndex();
+							// source.incCurrentIndex();
 						}
 						else
 						{
@@ -242,25 +265,26 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						throw new TokenizerException("Unexpected symbol '" + c + "'");
+						throw new UnexpectedSymbolException(source, c);
 					}
 					break;
 				case READING_COMMENT:
 					if (c == '*' && c2 == '/')
 					{
+						source.nextChar();
 						switch (this.getSettings().getCommentsBehaviour())
 						{
 							case IGNORE:
 								break;
 							case PRODUCE_TOKENS:
-								token=new SqlToken(Type.COMMENT, trailingText.toString() + "/*" + source.getCharSequence().subSequence(initialIndex, source.getCurrentIndex()).toString() + "*/");
+								token=new SqlToken(Type.COMMENT, trailingText.toString() + "/" + source.endRecord().toString());
 								break;
 							case INCLUDE_IN_FOLLOWING_TOKEN:
-								trailingText.append("/*" + source.getCharSequence().subSequence(initialIndex, source.getCurrentIndex()).toString() + "*/");
+								trailingText.append("/" + source.endRecord().toString());
 								break;
 						}
 						state=State.INITIAL;
-						source.incCurrentIndex();
+						// source.incCurrentIndex();
 					}
 					else
 					{
@@ -274,8 +298,9 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createTextToken(trailingText, source, initialIndex);
-						source.decCurrentIndex();
+						source.unget(c);
+						token=createTextToken(trailingText, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -294,8 +319,9 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.INTEGER_NUMBER_LITERAL, initialIndex);
-						source.decCurrentIndex();
+						source.unget(c);
+						token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -310,12 +336,12 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == '.')
 					{
-						throw new TokenizerException("Wrong number format: Double period in constant");
+						throw new IllegalDoublePeriodException(source);
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.DECIMAL_NUMBER_LITERAL, initialIndex);
-						source.decCurrentIndex();
+						token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -330,16 +356,16 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == 'E' || c == 'e')
 					{
-						throw new TokenizerException("Wrong number format: Double E in constant");
+						throw new IllegalDoubleEException(source);
 					}
 					else if (c == '.')
 					{
-						throw new TokenizerException("Wrong number format: Period not allowed in exponent");
+						throw new IllegalPeriodInExponentException(source);
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.DECIMAL_NUMBER_LITERAL, initialIndex);
-						source.decCurrentIndex();
+						token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -350,23 +376,23 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == 'E' || c == 'e')
 					{
-						throw new TokenizerException("Wrong number format: Double E in constant");
+						throw new IllegalDoubleEException(source);
 					}
 					else if (c == '.')
 					{
-						throw new TokenizerException("Wrong number format: Period not allowed in exponent");
+						throw new IllegalPeriodInExponentException(source);
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.DECIMAL_NUMBER_LITERAL, initialIndex);
-						source.decCurrentIndex();
+						token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
 				case READING_EXPONENT_DIGITS:
 					if (c == '-' || c == '+')
 					{
-						// Seguir en este estado
+						// Seguir en este estado: Podría haber varios signos seguidos y sería una notación válida.
 					}
 					else if (Character.isDigit(c))
 					{
@@ -374,16 +400,16 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == 'E' || c == 'e')
 					{
-						throw new TokenizerException("Wrong number format: Double E in constant");
+						throw new IllegalDoubleEException(source);
 					}
 					else if (c == '.')
 					{
-						throw new TokenizerException("Wrong number format: Period not allowed in exponent");
+						throw new IllegalPeriodInExponentException(source);
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.INTEGER_NUMBER_LITERAL, initialIndex);
-						source.decCurrentIndex();
+						token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -394,16 +420,17 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == 'E' || c == 'e')
 					{
-						throw new TokenizerException("Wrong number format: Double E in constant");
+						throw new IllegalDoubleEException(source);
 					}
 					else if (c == '.')
 					{
-						throw new TokenizerException("Wrong number format: Period not allowed in exponent");
+						throw new IllegalPeriodInExponentException(source);
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.INTEGER_NUMBER_LITERAL, initialIndex);
-						source.decCurrentIndex();
+						source.unget(c);
+						token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -413,11 +440,13 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						if (c2 == '\'')
 						{
 							// Comilla escapeada:
-							source.incCurrentIndex();
+							source.nextChar();
 						}
 						else
 						{
-							token=createToken(trailingText, source, SqlToken.Type.TEXT_LITERAL, initialIndex, 1 + source.getCurrentIndex());
+							String image=source.endRecord().toString();
+							String value=image.substring(1, image.length() - 1).replaceAll("\'\'", "\'");
+							token=createToken(trailingText, SqlToken.Type.TEXT_LITERAL, image, value);
 							state=State.INITIAL;
 						}
 					}
@@ -425,7 +454,8 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 				case READING_DOUBLE_QUOTED_TEXT_LITERAL:
 					if (c == '\"')
 					{
-						token=createToken(trailingText, source, SqlToken.Type.DOUBLE_QUOTED_TEXT_LITERAL, 1 + initialIndex, source.getCurrentIndex());
+						String image=source.endRecord().toString();
+						token=createToken(trailingText, SqlToken.Type.DOUBLE_QUOTED_TEXT_LITERAL, image, image.substring(1, image.length() - 1));
 						state=State.INITIAL;
 					}
 					break;
@@ -436,8 +466,10 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createToken(trailingText, source, SqlToken.Type.NAMED_PARAMETER, initialIndex, source.getCurrentIndex());
-						source.decCurrentIndex();
+						source.unget(c);
+						String image=source.endRecord().toString();
+						token=createToken(trailingText, SqlToken.Type.NAMED_PARAMETER, image, image.substring(1));
+						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
 					break;
@@ -445,29 +477,30 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					// No hay más casos.
 					break;
 			}
-			source.incCurrentIndex();
+			// source.incCurrentIndex();
 		}
 		// Completar el resto, si queda:
 		switch (state)
 		{
 			case READING_LETTERS:
-				token=createTextToken(trailingText, source, initialIndex);
+				token=createTextToken(trailingText, source.endRecord().toString());
 				break;
 			case READING_INTEGER_DIGITS:
 			case READING_EXPONENT_DIGITS_WITHOUT_SIGN:
-				token=createToken(trailingText, source, SqlToken.Type.INTEGER_NUMBER_LITERAL, initialIndex);
+				token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
 				break;
 			case READING_DECIMAL_DIGITS:
 			case READING_DECIMAL_AND_EXPONENT_DIGITS_WITHOUT_SIGN:
-				token=createToken(trailingText, source, SqlToken.Type.DECIMAL_NUMBER_LITERAL, initialIndex);
+				token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
 				break;
 			case READING_NAMED_PARAMETER:
-				token=createToken(trailingText, source, SqlToken.Type.NAMED_PARAMETER, initialIndex);
+				String image=source.endRecord().toString();
+				token=createToken(trailingText, SqlToken.Type.NAMED_PARAMETER, image, image.substring(1));
 				break;
 			case READING_COMMENT:
-				throw new TokenizerException("Comment not closed");
+				throw new UnclosedCommentException(source);
 			case READING_TEXT_LITERAL:
-				throw new TokenizerException("Text literal not closed");
+				throw new UnclosedTextLiteralException(source);
 			case INITIAL:
 			default:
 				// Ignorar.
@@ -482,24 +515,28 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 			: new SqlToken(token.getType(), text.toString());
 	}
 
-	private SqlToken createToken(StringBuilder text, Source source, SqlToken.Type type, int initialIndex, int endIndex)
+	// private SqlToken createToken(StringBuilder text, Source source, SqlToken.Type type, int initialIndex, int endIndex)
+	// {
+	// return new SqlToken(type, text.toString() + source.endRecord().toString());
+	// }
+
+	private SqlToken createToken(StringBuilder trailingText, SqlToken.Type type, String image, String value)
 	{
-		return new SqlToken(type, text.toString() + source.getCharSequence().subSequence(initialIndex, endIndex).toString());
+		return new SqlToken(type, trailingText.toString() + image, value);
 	}
 
-	private SqlToken createToken(StringBuilder text, Source source, SqlToken.Type type, int initialIndex)
+	private SqlToken createToken(StringBuilder trailingText, SqlToken.Type type, String text)
 	{
-		return createToken(text, source, type, initialIndex, source.getCurrentIndex());
+		return new SqlToken(type, trailingText.toString() + text);
 	}
 
-	private SqlToken createTextToken(StringBuilder leftText, Source source, int initialIndex)
+	private SqlToken createTextToken(StringBuilder leftText, String text)
 	{
-		String text=source.getCharSequence().subSequence(initialIndex, source.getCurrentIndex()).toString();
 		// Decide si se trata de una palabra reservada, un operador, o un identificador:
-		SqlToken.Type type=KEYWORDS.get(text.toUpperCase());
+		SqlToken.Type type=SqlTokenizer.KEYWORDS.get(text.toUpperCase());
 		if (type == null)
 		{
-			type=OPERATORS.get(text.toUpperCase());
+			type=SqlTokenizer.OPERATORS.get(text.toUpperCase());
 			if (type == null)
 			{
 				type=SqlToken.Type.IDENTIFIER;
@@ -511,4 +548,12 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 		}
 		return new SqlToken(type, text);
 	}
+
+	@Override
+	protected void pushBackToken(SqlToken token, PushBackSource source)
+		throws IOException
+	{
+		source.unget(token.getImage());
+	}
+
 }

@@ -1,5 +1,7 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
+
 import com.samajackun.rodas.core.model.AddExpression;
 import com.samajackun.rodas.core.model.AsteriskExpression;
 import com.samajackun.rodas.core.model.BooleanConstantExpression;
@@ -18,9 +20,11 @@ import com.samajackun.rodas.core.model.SubstractExpression;
 import com.samajackun.rodas.core.model.TextConstantExpression;
 import com.samajackun.rodas.core.model.UnitMinusExpression;
 import com.samajackun.rodas.core.model.UnitPlusExpression;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.parser.tokenizer.UnexpectedTokenException;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 {
@@ -28,7 +32,7 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 
 	public static ArithmeticExpressionParser getInstance()
 	{
-		return INSTANCE;
+		return ArithmeticExpressionParser.INSTANCE;
 	}
 
 	private ArithmeticExpressionParser()
@@ -40,49 +44,55 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 	}
 
 	@Override
-	public Expression parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public Expression parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		return parseAddingExpression(tokenizer);
 	};
 
-	Expression parseTerminal(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseTerminal(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		// Reconocer expresiones constante e identificador
 		Expression expression=null;
 		ExpressionList expressionList=null;
 		State state=State.INITIAL;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			SqlToken token=tokenizer.nextUsefulToken();
+			if (token == null)
+			{
+				break;
+			}
 			switch (state)
 			{
 				case INITIAL:
 					switch (token.getType())
 					{
 						case INTEGER_NUMBER_LITERAL:
-							expression=new NumericConstantExpression(token.getImage(), Long.parseLong(token.getImage()));
+							expression=new NumericConstantExpression(token.getValue(), Long.parseLong(token.getValue()));
 							state=State.COMPLETE;
 							break;
 						case DECIMAL_NUMBER_LITERAL:
-							expression=new NumericConstantExpression(token.getImage(), Double.parseDouble(token.getImage()));
+							expression=new NumericConstantExpression(token.getValue(), Double.parseDouble(token.getValue()));
 							state=State.COMPLETE;
 							break;
 						case TEXT_LITERAL:
-							expression=new TextConstantExpression(token.getImage().substring(1, token.getImage().length() - 1));
+							expression=new TextConstantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
 						case KEYWORD_NULL:
-							expression=new NullConstantExpression(token.getImage());
+							expression=new NullConstantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
 						case TRUE:
-							expression=BooleanConstantExpression.createTrueConstrantExpression(token.getImage());
+							expression=BooleanConstantExpression.createTrueConstrantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
 						case FALSE:
-							expression=BooleanConstantExpression.createFalseConstrantExpression(token.getImage());
+							expression=BooleanConstantExpression.createFalseConstrantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
 						case IDENTIFIER:
@@ -93,29 +103,29 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 								if (token2.getType() == SqlToken.Type.PARENTHESIS_START)
 								{
 									ExpressionList argumentsExpressions=ExpressionParser.getInstance().parseExpressionList(tokenizer);
-									FunctionExpression functionExpression=new FunctionExpression(token.getImage());
+									FunctionExpression functionExpression=new FunctionExpression(token.getValue());
 									functionExpression.getArguments().addAll(argumentsExpressions.getExpressions());
 									tokenizer.matchToken(SqlToken.Type.PARENTHESIS_END);
 									expression=functionExpression;
 								}
 								else if (token2.getType() == SqlToken.Type.PERIOD)
 								{
-									expression=parsePrefixedExpression(tokenizer, token.getImage());
+									expression=parsePrefixedExpression(tokenizer, token.getValue());
 								}
 								else
 								{
-									expression=new IdentifierExpression(token.getImage());
-									tokenizer.pushBack();
+									expression=new IdentifierExpression(token.getValue());
+									tokenizer.pushBack(token2);
 								}
 							}
 							else
 							{
-								expression=new IdentifierExpression(token.getImage());
+								expression=new IdentifierExpression(token.getValue());
 							}
 							state=State.COMPLETE;
 							break;
 						case NAMED_PARAMETER:
-							expression=new NamedParameterExpression(token.getImage());
+							expression=new NamedParameterExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
 						case PARENTHESIS_START:
@@ -125,7 +135,7 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 							state=State.EXPECTING_COMMA_OR_PAREHENTESIS_CLOSING;
 							break;
 						case ASTERISK:
-							expression=new AsteriskExpression(token.getImage());
+							expression=new AsteriskExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
 						default:
@@ -164,6 +174,7 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 					throw new IllegalStateException(state.toString());
 			}
 		}
+		while (state != State.COMPLETE && tokenizer.tokenWasRead());
 		if (expression == null)
 		{
 			throw new ParserException("End of stream");
@@ -171,63 +182,67 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 		return expression;
 	}
 
-	private Expression parseSelectOrExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	private Expression parseSelectOrExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
-		if (tokenizer.hasMoreTokens())
-		{
-			Expression expression;
-			SqlToken sqlToken=tokenizer.nextToken();
-			tokenizer.pushBack();
-			switch (sqlToken.getType())
-			{
-				case KEYWORD_SELECT:
-					expression=SelectSentenceParser.getInstance().parse(tokenizer);
-					break;
-				default:
-					expression=ExpressionParser.getInstance().parse(tokenizer);
-			}
-			return expression;
-		}
-		else
+		Expression expression;
+		SqlToken sqlToken=tokenizer.nextToken();
+		if (sqlToken == null)
 		{
 			throw new IncompleteExpressionException();
 		}
-	}
-
-	Expression parseSignExpression(ParserTokenizer tokenizer)
-		throws ParserException
-	{
-		Expression expression=null;
-		while (tokenizer.hasMoreTokens() && expression == null)
+		tokenizer.pushBack(sqlToken);
+		switch (sqlToken.getType())
 		{
-			SqlToken token=tokenizer.nextToken();
-			switch (token.getType())
-			{
-				case OPERATOR_PLUS:
-					expression=parseTerminal(tokenizer);
-					expression=new UnitPlusExpression(token.getImage(), expression);
-					break;
-				case OPERATOR_MINUS:
-					expression=parseTerminal(tokenizer);
-					expression=new UnitMinusExpression(token.getImage(), expression);
-					break;
-				default:
-					tokenizer.pushBack();
-					expression=parseTerminal(tokenizer);
-			}
+			case KEYWORD_SELECT:
+				expression=SelectSentenceParser.getInstance().parse(tokenizer);
+				break;
+			default:
+				expression=ExpressionParser.getInstance().parse(tokenizer);
 		}
 		return expression;
 	}
 
-	Expression parseMultiplyingExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseSignExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
+	{
+		Expression expression=null;
+		do
+		{
+			SqlToken token=tokenizer.nextToken();
+			if (token != null)
+			{
+				switch (token.getType())
+				{
+					case OPERATOR_PLUS:
+						expression=parseTerminal(tokenizer);
+						expression=new UnitPlusExpression(token.getValue(), expression);
+						break;
+					case OPERATOR_MINUS:
+						expression=parseTerminal(tokenizer);
+						expression=new UnitMinusExpression(token.getValue(), expression);
+						break;
+					default:
+						tokenizer.pushBack(token);
+						expression=parseTerminal(tokenizer);
+				}
+			}
+		}
+		while (tokenizer.tokenWasRead() && expression == null);
+		return expression;
+	}
+
+	Expression parseMultiplyingExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		State state=State.INITIAL;
 		String operator=null;
 		Expression t;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -237,19 +252,22 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_OPERATOR:
 					SqlToken token=tokenizer.nextUsefulToken();
-					switch (token.getType())
+					if (token != null)
 					{
-						case ASTERISK:
-							operator=token.getImage();
-							state=State.EXPECTING_TERMINAL_MULTIPLY;
-							break;
-						case OPERATOR_DIV:
-							operator=token.getImage();
-							state=State.EXPECTING_TERMINAL_DIVIDE;
-							break;
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
+						switch (token.getType())
+						{
+							case ASTERISK:
+								operator=token.getValue();
+								state=State.EXPECTING_TERMINAL_MULTIPLY;
+								break;
+							case OPERATOR_DIV:
+								operator=token.getValue();
+								state=State.EXPECTING_TERMINAL_DIVIDE;
+								break;
+							default:
+								tokenizer.pushBack(token);
+								state=State.COMPLETE;
+						}
 					}
 					break;
 				case EXPECTING_TERMINAL_MULTIPLY:
@@ -280,17 +298,19 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 					throw new IllegalStateException();
 			}
 		}
+		while (state != State.COMPLETE && tokenizer.tokenWasRead());
 		return expression;
 	}
 
-	Expression parseAddingExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseAddingExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		State state=State.INITIAL;
 		String operator=null;
 		Expression t;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -300,22 +320,26 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_OPERATOR:
 					SqlToken token=tokenizer.nextUsefulToken();
+					if (token == null)
+					{
+						break;
+					}
 					switch (token.getType())
 					{
 						case OPERATOR_PLUS:
-							operator=token.getImage();
+							operator=token.getValue();
 							state=State.EXPECTING_TERMINAL_PLUS;
 							break;
 						case OPERATOR_MINUS:
-							operator=token.getImage();
+							operator=token.getValue();
 							state=State.EXPECTING_TERMINAL_MINUS;
 							break;
 						case OPERATOR_CONCATENATION:
-							operator=token.getImage();
+							operator=token.getValue();
 							state=State.EXPECTING_TERMINAL_CONCATENATION;
 							break;
 						default:
-							tokenizer.pushBack();
+							tokenizer.pushBack(token);
 							state=State.COMPLETE;
 					}
 					break;
@@ -359,24 +383,29 @@ public final class ArithmeticExpressionParser extends AbstractParser<Expression>
 					throw new IllegalStateException();
 			}
 		}
+		while (state != State.COMPLETE && tokenizer.tokenWasRead());
 		return expression;
 	}
 
-	Expression parsePrefixedExpression(ParserTokenizer tokenizer, String prefix)
-		throws ParserException
+	Expression parsePrefixedExpression(MatchingSqlTokenizer tokenizer, String prefix)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		SqlToken token=tokenizer.nextToken();
-		switch (token.getType())
+		if (token != null)
 		{
-			case IDENTIFIER:
-				expression=new IdentifierExpression(prefix, token.getImage());
-				break;
-			case ASTERISK:
-				expression=new AsteriskExpression(prefix, token.getImage());
-				break;
-			default:
-				throw new UnexpectedTokenException(token);
+			switch (token.getType())
+			{
+				case IDENTIFIER:
+					expression=new IdentifierExpression(prefix, token.getValue());
+					break;
+				case ASTERISK:
+					expression=new AsteriskExpression(prefix, token.getValue());
+					break;
+				default:
+					throw new UnexpectedTokenException(token);
+			}
 		}
 		return expression;
 	}

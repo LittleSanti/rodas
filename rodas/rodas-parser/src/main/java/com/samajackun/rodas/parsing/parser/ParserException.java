@@ -1,4 +1,4 @@
-package com.samajackun.rodas.sql.parser;
+package com.samajackun.rodas.parsing.parser;
 
 import com.samajackun.rodas.core.RodasException;
 

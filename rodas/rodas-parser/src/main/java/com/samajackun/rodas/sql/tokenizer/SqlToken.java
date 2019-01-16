@@ -1,4 +1,4 @@
-package com.samajackun.rodas.sql.parser.tokenizer;
+package com.samajackun.rodas.sql.tokenizer;
 
 public class SqlToken
 {
@@ -48,13 +48,16 @@ public class SqlToken
 
 	private final String image;
 
+	private final String value;
+
 	private final boolean keyword;
 
-	public SqlToken(Type type, String image)
+	public SqlToken(Type type, String image, String value)
 	{
 		super();
 		this.type=type;
 		this.image=image;
+		this.value=value;
 		switch (type)
 		{
 			case KEYWORD_SELECT:
@@ -87,6 +90,11 @@ public class SqlToken
 		}
 	}
 
+	public SqlToken(Type type, String image)
+	{
+		this(type, image, image);
+	}
+
 	public Type getType()
 	{
 		return this.type;
@@ -95,6 +103,16 @@ public class SqlToken
 	public String getImage()
 	{
 		return this.image;
+	}
+
+	public boolean isKeyword()
+	{
+		return this.keyword;
+	}
+
+	public String getValue()
+	{
+		return this.value;
 	}
 
 	@Override
@@ -128,18 +146,23 @@ public class SqlToken
 		{
 			return false;
 		}
+		if (this.value == null)
+		{
+			if (other.value != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.value.equals(other.value))
+		{
+			return false;
+		}
 		return true;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Token [type=" + this.type + ", image=" + this.image + "]";
+		return "SqlToken [type=" + this.type + ", image=" + this.image + ", value=" + this.value + "]";
 	}
-
-	public boolean isKeyword()
-	{
-		return this.keyword;
-	}
-
 }

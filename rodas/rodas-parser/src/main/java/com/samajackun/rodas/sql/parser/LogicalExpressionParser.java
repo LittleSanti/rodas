@@ -1,5 +1,7 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
+
 import com.samajackun.rodas.core.model.AndExpression;
 import com.samajackun.rodas.core.model.BetweenExpression;
 import com.samajackun.rodas.core.model.BinaryExpressionsFactories;
@@ -9,9 +11,11 @@ import com.samajackun.rodas.core.model.IExpressionFactory;
 import com.samajackun.rodas.core.model.NotExpression;
 import com.samajackun.rodas.core.model.NullConstantExpression;
 import com.samajackun.rodas.core.model.OrExpression;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.parser.tokenizer.UnexpectedTokenException;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public final class LogicalExpressionParser extends AbstractParser<Expression>
 {
@@ -19,7 +23,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 
 	public static LogicalExpressionParser getInstance()
 	{
-		return INSTANCE;
+		return LogicalExpressionParser.INSTANCE;
 	}
 
 	private LogicalExpressionParser()
@@ -31,20 +35,22 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 	}
 
 	@Override
-	public Expression parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public Expression parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		return parseLogicalExpression(tokenizer);
 	};
 
-	Expression parseLogicalExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseLogicalExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		State state=State.INITIAL;
 		String operator=null;
 		Expression t;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -55,7 +61,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					t=parseConjunctionExpression(tokenizer);
 					if (t != null)
 					{
-						expression=(expression == null)
+						expression=expression == null
 							? t
 							: new OrExpression(operator, expression, t);
 						state=State.EXPECTING_OPERATOR_OR;
@@ -67,35 +73,40 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_OPERATOR_OR:
 					SqlToken token1=tokenizer.nextUsefulToken();
-					switch (token1.getType())
+					if (token1 != null)
 					{
-						case OPERATOR_OR:
-							operator=token1.getImage();
-							state=State.EXPECTING_CONJUNCTION_EXPRESSION;
-							break;
-						case PARENTHESIS_END:
-						case COMMA:
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
-							break;
+						switch (token1.getType())
+						{
+							case OPERATOR_OR:
+								operator=token1.getValue();
+								state=State.EXPECTING_CONJUNCTION_EXPRESSION;
+								break;
+							case PARENTHESIS_END:
+							case COMMA:
+							default:
+								tokenizer.pushBack(token1);
+								state=State.COMPLETE;
+								break;
+						}
 					}
 					break;
 				default:
 					throw new IllegalStateException();
 			}
 		}
+		while (tokenizer.tokenWasRead() && state != State.COMPLETE);
 		return expression;
 	}
 
-	Expression parseConjunctionExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseConjunctionExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		State state=State.INITIAL;
 		String operator=null;
 		Expression t;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -106,7 +117,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					t=parseNotExpression(tokenizer);
 					if (t != null)
 					{
-						expression=(expression == null)
+						expression=expression == null
 							? t
 							: new AndExpression(operator, expression, t);
 						state=State.EXPECTING_OPERATOR_AND;
@@ -118,33 +129,38 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_OPERATOR_AND:
 					SqlToken token1=tokenizer.nextUsefulToken();
-					switch (token1.getType())
+					if (token1 != null)
 					{
-						case OPERATOR_AND:
-							operator=token1.getImage();
-							state=State.EXPECTING_NOT_EXPRESSION;
-							break;
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
-							break;
+						switch (token1.getType())
+						{
+							case OPERATOR_AND:
+								operator=token1.getValue();
+								state=State.EXPECTING_NOT_EXPRESSION;
+								break;
+							default:
+								tokenizer.pushBack(token1);
+								state=State.COMPLETE;
+								break;
+						}
 					}
 					break;
 				default:
 					throw new IllegalStateException();
 			}
 		}
+		while (tokenizer.tokenWasRead() && state != State.COMPLETE);
 		return expression;
 	}
 
-	Expression parseNotExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseNotExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		State state=State.INITIAL;
 		String operator=null;
 		Expression t;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -153,21 +169,24 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_NOT_EXPRESSION:
 					SqlToken token2=tokenizer.nextUsefulToken();
-					switch (token2.getType())
+					if (token2 != null)
 					{
-						case OPERATOR_NOT:
-							operator=token2.getImage();
-							t=parseNotExpression(tokenizer);
-							expression=new NotExpression(operator, t);
-							break;
-						case OPERATOR_EXISTS:
-							operator=token2.getImage();
-							t=parseComparisonExpression(tokenizer);
-							expression=new ExistsExpression(operator, t);
-							break;
-						default:
-							tokenizer.pushBack();
-							expression=parseComparisonExpression(tokenizer);
+						switch (token2.getType())
+						{
+							case OPERATOR_NOT:
+								operator=token2.getValue();
+								t=parseNotExpression(tokenizer);
+								expression=new NotExpression(operator, t);
+								break;
+							case OPERATOR_EXISTS:
+								operator=token2.getValue();
+								t=parseComparisonExpression(tokenizer);
+								expression=new ExistsExpression(operator, t);
+								break;
+							default:
+								tokenizer.pushBack(token2);
+								expression=parseComparisonExpression(tokenizer);
+						}
 					}
 					state=State.COMPLETE;
 					break;
@@ -175,11 +194,13 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					throw new IllegalStateException();
 			}
 		}
+		while (tokenizer.tokenWasRead() && state != State.COMPLETE);
 		return expression;
 	}
 
-	Expression parseComparisonExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseComparisonExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		// IS [NOT] NULL, LIKE, [NOT] BETWEEN, [NOT] IN, EXISTS, IS OF type comparison
 		Expression expression=null;
@@ -187,7 +208,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 		String operator=null;
 		Expression t;
 		IExpressionFactory expressionFactory=null;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -198,7 +219,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					t=ComparisonExpressionParser.getInstance().parse(tokenizer);
 					if (t != null)
 					{
-						expression=(expression == null)
+						expression=expression == null
 							? t
 							: expressionFactory.create(t);
 						state=State.EXPECTING_OPERATOR;
@@ -210,33 +231,36 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_OPERATOR:
 					SqlToken token1=tokenizer.nextUsefulToken();
-					switch (token1.getType())
+					if (token1 != null)
 					{
-						case OPERATOR_IS:
-							// operator=token1.getImage();
-							expressionFactory=BinaryExpressionsFactories.getInstance().createIsExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_OF_OR_NOT_OR_NULL;
-							break;
-						case OPERATOR_LIKE:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createLikeExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_RELATIONAL_EXPRESSION;
-							break;
-						case OPERATOR_IN:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createInExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_RELATIONAL_EXPRESSION;
-							break;
-						case OPERATOR_NOT:
-							operator=token1.getImage();
-							expressionFactory=BinaryExpressionsFactories.getInstance().createBetweenExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_IN_OR_BETWEEN;
-							break;
-						case OPERATOR_BETWEEN:
-							operator=token1.getImage();
-							state=State.EXPECTING_INTERVAL_BOUNDS;
-							break;
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
+						switch (token1.getType())
+						{
+							case OPERATOR_IS:
+								// operator=token1.getValue();
+								expressionFactory=BinaryExpressionsFactories.getInstance().createIsExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_OF_OR_NOT_OR_NULL;
+								break;
+							case OPERATOR_LIKE:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createLikeExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_RELATIONAL_EXPRESSION;
+								break;
+							case OPERATOR_IN:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createInExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_RELATIONAL_EXPRESSION;
+								break;
+							case OPERATOR_NOT:
+								operator=token1.getValue();
+								expressionFactory=BinaryExpressionsFactories.getInstance().createBetweenExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_IN_OR_BETWEEN;
+								break;
+							case OPERATOR_BETWEEN:
+								operator=token1.getValue();
+								state=State.EXPECTING_INTERVAL_BOUNDS;
+								break;
+							default:
+								tokenizer.pushBack(token1);
+								state=State.COMPLETE;
+						}
 					}
 					break;
 				case EXPECTING_INTERVAL_BOUNDS:
@@ -257,16 +281,16 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					switch (token3.getType())
 					{
 						case OPERATOR_OF:
-							operator=operator + token3.getImage();
+							operator=operator + token3.getValue();
 							state=State.EXPECTING_RELATIONAL_EXPRESSION;
 							break;
 						case OPERATOR_NOT:
-							// operator=operator + token3.getImage();
-							expressionFactory=BinaryExpressionsFactories.getInstance().createIsNotExpressionFactory(token3.getImage(), expressionFactory);
+							// operator=operator + token3.getValue();
+							expressionFactory=BinaryExpressionsFactories.getInstance().createIsNotExpressionFactory(token3.getValue(), expressionFactory);
 							state=State.EXPECTING_NULL;
 							break;
 						case KEYWORD_NULL:
-							expression=expressionFactory.create(new NullConstantExpression(token3.getImage()));
+							expression=expressionFactory.create(new NullConstantExpression(token3.getValue()));
 							state=State.COMPLETE;
 							break;
 						default:
@@ -278,7 +302,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					switch (token4.getType())
 					{
 						case KEYWORD_NULL:
-							expression=expressionFactory.create(new NullConstantExpression(token4.getImage()));
+							expression=expressionFactory.create(new NullConstantExpression(token4.getValue()));
 							state=State.COMPLETE;
 							break;
 						default:
@@ -290,11 +314,11 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					switch (token5.getType())
 					{
 						case OPERATOR_IN:
-							operator=operator + token5.getImage();
+							operator=operator + token5.getValue();
 							state=State.EXPECTING_RELATIONAL_EXPRESSION;
 							break;
 						case OPERATOR_BETWEEN:
-							operator=token5.getImage();
+							operator=token5.getValue();
 							state=State.EXPECTING_INTERVAL_BOUNDS;
 							break;
 						default:
@@ -305,6 +329,7 @@ public final class LogicalExpressionParser extends AbstractParser<Expression>
 					throw new IllegalStateException();
 			}
 		}
+		while (tokenizer.tokenWasRead() && state != State.COMPLETE);
 		return expression;
 	}
 }

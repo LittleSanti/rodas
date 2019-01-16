@@ -1,10 +1,14 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
+
 import com.samajackun.rodas.core.model.BinaryExpressionsFactories;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.IExpressionFactory;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public final class RelationalExpressionParser extends AbstractParser<Expression>
 {
@@ -12,7 +16,7 @@ public final class RelationalExpressionParser extends AbstractParser<Expression>
 
 	public static RelationalExpressionParser getInstance()
 	{
-		return INSTANCE;
+		return RelationalExpressionParser.INSTANCE;
 	}
 
 	private RelationalExpressionParser()
@@ -24,20 +28,22 @@ public final class RelationalExpressionParser extends AbstractParser<Expression>
 	}
 
 	@Override
-	public Expression parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public Expression parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		return parseRelationalExpression(tokenizer);
 	};
 
-	Expression parseRelationalExpression(ParserTokenizer tokenizer)
-		throws ParserException
+	Expression parseRelationalExpression(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
 		Expression expression=null;
 		State state=State.INITIAL;
 		Expression t;
 		IExpressionFactory expressionFactory=null;
-		while (tokenizer.hasMoreTokens() && state != State.COMPLETE)
+		do
 		{
 			switch (state)
 			{
@@ -60,42 +66,46 @@ public final class RelationalExpressionParser extends AbstractParser<Expression>
 					break;
 				case EXPECTING_OPERATOR:
 					SqlToken token1=tokenizer.nextUsefulToken();
-					switch (token1.getType())
+					if (token1 != null)
 					{
-						case OPERATOR_EQUALS:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createEqualsExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_TERMINAL;
-							break;
-						case OPERATOR_DISTINCT1:
-						case OPERATOR_DISTINCT2:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createNotEqualsExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_TERMINAL;
-							break;
-						case OPERATOR_GREATER:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createGreaterThanExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_TERMINAL;
-							break;
-						case OPERATOR_GREATER_OR_EQUALS:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createGreaterThanOrEqualsExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_TERMINAL;
-							break;
-						case OPERATOR_LOWER:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createLowerThanExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_TERMINAL;
-							break;
-						case OPERATOR_LOWER_OR_EQUALS:
-							expressionFactory=BinaryExpressionsFactories.getInstance().createLowerThanOrEqualsExpressionFactory(token1.getImage(), expression);
-							state=State.EXPECTING_TERMINAL;
-							break;
-						default:
-							tokenizer.pushBack();
-							state=State.COMPLETE;
+						switch (token1.getType())
+						{
+							case OPERATOR_EQUALS:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createEqualsExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_TERMINAL;
+								break;
+							case OPERATOR_DISTINCT1:
+							case OPERATOR_DISTINCT2:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createNotEqualsExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_TERMINAL;
+								break;
+							case OPERATOR_GREATER:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createGreaterThanExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_TERMINAL;
+								break;
+							case OPERATOR_GREATER_OR_EQUALS:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createGreaterThanOrEqualsExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_TERMINAL;
+								break;
+							case OPERATOR_LOWER:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createLowerThanExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_TERMINAL;
+								break;
+							case OPERATOR_LOWER_OR_EQUALS:
+								expressionFactory=BinaryExpressionsFactories.getInstance().createLowerThanOrEqualsExpressionFactory(token1.getValue(), expression);
+								state=State.EXPECTING_TERMINAL;
+								break;
+							default:
+								tokenizer.pushBack(token1);
+								state=State.COMPLETE;
+						}
 					}
 					break;
 				default:
 					throw new IllegalStateException();
 			}
 		}
+		while (tokenizer.tokenWasRead() && state != State.COMPLETE);
 		return expression;
 	}
 }

@@ -1,5 +1,7 @@
 package com.samajackun.rodas.sql.parser;
 
+import com.samajackun.rodas.parsing.parser.ParserException;
+
 public class BooleanExpressionExpectedException extends ParserException
 {
 	private static final long serialVersionUID=-5723831627103444264L;

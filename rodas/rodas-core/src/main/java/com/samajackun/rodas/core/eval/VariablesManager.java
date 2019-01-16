@@ -12,6 +12,9 @@ public interface VariablesManager
 	public Object getLocalVariable(String name)
 		throws VariableNotFoundException;
 
+	public Object getNearestVariable(String name)
+		throws VariableNotFoundException;
+
 	public void setLocalVariable(String name, Object value);
 
 	public void removeLocalVariable(String name);
@@ -19,4 +22,7 @@ public interface VariablesManager
 	public void pushLocalContext();
 
 	public void popLocalContext();
+
+	public VariablesContext getVariablesContext(String variableName)
+		throws VariableNotFoundException;
 }

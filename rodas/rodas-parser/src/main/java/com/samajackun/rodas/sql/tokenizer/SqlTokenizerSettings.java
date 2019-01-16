@@ -1,4 +1,4 @@
-package com.samajackun.rodas.sql.parser.tokenizer;
+package com.samajackun.rodas.sql.tokenizer;
 
 public class SqlTokenizerSettings
 {

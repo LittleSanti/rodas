@@ -1,176 +1,187 @@
 package com.samajackun.rodas.sql.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.model.BinaryExpression;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.PushBackTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlTokenizer;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.parsing.source.CharSequenceSource;
+import com.samajackun.rodas.parsing.source.PushBackSource;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class RelationalExpressionParserTest
 {
 	private Expression parse(String src)
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
-		ParserTokenizer tokenizer=new ParserTokenizer(new PushBackTokenizer<SqlToken>(new SqlTokenizer(src)));
+		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return RelationalExpressionParser.getInstance().parse(tokenizer);
 	}
 
 	@Test
 	public void parseRelationEquals()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a=b";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression=(BinaryExpression)expression;
-		assertEquals("=", binaryExpression.getOperator());
-		assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
-		assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
-		assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
+		Assert.assertEquals("=", binaryExpression.getOperator());
+		Assert.assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
+		Assert.assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseRelationDistinct1()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a<>b";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression=(BinaryExpression)expression;
-		assertEquals("<>", binaryExpression.getOperator());
-		assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
-		assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
-		assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
+		Assert.assertEquals("<>", binaryExpression.getOperator());
+		Assert.assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
+		Assert.assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseRelationDistinct2()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a!=b";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression=(BinaryExpression)expression;
-		assertEquals("!=", binaryExpression.getOperator());
-		assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
-		assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
-		assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
+		Assert.assertEquals("!=", binaryExpression.getOperator());
+		Assert.assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
+		Assert.assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseRelationLower()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a<b";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression=(BinaryExpression)expression;
-		assertEquals("<", binaryExpression.getOperator());
-		assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
-		assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
-		assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
+		Assert.assertEquals("<", binaryExpression.getOperator());
+		Assert.assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
+		Assert.assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseRelationLowerOrEquals()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a<=b";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression=(BinaryExpression)expression;
-		assertEquals("<=", binaryExpression.getOperator());
-		assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
-		assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
-		assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
+		Assert.assertEquals("<=", binaryExpression.getOperator());
+		Assert.assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
+		Assert.assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseRelationGreaterOrEquals()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a>=b";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression=(BinaryExpression)expression;
-		assertEquals(">=", binaryExpression.getOperator());
-		assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
-		assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
-		assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
+		Assert.assertEquals(">=", binaryExpression.getOperator());
+		Assert.assertTrue(binaryExpression.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
+		Assert.assertTrue(binaryExpression.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseEqualsWithAnAddAsFirstOperator()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a+b=c";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression1=(BinaryExpression)expression;
-		assertEquals("=", binaryExpression1.getOperator());
+		Assert.assertEquals("=", binaryExpression1.getOperator());
 
-		assertTrue(binaryExpression1.getExpression1() instanceof BinaryExpression);
+		Assert.assertTrue(binaryExpression1.getExpression1() instanceof BinaryExpression);
 		BinaryExpression binaryExpression2=(BinaryExpression)binaryExpression1.getExpression1();
-		assertEquals("a", ((IdentifierExpression)binaryExpression2.getExpression1()).getIdentifier());
-		assertEquals("+", binaryExpression2.getOperator());
-		assertEquals("b", ((IdentifierExpression)binaryExpression2.getExpression2()).getIdentifier());
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression2.getExpression1()).getIdentifier());
+		Assert.assertEquals("+", binaryExpression2.getOperator());
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression2.getExpression2()).getIdentifier());
 
-		assertTrue(binaryExpression1.getExpression2() instanceof IdentifierExpression);
-		assertEquals("c", ((IdentifierExpression)binaryExpression1.getExpression2()).getIdentifier());
+		Assert.assertTrue(binaryExpression1.getExpression2() instanceof IdentifierExpression);
+		Assert.assertEquals("c", ((IdentifierExpression)binaryExpression1.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseEqualsWithAnAddAsSecondOperator()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a=b+c";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression1=(BinaryExpression)expression;
-		assertEquals("=", binaryExpression1.getOperator());
-		assertTrue(binaryExpression1.getExpression1() instanceof IdentifierExpression);
-		assertEquals("a", ((IdentifierExpression)binaryExpression1.getExpression1()).getIdentifier());
+		Assert.assertEquals("=", binaryExpression1.getOperator());
+		Assert.assertTrue(binaryExpression1.getExpression1() instanceof IdentifierExpression);
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression1.getExpression1()).getIdentifier());
 
-		assertTrue(binaryExpression1.getExpression2() instanceof BinaryExpression);
+		Assert.assertTrue(binaryExpression1.getExpression2() instanceof BinaryExpression);
 		BinaryExpression binaryExpression2=(BinaryExpression)binaryExpression1.getExpression2();
-		assertEquals("b", ((IdentifierExpression)binaryExpression2.getExpression1()).getIdentifier());
-		assertEquals("+", binaryExpression2.getOperator());
-		assertEquals("c", ((IdentifierExpression)binaryExpression2.getExpression2()).getIdentifier());
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression2.getExpression1()).getIdentifier());
+		Assert.assertEquals("+", binaryExpression2.getOperator());
+		Assert.assertEquals("c", ((IdentifierExpression)binaryExpression2.getExpression2()).getIdentifier());
 	}
 
 	@Test
 	public void parseEqualsWithAddAsFirstAndSecondOperator()
-		throws ParserException
+		throws ParserException,
+		IOException
 	{
 		String src="a+b=c-d";
 		Expression expression=parse(src);
-		assertTrue(expression instanceof BinaryExpression);
+		Assert.assertTrue(expression instanceof BinaryExpression);
 		BinaryExpression binaryExpression1=(BinaryExpression)expression;
-		assertEquals("=", binaryExpression1.getOperator());
+		Assert.assertEquals("=", binaryExpression1.getOperator());
 
-		assertTrue(binaryExpression1.getExpression1() instanceof BinaryExpression);
+		Assert.assertTrue(binaryExpression1.getExpression1() instanceof BinaryExpression);
 		BinaryExpression binaryExpression2=(BinaryExpression)binaryExpression1.getExpression1();
-		assertEquals("a", ((IdentifierExpression)binaryExpression2.getExpression1()).getIdentifier());
-		assertEquals("+", binaryExpression2.getOperator());
-		assertEquals("b", ((IdentifierExpression)binaryExpression2.getExpression2()).getIdentifier());
+		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression2.getExpression1()).getIdentifier());
+		Assert.assertEquals("+", binaryExpression2.getOperator());
+		Assert.assertEquals("b", ((IdentifierExpression)binaryExpression2.getExpression2()).getIdentifier());
 
-		assertTrue(binaryExpression1.getExpression2() instanceof BinaryExpression);
+		Assert.assertTrue(binaryExpression1.getExpression2() instanceof BinaryExpression);
 		BinaryExpression binaryExpression3=(BinaryExpression)binaryExpression1.getExpression2();
-		assertEquals("c", ((IdentifierExpression)binaryExpression3.getExpression1()).getIdentifier());
-		assertEquals("-", binaryExpression3.getOperator());
-		assertEquals("d", ((IdentifierExpression)binaryExpression3.getExpression2()).getIdentifier());
+		Assert.assertEquals("c", ((IdentifierExpression)binaryExpression3.getExpression1()).getIdentifier());
+		Assert.assertEquals("-", binaryExpression3.getOperator());
+		Assert.assertEquals("d", ((IdentifierExpression)binaryExpression3.getExpression2()).getIdentifier());
 	}
 }

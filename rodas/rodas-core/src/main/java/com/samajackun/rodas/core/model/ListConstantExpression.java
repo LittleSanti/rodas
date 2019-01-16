@@ -9,7 +9,7 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class ListConstantExpression extends ConstantExpression
 {
-	private final List<ConstantExpression> list=new ArrayList<ConstantExpression>();
+	private final List<ConstantExpression> list=new ArrayList<>();
 
 	public ListConstantExpression()
 	{
@@ -25,17 +25,17 @@ public class ListConstantExpression extends ConstantExpression
 	public Object evaluateOnce(Context context, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
-		int i=0;
-		Object[] result=new Object[this.list.size()];
+		List<Object> result=new ArrayList<>(this.list.size());
 		for (ConstantExpression item : this.list)
 		{
-			result[i++]=item.evaluate(context, evaluatorFactory);
+			result.add(item.evaluate(context, evaluatorFactory));
 		}
 		return result;
 	}
 
 	@Override
-	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory) throws MetadataException
+	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory)
+		throws MetadataException
 	{
 		if (this.list.size() == 1)
 		{

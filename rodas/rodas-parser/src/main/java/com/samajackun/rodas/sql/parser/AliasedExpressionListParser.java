@@ -1,12 +1,15 @@
 package com.samajackun.rodas.sql.parser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.samajackun.rodas.core.model.AliasedExpression;
 import com.samajackun.rodas.core.model.Expression;
-import com.samajackun.rodas.sql.parser.tokenizer.ParserTokenizer;
-import com.samajackun.rodas.sql.parser.tokenizer.SqlToken;
+import com.samajackun.rodas.parsing.parser.AbstractParser;
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpression>>
 {
@@ -14,7 +17,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 
 	public static AliasedExpressionListParser getInstance()
 	{
-		return INSTANCE;
+		return AliasedExpressionListParser.INSTANCE;
 	}
 
 	private AliasedExpressionListParser()
@@ -26,19 +29,24 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 	};
 
 	@Override
-	public List<AliasedExpression> parse(ParserTokenizer tokenizer)
-		throws ParserException
+	public List<AliasedExpression> parse(MatchingSqlTokenizer tokenizer)
+		throws ParserException,
+		IOException
 	{
-		List<AliasedExpression> expressions=new ArrayList<AliasedExpression>();
+		List<AliasedExpression> expressions=new ArrayList<>();
 		Expression expression=null;
 		State state=State.INITIAL;
-		while (state != State.COMPLETE && tokenizer.hasMoreTokens())
+		while (state != State.COMPLETE)
 		{
 			SqlToken token=tokenizer.nextUsefulToken();
+			if (token == null)
+			{
+				break;
+			}
 			switch (state)
 			{
 				case INITIAL:
-					tokenizer.pushBack();
+					tokenizer.pushBack(token);
 					expression=ExpressionParser.getInstance().parse(tokenizer);
 					// expressions.add(new AliasedExpression(expression, null));
 					state=State.READ_EXPRESSION;
@@ -56,12 +64,12 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 							break;
 						case IDENTIFIER:
 						case DOUBLE_QUOTED_TEXT_LITERAL:
-							AliasedExpression aliasedExpression=new AliasedExpression(expression, token.getImage());
+							AliasedExpression aliasedExpression=new AliasedExpression(expression, token.getValue());
 							expressions.add(aliasedExpression);
 							state=State.READ_ALIAS;
 							break;
 						default:
-							tokenizer.pushBack();
+							tokenizer.pushBack(token);
 							state=State.COMPLETE;
 					}
 					break;
@@ -70,7 +78,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 					{
 						case IDENTIFIER:
 						case DOUBLE_QUOTED_TEXT_LITERAL:
-							AliasedExpression aliasedExpression=new AliasedExpression(expression, token.getImage());
+							AliasedExpression aliasedExpression=new AliasedExpression(expression, token.getValue());
 							expressions.add(aliasedExpression);
 							expression=null;
 							state=State.READ_ALIAS;
@@ -93,7 +101,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 							state=State.INITIAL;
 							break;
 						default:
-							tokenizer.pushBack();
+							tokenizer.pushBack(token);
 							state=State.COMPLETE;
 					}
 					break;
