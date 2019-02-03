@@ -11,7 +11,7 @@ import com.samajackun.rodas.core.model.BinaryExpression;
 import com.samajackun.rodas.core.model.ConstantExpression;
 import com.samajackun.rodas.core.model.ExistsExpression;
 import com.samajackun.rodas.core.model.Expression;
-import com.samajackun.rodas.core.model.ExpressionList;
+import com.samajackun.rodas.core.model.ExpressionCollection;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.InExpression;
 import com.samajackun.rodas.core.model.IsExpression;
@@ -25,7 +25,7 @@ import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings.WhitespaceBehaviour;
@@ -39,7 +39,7 @@ public class LogicalExpressionParserTest
 	{
 		SqlTokenizerSettings settings=new SqlTokenizerSettings();
 		settings.setWhitespaceBehaviour(WhitespaceBehaviour.IGNORE);
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), settings));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), settings));
 		Expression expression=LogicalExpressionParser.getInstance().parse(tokenizer);
 		return expression;
 	}
@@ -365,8 +365,8 @@ public class LogicalExpressionParserTest
 		Assert.assertEquals("a", ((IdentifierExpression)binaryExpression.getExpression1()).getIdentifier());
 		Assert.assertTrue(binaryExpression.getExpression2() instanceof ParehentesizedExpression);
 		ParehentesizedExpression set=(ParehentesizedExpression)binaryExpression.getExpression2();
-		Assert.assertTrue(set.getExpression() instanceof ExpressionList);
-		ExpressionList expressionList=(ExpressionList)set.getExpression();
+		Assert.assertTrue(set.getExpression() instanceof ExpressionCollection);
+		ExpressionCollection expressionList=(ExpressionCollection)set.getExpression();
 		Assert.assertEquals(3, expressionList.getExpressions().size());
 		Assert.assertEquals("a1", ((IdentifierExpression)expressionList.getExpressions().get(0)).getIdentifier());
 		Assert.assertEquals("a2", ((IdentifierExpression)expressionList.getExpressions().get(1)).getIdentifier());
@@ -384,15 +384,15 @@ public class LogicalExpressionParserTest
 		BinaryExpression binaryExpression=(InExpression)expression;
 		Assert.assertEquals("in", binaryExpression.getOperator());
 		Assert.assertTrue(binaryExpression.getExpression1() instanceof ParehentesizedExpression);
-		Assert.assertTrue(((ParehentesizedExpression)binaryExpression.getExpression1()).getExpression() instanceof ExpressionList);
-		ExpressionList expressionList=(ExpressionList)((ParehentesizedExpression)binaryExpression.getExpression1()).getExpression();
+		Assert.assertTrue(((ParehentesizedExpression)binaryExpression.getExpression1()).getExpression() instanceof ExpressionCollection);
+		ExpressionCollection expressionList=(ExpressionCollection)((ParehentesizedExpression)binaryExpression.getExpression1()).getExpression();
 		Assert.assertEquals(2, expressionList.getExpressions().size());
 		Assert.assertEquals("a", ((IdentifierExpression)expressionList.getExpressions().get(0)).getIdentifier());
 		Assert.assertEquals("b", ((IdentifierExpression)expressionList.getExpressions().get(1)).getIdentifier());
 		Assert.assertTrue(binaryExpression.getExpression2() instanceof ParehentesizedExpression);
 		ParehentesizedExpression set=(ParehentesizedExpression)binaryExpression.getExpression2();
-		Assert.assertTrue(set.getExpression() instanceof ExpressionList);
-		ExpressionList expressionList2=(ExpressionList)set.getExpression();
+		Assert.assertTrue(set.getExpression() instanceof ExpressionCollection);
+		ExpressionCollection expressionList2=(ExpressionCollection)set.getExpression();
 		Assert.assertEquals(3, expressionList2.getExpressions().size());
 		Assert.assertEquals("a1", ((IdentifierExpression)expressionList2.getExpressions().get(0)).getIdentifier());
 		Assert.assertEquals("a2", ((IdentifierExpression)expressionList2.getExpressions().get(1)).getIdentifier());

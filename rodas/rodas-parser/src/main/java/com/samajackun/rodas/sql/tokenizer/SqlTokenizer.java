@@ -98,7 +98,8 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 		StringBuilder trailingText=new StringBuilder(80);
 
 		char c=0;
-		while (token == null && source.hasMoreChars())
+		boolean looping=true;
+		while (token == null && source.hasMoreChars() && looping)
 		{
 			c=(char)source.nextChar();
 			char c2=(char)source.lookahead();
@@ -211,7 +212,15 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						}
 						else
 						{
-							throw new UnexpectedSymbolException(source, c);
+							if (this.getSettings().getUnexpectedSymbolBehaviour() == SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
+							{
+								throw new UnexpectedSymbolException(source, c);
+							}
+							else
+							{
+								looping=false;
+								source.unget(c);
+							}
 						}
 					}
 					else if (c == '|')
@@ -224,7 +233,15 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						}
 						else
 						{
-							throw new UnexpectedSymbolException(source, c);
+							if (this.getSettings().getUnexpectedSymbolBehaviour() == SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
+							{
+								throw new UnexpectedSymbolException(source, c);
+							}
+							else
+							{
+								looping=false;
+								source.unget(c);
+							}
 						}
 					}
 					else if (c == '=')
@@ -236,14 +253,17 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						if (c2 == '>')
 						{
 							source.nextChar();
-							token=SqlToken.TOKEN_DISTINCT1;
-							// source.incCurrentIndex();
+							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_DISTINCT1);
 						}
 						else if (c2 == '=')
 						{
 							source.nextChar();
 							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_LOWER_OR_EQUALS);
-							// source.incCurrentIndex();
+						}
+						else if (c2 == '<')
+						{
+							source.nextChar();
+							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_LOWER_LOWER);
 						}
 						else
 						{
@@ -256,7 +276,11 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						{
 							source.nextChar();
 							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_GREATER_OR_EQUALS);
-							// source.incCurrentIndex();
+						}
+						else if (c2 == '>')
+						{
+							source.nextChar();
+							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_GREATER_GREATER);
 						}
 						else
 						{
@@ -265,7 +289,15 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						throw new UnexpectedSymbolException(source, c);
+						if (this.getSettings().getUnexpectedSymbolBehaviour() == SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
+						{
+							throw new UnexpectedSymbolException(source, c);
+						}
+						else
+						{
+							looping=false;
+							source.unget(c);
+						}
 					}
 					break;
 				case READING_COMMENT:

@@ -10,20 +10,27 @@ public class SqlTokenizerSettings
 		IGNORE, PRODUCE_TOKENS, INCLUDE_IN_FOLLOWING_TOKEN
 	};
 
+	public enum UnexpectedSymbolBehaviour {
+		THROW_EXCEPTION, END_PARSING
+	};
+
 	private WhitespaceBehaviour whitespaceBehaviour;
 
 	private CommentsBehaviour commentsBehaviour;
 
-	public SqlTokenizerSettings(WhitespaceBehaviour whitespaceBehaviour, CommentsBehaviour commentsBehaviour)
+	private UnexpectedSymbolBehaviour unexpectedSymbolBehaviour=UnexpectedSymbolBehaviour.THROW_EXCEPTION;
+
+	public SqlTokenizerSettings(WhitespaceBehaviour whitespaceBehaviour, CommentsBehaviour commentsBehaviour, UnexpectedSymbolBehaviour unexpectedSymbolBehaviour)
 	{
 		super();
 		this.whitespaceBehaviour=whitespaceBehaviour;
 		this.commentsBehaviour=commentsBehaviour;
+		this.unexpectedSymbolBehaviour=unexpectedSymbolBehaviour;
 	}
 
 	public SqlTokenizerSettings()
 	{
-		this(WhitespaceBehaviour.IGNORE, CommentsBehaviour.IGNORE);
+		this(WhitespaceBehaviour.IGNORE, CommentsBehaviour.IGNORE, UnexpectedSymbolBehaviour.THROW_EXCEPTION);
 	}
 
 	public WhitespaceBehaviour getWhitespaceBehaviour()
@@ -31,9 +38,10 @@ public class SqlTokenizerSettings
 		return this.whitespaceBehaviour;
 	}
 
-	public void setWhitespaceBehaviour(WhitespaceBehaviour whitespaceBehaviour)
+	public SqlTokenizerSettings setWhitespaceBehaviour(WhitespaceBehaviour whitespaceBehaviour)
 	{
 		this.whitespaceBehaviour=whitespaceBehaviour;
+		return this;
 	}
 
 	public CommentsBehaviour getCommentsBehaviour()
@@ -41,9 +49,20 @@ public class SqlTokenizerSettings
 		return this.commentsBehaviour;
 	}
 
-	public void setCommentsBehaviour(CommentsBehaviour commentsBehaviour)
+	public SqlTokenizerSettings setCommentsBehaviour(CommentsBehaviour commentsBehaviour)
 	{
 		this.commentsBehaviour=commentsBehaviour;
+		return this;
 	}
 
+	public UnexpectedSymbolBehaviour getUnexpectedSymbolBehaviour()
+	{
+		return this.unexpectedSymbolBehaviour;
+	}
+
+	public SqlTokenizerSettings setUnexpectedSymbolBehaviour(UnexpectedSymbolBehaviour unexpectedSymbolBehaviour)
+	{
+		this.unexpectedSymbolBehaviour=unexpectedSymbolBehaviour;
+		return this;
+	}
 }

@@ -117,8 +117,15 @@ public abstract class AbstractVariablesManager implements VariablesManager
 	protected abstract VariablesContext getVariablesContextForVariableNotFound(String name)
 		throws VariableNotFoundException;
 
-	protected VariablesContext getGlobalVariables()
+	public VariablesContext getGlobalVariablesContext()
 	{
 		return this.globalVariables;
 	}
+
+	@Override
+	public VariablesContext getLocalVariablesContext()
+	{
+		return this.localVariables.peek();
+	}
+
 }

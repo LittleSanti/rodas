@@ -8,7 +8,7 @@ import com.samajackun.rodas.core.model.AliasedExpression;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlToken;
 
 public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpression>>
@@ -22,6 +22,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 
 	private AliasedExpressionListParser()
 	{
+		super(DefaultParserFactory.getInstance());
 	}
 
 	private enum State {
@@ -29,7 +30,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 	};
 
 	@Override
-	public List<AliasedExpression> parse(MatchingSqlTokenizer tokenizer)
+	public List<AliasedExpression> parse(SqlMatchingTokenizer tokenizer)
 		throws ParserException,
 		IOException
 	{
@@ -38,7 +39,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 		State state=State.INITIAL;
 		while (state != State.COMPLETE)
 		{
-			SqlToken token=tokenizer.nextUsefulToken();
+			SqlToken token=tokenizer.nextOptionalUsefulToken();
 			if (token == null)
 			{
 				break;

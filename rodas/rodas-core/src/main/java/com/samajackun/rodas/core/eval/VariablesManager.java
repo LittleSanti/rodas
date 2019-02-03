@@ -25,4 +25,6 @@ public interface VariablesManager
 
 	public VariablesContext getVariablesContext(String variableName)
 		throws VariableNotFoundException;
+
+	public VariablesContext getLocalVariablesContext();
 }

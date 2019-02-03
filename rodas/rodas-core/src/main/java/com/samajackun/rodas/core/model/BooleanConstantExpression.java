@@ -43,4 +43,9 @@ public class BooleanConstantExpression extends ConstantExpression implements Boo
 		return Boolean.class.cast(super.evaluate(context, evaluatorFactory));
 	}
 
+	@Override
+	public Object evaluateAsConstant()
+	{
+		return this.booleanValue;
+	}
 }

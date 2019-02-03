@@ -66,6 +66,9 @@ public abstract class ConstantExpression implements Expression
 	protected abstract Object evaluateOnce(Context context, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException;
 
+	public abstract Object evaluateAsConstant()
+		throws EvaluationException;
+
 	@Override
 	public Expression reduce(EvaluatorFactory evaluatorFactory)
 		throws EvaluationException

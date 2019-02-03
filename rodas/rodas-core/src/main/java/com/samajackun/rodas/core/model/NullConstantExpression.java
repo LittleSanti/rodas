@@ -19,8 +19,15 @@ public class NullConstantExpression extends ConstantExpression implements Expres
 	}
 
 	@Override
-	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory) throws MetadataException
+	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory)
+		throws MetadataException
 	{
 		return Datatype.NULL;
+	}
+
+	@Override
+	public Object evaluateAsConstant()
+	{
+		return null;
 	}
 }

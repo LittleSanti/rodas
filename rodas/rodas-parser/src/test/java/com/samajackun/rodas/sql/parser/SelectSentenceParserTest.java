@@ -23,7 +23,7 @@ import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings;
 
@@ -35,7 +35,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -59,7 +59,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a,b FROM t";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -92,7 +92,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a,b FROM t,s";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -118,7 +118,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a,b FROM (SELECT 120 FROM t)";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -144,7 +144,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a AS x1 FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -168,7 +168,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a AS \"x1\" FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -192,7 +192,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -214,7 +214,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT * FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -239,7 +239,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT b.* FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -264,7 +264,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM (SELECT x FROM y)";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -286,7 +286,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM (SELECT x FROM y WHERE z1=z2)";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -308,7 +308,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -332,7 +332,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT 1+a";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -360,7 +360,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT (1)";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -385,7 +385,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM b WHERE c";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -404,7 +404,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT count(1) FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -431,7 +431,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT count(*) FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -457,7 +457,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT /*1*/a, my_fn(12*b) as z FROM b INNER JOIN (SELECT 120 y FROM t2) AS t3 ON b.x=t3.y, t4 WHERE c=a*b-c>t3.t";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -479,7 +479,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a, count(1) FROM b GROUP BY a";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -501,7 +501,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT count(*) FROM b";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -525,7 +525,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a, count(1) FROM b GROUP BY a HAVING count(1)>0";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -551,7 +551,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM b ORDER BY c";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -572,7 +572,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM b ORDER BY c,d";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -593,7 +593,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="WITH t AS (SELECT a FROM b) SELECT * FROM t";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -617,7 +617,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="WITH t AS (SELECT a FROM b), s AS (SELECT c FROM d) SELECT * FROM t,s";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN)));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new SqlTokenizerSettings(SqlTokenizerSettings.WhitespaceBehaviour.IGNORE, SqlTokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -647,7 +647,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM b WHERE c=:P1";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
 		Assert.assertTrue(sentence.getWhereExpression() instanceof EqualsExpression);
 		EqualsExpression equalsExpression=(EqualsExpression)sentence.getWhereExpression();
@@ -662,7 +662,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM \"b\"";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);
@@ -689,7 +689,7 @@ public class SelectSentenceParserTest
 		IOException
 	{
 		String src="SELECT a FROM \"c:\\enero\\febrero\\marzo y abril.mayo\"";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer);

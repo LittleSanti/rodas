@@ -25,8 +25,15 @@ public class TextConstantExpression extends ConstantExpression
 	}
 
 	@Override
-	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory) throws MetadataException
+	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory)
+		throws MetadataException
 	{
 		return Datatype.TEXT;
+	}
+
+	@Override
+	public Object evaluateAsConstant()
+	{
+		return getValue();
 	}
 }

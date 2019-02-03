@@ -7,16 +7,16 @@ import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
-public class ExpressionList implements Expression
+public class ExpressionCollection implements Expression
 {
 	private final List<Expression> expressions;
 
-	public ExpressionList()
+	public ExpressionCollection()
 	{
 		this.expressions=new ArrayList<Expression>();
 	}
 
-	public ExpressionList(int size)
+	public ExpressionCollection(int size)
 	{
 		this.expressions=new ArrayList<Expression>(size);
 	}
@@ -57,7 +57,7 @@ public class ExpressionList implements Expression
 	public Expression reduce(EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
-		ExpressionList reduced=new ExpressionList(this.expressions.size());
+		ExpressionCollection reduced=new ExpressionCollection(this.expressions.size());
 		for (Expression src : this.expressions)
 		{
 			reduced.add(src.reduce(evaluatorFactory));

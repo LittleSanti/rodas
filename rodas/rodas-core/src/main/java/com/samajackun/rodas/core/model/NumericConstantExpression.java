@@ -32,4 +32,10 @@ public class NumericConstantExpression extends ConstantExpression
 	{
 		return evaluatorFactory.getBaseEvaluator().getDatatype(context, this);
 	}
+
+	@Override
+	public Object evaluateAsConstant()
+	{
+		return this.numericValue;
+	}
 }

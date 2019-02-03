@@ -69,4 +69,9 @@ public abstract class AbstractTokenizer<T, S> implements Tokenizer<T>
 	// {
 	// return this.source;
 	// }
+
+	public PushBackSource getSource()
+	{
+		return this.source;
+	}
 }

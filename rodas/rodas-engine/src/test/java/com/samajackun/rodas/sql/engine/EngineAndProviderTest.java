@@ -21,7 +21,7 @@ import com.samajackun.rodas.core.model.SelectSentence;
 import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.TableSource;
 import com.samajackun.rodas.sql.parser.SelectSentenceParser;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class EngineAndProviderTest
@@ -63,7 +63,7 @@ public class EngineAndProviderTest
 	private void executeQuery(String sql, Context context)
 		throws RodasException
 	{
-		SelectSentence source=SelectSentenceParser.getInstance().parse(new MatchingSqlTokenizer(new SqlTokenizer(sql)));
+		SelectSentence source=SelectSentenceParser.getInstance().parse(new SqlMatchingTokenizer(new SqlTokenizer(sql)));
 		Cursor cursor=this.engine.execute(source, this.provider, context);
 		cursor.getColumnMap().keySet().stream().forEach(s -> System.out.printf("%s\t", s));
 		System.out.printf("\r\n");

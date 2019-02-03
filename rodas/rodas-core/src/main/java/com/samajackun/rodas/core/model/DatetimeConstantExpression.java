@@ -34,4 +34,10 @@ public class DatetimeConstantExpression extends ConstantExpression
 	{
 		return Datatype.DATETIME;
 	}
+
+	@Override
+	public Object evaluateAsConstant()
+	{
+		return this.numericValue;
+	}
 }

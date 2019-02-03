@@ -43,4 +43,10 @@ public class ListConstantExpression extends ConstantExpression
 		}
 		throw new ExpressionWithTooManyColumnsException(this);
 	}
+
+	@Override
+	public Object evaluateAsConstant()
+	{
+		return this.list;
+	}
 }

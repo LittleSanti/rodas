@@ -16,7 +16,7 @@ import com.samajackun.rodas.core.model.UsingJoinedSource;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlToken;
 import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
 
@@ -31,6 +31,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 
 	private SourceListParser()
 	{
+		super(DefaultParserFactory.getInstance());
 	}
 
 	private enum State {
@@ -38,7 +39,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 	};
 
 	@Override
-	public List<Source> parse(MatchingSqlTokenizer tokenizer)
+	public List<Source> parse(SqlMatchingTokenizer tokenizer)
 		throws ParserException,
 		IOException
 	{
@@ -62,7 +63,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					}
 					break;
 				case EXPECTING_COMMA:
-					SqlToken token=tokenizer.nextUsefulToken();
+					SqlToken token=tokenizer.nextOptionalUsefulToken();
 					if (token != null)
 					{
 						if (token.getType() == SqlToken.Type.COMMA)
@@ -92,7 +93,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 		return sources;
 	}
 
-	public Source parseSource(MatchingSqlTokenizer tokenizer)
+	public Source parseSource(SqlMatchingTokenizer tokenizer)
 		throws ParserException,
 		IOException
 	{
@@ -102,7 +103,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 		OnJoinedSource.Type joinType=null;
 		do
 		{
-			SqlToken token=tokenizer.nextUsefulToken();
+			SqlToken token=tokenizer.nextOptionalUsefulToken();
 			if (token != null)
 			{
 				switch (state)

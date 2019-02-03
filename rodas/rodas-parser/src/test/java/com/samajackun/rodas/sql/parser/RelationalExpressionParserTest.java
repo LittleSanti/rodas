@@ -11,7 +11,7 @@ import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class RelationalExpressionParserTest
@@ -20,7 +20,7 @@ public class RelationalExpressionParserTest
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return RelationalExpressionParser.getInstance().parse(tokenizer);
 	}
 

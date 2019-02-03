@@ -23,7 +23,7 @@ import com.samajackun.rodas.core.model.UnitMinusExpression;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class ArithmeticExpressionParserTest
@@ -32,7 +32,7 @@ public class ArithmeticExpressionParserTest
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return ArithmeticExpressionParser.getInstance().parseTerminal(tokenizer);
 	}
 
@@ -42,7 +42,7 @@ public class ArithmeticExpressionParserTest
 		IOException
 	{
 		String src="";
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		ArithmeticExpressionParser.getInstance().parseTerminal(tokenizer);
 	}
 
@@ -130,7 +130,7 @@ public class ArithmeticExpressionParserTest
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return ArithmeticExpressionParser.getInstance().parseSignExpression(tokenizer);
 	}
 
@@ -196,7 +196,7 @@ public class ArithmeticExpressionParserTest
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return ArithmeticExpressionParser.getInstance().parseMultiplyingExpression(tokenizer);
 	}
 
@@ -299,7 +299,7 @@ public class ArithmeticExpressionParserTest
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return ArithmeticExpressionParser.getInstance().parseAddingExpression(tokenizer);
 	}
 

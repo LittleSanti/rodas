@@ -7,24 +7,24 @@ import org.junit.Test;
 
 import com.samajackun.rodas.core.model.ConstantExpression;
 import com.samajackun.rodas.core.model.Expression;
-import com.samajackun.rodas.core.model.ExpressionList;
+import com.samajackun.rodas.core.model.ExpressionCollection;
 import com.samajackun.rodas.core.model.FunctionExpression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.ParehentesizedExpression;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class ExpressionParserTest
 {
-	private ExpressionList parseExpressionList(String src)
+	private ExpressionCollection parseExpressionList(String src)
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ExpressionParser.getInstance().parseExpressionList(tokenizer);
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		return ExpressionCollectionParser.getInstance().parse(tokenizer);
 	}
 
 	@Test
@@ -33,7 +33,7 @@ public class ExpressionParserTest
 		IOException
 	{
 		String src="";
-		ExpressionList expressions=parseExpressionList(src);
+		ExpressionCollection expressions=parseExpressionList(src);
 		Assert.assertEquals(0, expressions.getExpressions().size());
 
 	}
@@ -44,7 +44,7 @@ public class ExpressionParserTest
 		IOException
 	{
 		String src="a";
-		ExpressionList expressions=parseExpressionList(src);
+		ExpressionCollection expressions=parseExpressionList(src);
 		Assert.assertEquals(1, expressions.getExpressions().size());
 		Assert.assertTrue(expressions.getExpressions().get(0) instanceof IdentifierExpression);
 		Assert.assertEquals("a", ((IdentifierExpression)expressions.getExpressions().get(0)).getIdentifier());
@@ -56,7 +56,7 @@ public class ExpressionParserTest
 		IOException
 	{
 		String src="a,b";
-		ExpressionList expressions=parseExpressionList(src);
+		ExpressionCollection expressions=parseExpressionList(src);
 		Assert.assertEquals(2, expressions.getExpressions().size());
 		Assert.assertTrue(expressions.getExpressions().get(0) instanceof IdentifierExpression);
 		Assert.assertEquals("a", ((IdentifierExpression)expressions.getExpressions().get(0)).getIdentifier());
@@ -68,7 +68,7 @@ public class ExpressionParserTest
 		throws ParserException,
 		IOException
 	{
-		MatchingSqlTokenizer tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		return ExpressionParser.getInstance().parse(tokenizer);
 	}
 
@@ -164,8 +164,8 @@ public class ExpressionParserTest
 		Expression expression=parseExpression(src);
 		Assert.assertTrue(expression instanceof ParehentesizedExpression);
 		ParehentesizedExpression parehentesizedExpression=(ParehentesizedExpression)expression;
-		Assert.assertTrue(parehentesizedExpression.getExpression() instanceof ExpressionList);
-		ExpressionList expressionList=(ExpressionList)parehentesizedExpression.getExpression();
+		Assert.assertTrue(parehentesizedExpression.getExpression() instanceof ExpressionCollection);
+		ExpressionCollection expressionList=(ExpressionCollection)parehentesizedExpression.getExpression();
 		Assert.assertEquals(2, expressionList.getExpressions().size());
 		Assert.assertEquals("a", ((IdentifierExpression)expressionList.getExpressions().get(0)).getIdentifier());
 		Assert.assertEquals("b", ((IdentifierExpression)expressionList.getExpressions().get(1)).getIdentifier());

@@ -11,20 +11,20 @@ import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
-import com.samajackun.rodas.sql.tokenizer.MatchingSqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlToken;
 import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class ScriptParser
 {
-	private final MatchingSqlTokenizer tokenizer;
+	private final SqlMatchingTokenizer tokenizer;
 
 	private Sentence fetched;
 
 	public ScriptParser(PushBackSource source) throws ParserException, IOException
 	{
-		this.tokenizer=new MatchingSqlTokenizer(new SqlTokenizer(source));
+		this.tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(source));
 		this.fetched=fetch();
 	}
 

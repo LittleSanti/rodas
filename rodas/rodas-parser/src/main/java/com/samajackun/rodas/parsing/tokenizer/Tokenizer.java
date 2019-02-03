@@ -2,6 +2,8 @@ package com.samajackun.rodas.parsing.tokenizer;
 
 import java.io.IOException;
 
+import com.samajackun.rodas.parsing.source.PushBackSource;
+
 public interface Tokenizer<T>
 {
 	// public abstract boolean hasMoreTokens();
@@ -12,4 +14,6 @@ public interface Tokenizer<T>
 
 	public abstract void pushBackToken(T token)
 		throws IOException;
+
+	public PushBackSource getSource();
 }
