@@ -1,6 +1,5 @@
 package com.samajackun.rodas.core.eval;
 
-
 import com.samajackun.rodas.core.model.Expression;
 
 public class LogicalUtils
@@ -13,22 +12,22 @@ public class LogicalUtils
 	public static Boolean computeAnd(Object value1, Object value2, Expression expression)
 		throws EvaluationException
 	{
-		return toBoolean(null, value1) && toBoolean(null, value2);
+		return toBoolean(value1) && toBoolean(value2);
 	}
 
 	public static Boolean computeOr(Object value1, Object value2, Expression expression)
 		throws EvaluationException
 	{
-		return toBoolean(null, value1) || toBoolean(null, value2);
+		return toBoolean(value1) || toBoolean(value2);
 	}
 
 	public static Boolean computeNot(Object value1, Expression expression)
 		throws EvaluationException
 	{
-		return !toBoolean(null, value1);
+		return !toBoolean(value1);
 	}
 
-	private static boolean toBoolean(Context context, Object value)
+	public static boolean toBoolean(Object value)
 		throws EvaluationException
 	{
 		boolean v;

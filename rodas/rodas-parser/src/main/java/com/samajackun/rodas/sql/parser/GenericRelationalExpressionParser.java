@@ -7,8 +7,9 @@ import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.IExpressionFactory;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class GenericRelationalExpressionParser extends AbstractParser<Expression> implements PartialParser
 {
@@ -22,14 +23,14 @@ public class GenericRelationalExpressionParser extends AbstractParser<Expression
 	}
 
 	@Override
-	public Expression parse(SqlMatchingTokenizer tokenizer)
+	public Expression parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
-		return parseRelationalExpression(tokenizer);
+		return parseRelationalExpression(tokenizer, parserContext);
 	};
 
-	Expression parseRelationalExpression(SqlMatchingTokenizer tokenizer)
+	Expression parseRelationalExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -45,7 +46,7 @@ public class GenericRelationalExpressionParser extends AbstractParser<Expression
 				// state=State.EXPECTING_TERMINAL;
 				// break;
 				case EXPECTING_TERMINAL:
-					t=getParserFactory().getArithmeticExpressionParser().parse(tokenizer);
+					t=getParserFactory().getArithmeticExpressionParser().parse(tokenizer, parserContext);
 					if (t != null)
 					{
 						expression=(expression == null)
@@ -59,33 +60,32 @@ public class GenericRelationalExpressionParser extends AbstractParser<Expression
 					}
 					break;
 				case EXPECTING_OPERATOR:
-					SqlToken token1=tokenizer.nextOptionalUsefulToken();
+					Token token1=tokenizer.nextOptionalUsefulToken();
 					if (token1 != null)
 					{
 						switch (token1.getType())
 						{
-							case OPERATOR_EQUALS:
+							case SqlTokenTypes.OPERATOR_EQUALS:
 								expressionFactory=BinaryExpressionsFactories.getInstance().createEqualsExpressionFactory(token1.getValue(), expression);
 								state=State.EXPECTING_TERMINAL;
 								break;
-							case OPERATOR_DISTINCT1:
-							case OPERATOR_DISTINCT2:
+							case SqlTokenTypes.OPERATOR_DISTINCT:
 								expressionFactory=BinaryExpressionsFactories.getInstance().createNotEqualsExpressionFactory(token1.getValue(), expression);
 								state=State.EXPECTING_TERMINAL;
 								break;
-							case OPERATOR_GREATER:
+							case SqlTokenTypes.OPERATOR_GREATER:
 								expressionFactory=BinaryExpressionsFactories.getInstance().createGreaterThanExpressionFactory(token1.getValue(), expression);
 								state=State.EXPECTING_TERMINAL;
 								break;
-							case OPERATOR_GREATER_OR_EQUALS:
+							case SqlTokenTypes.OPERATOR_GREATER_OR_EQUALS:
 								expressionFactory=BinaryExpressionsFactories.getInstance().createGreaterThanOrEqualsExpressionFactory(token1.getValue(), expression);
 								state=State.EXPECTING_TERMINAL;
 								break;
-							case OPERATOR_LOWER:
+							case SqlTokenTypes.OPERATOR_LOWER:
 								expressionFactory=BinaryExpressionsFactories.getInstance().createLowerThanExpressionFactory(token1.getValue(), expression);
 								state=State.EXPECTING_TERMINAL;
 								break;
-							case OPERATOR_LOWER_OR_EQUALS:
+							case SqlTokenTypes.OPERATOR_LOWER_OR_EQUALS:
 								expressionFactory=BinaryExpressionsFactories.getInstance().createLowerThanOrEqualsExpressionFactory(token1.getValue(), expression);
 								state=State.EXPECTING_TERMINAL;
 								break;

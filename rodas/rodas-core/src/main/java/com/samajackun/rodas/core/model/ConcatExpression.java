@@ -1,6 +1,7 @@
 package com.samajackun.rodas.core.model;
 
 import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.DummyContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
@@ -27,7 +28,7 @@ public class ConcatExpression extends BinaryExpression
 		Expression reduced2=getExpression2().reduceAndReport(evaluatorFactory);
 		if (getExpression1() instanceof TextConstantExpression && getExpression2() instanceof TextConstantExpression)
 		{
-			String result=evaluatorFactory.getTextEvaluator().evaluateConcat(null, reduced1, reduced2);
+			String result=evaluatorFactory.getTextEvaluator().evaluateConcat(DummyContext.getInstance(), reduced1, reduced2);
 			reduced=new TextConstantExpression(result);
 		}
 		else

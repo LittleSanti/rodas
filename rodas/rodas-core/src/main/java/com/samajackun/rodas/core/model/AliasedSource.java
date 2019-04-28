@@ -1,10 +1,8 @@
 package com.samajackun.rodas.core.model;
 
-import java.util.List;
-
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.execution.Cursor;
 
 // TODO Falta procesar el alias.
 public class AliasedSource implements Source
@@ -42,39 +40,39 @@ public class AliasedSource implements Source
 		String code=this.source.toCode();
 		if (this.alias != null)
 		{
-			code+=" AS " + this.alias;
+			code+=" AS \"" + this.alias + "\"";
 		}
 		return code;
 	}
 
 	@Override
-	public boolean hasColumn(String column, Provider provider)
-		throws ProviderException
-	{
-		return this.source.hasColumn(column, provider);
-	}
-
-	@Override
-	public Cursor execute(Engine engine, Provider provider, Context context)
+	public Cursor execute(Engine engine, Context context)
 		throws EngineException,
 		EvaluationException,
 		ProviderException
 	{
-		return this.source.execute(engine, provider, context);
+		return this.source.execute(engine, context);
 	}
 
-	@Override
-	public List<String> getColumnNames(Provider provider)
-		throws ProviderException
-	{
-		return this.source.getColumnNames(provider);
-	}
-
-	@Override
-	public ColumnMetadata getColumnMetadata(int column, Provider provider, Context context, EvaluatorFactory evaluatorFactory)
-		throws MetadataException,
-		ProviderException
-	{
-		return this.source.getColumnMetadata(column, provider, context, evaluatorFactory);
-	}
+	// @Override
+	// public boolean hasColumn(String column)
+	// throws ProviderException
+	// {
+	// return this.source.hasColumn(column);
+	// }
+	//
+	// @Override
+	// public List<String> getColumnNames()
+	// throws ProviderException
+	// {
+	// return this.source.getColumnNames();
+	// }
+	//
+	// @Override
+	// public ColumnMetadata getColumnMetadata(int column, Context context, EvaluatorFactory evaluatorFactory)
+	// throws MetadataException,
+	// ProviderException
+	// {
+	// return this.source.getColumnMetadata(column, context, evaluatorFactory);
+	// }
 }

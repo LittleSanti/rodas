@@ -12,18 +12,21 @@ import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
 import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class ScriptParser
 {
 	private final SqlMatchingTokenizer tokenizer;
 
+	private final ParserContext parserContext;
+
 	private Sentence fetched;
 
-	public ScriptParser(PushBackSource source) throws ParserException, IOException
+	public ScriptParser(PushBackSource source, ParserContext parserContext) throws ParserException, IOException
 	{
+		this.parserContext=parserContext;
 		this.tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(source));
 		this.fetched=fetch();
 	}
@@ -60,7 +63,7 @@ public class ScriptParser
 		List<WithDeclaration> withDeclarations=new ArrayList<>();
 		do
 		{
-			SqlToken token=this.tokenizer.nextToken();
+			Token token=this.tokenizer.nextToken();
 			if (token != null)
 			{
 				switch (state)
@@ -68,16 +71,16 @@ public class ScriptParser
 					case INITIAL:
 						switch (token.getType())
 						{
-							case COMMENT:
+							case SqlTokenTypes.COMMENT:
 								// Ignorar
 								break;
-							case KEYWORD_SELECT:
+							case SqlTokenTypes.KEYWORD_SELECT:
 								selectSource=new SelectSentence();
 								do
 								{
 									// Recopilar opciones:
 									token=nextToken();
-									if (token.isKeyword())
+									if (SqlTokenTypes.isKeyword(token.getType()))
 									{
 										selectSource.getOptions().add(token.getValue());
 									}
@@ -86,22 +89,22 @@ public class ScriptParser
 										this.tokenizer.pushBack(token);
 									}
 								}
-								while (token.isKeyword());
+								while (SqlTokenTypes.isKeyword(token.getType()));
 								state=State.READING_SELECT_EXPRESSIONS;
 								break;
-							case KEYWORD_WITH:
+							case SqlTokenTypes.KEYWORD_WITH:
 								do
 								{
-									SqlToken tokenAlias=matchToken(SqlToken.Type.IDENTIFIER);
-									token=matchToken(SqlToken.Type.KEYWORD_AS);
-									token=matchToken(SqlToken.Type.PARENTHESIS_START);
-									SelectSentence selectSentence=SelectSentenceParser.getInstance().parse(this.tokenizer);
+									Token tokenAlias=matchToken(SqlTokenTypes.IDENTIFIER);
+									token=matchToken(SqlTokenTypes.KEYWORD_AS);
+									token=matchToken(SqlTokenTypes.PARENTHESIS_START);
+									SelectSentence selectSentence=SelectSentenceParser.getInstance().parse(this.tokenizer, this.parserContext);
 									WithDeclaration withDeclaration=new WithDeclaration(tokenAlias.getValue(), selectSentence);
 									withDeclarations.add(withDeclaration);
-									token=matchToken(SqlToken.Type.PARENTHESIS_END);
+									token=matchToken(SqlTokenTypes.PARENTHESIS_END);
 									token=nextToken();
 								}
-								while (token.getType() == SqlToken.Type.COMMA);
+								while (token.getType().equals(SqlTokenTypes.COMMA));
 								this.tokenizer.pushBack(token);
 								break;
 							default:
@@ -122,25 +125,25 @@ public class ScriptParser
 		return sentence;
 	}
 
-	private SqlToken nextToken()
+	private Token nextToken()
 		throws TokenizerException,
 		IOException
 	{
-		SqlToken token;
+		Token token;
 		do
 		{
 			token=this.tokenizer.nextToken();
 		}
-		while (token.getType() == Type.COMMENT);
+		while (!token.getType().equals(SqlTokenTypes.COMMENT));
 		return token;
 	}
 
-	private SqlToken matchToken(Type type)
+	private Token matchToken(String type)
 		throws ParserException,
 		IOException
 	{
-		SqlToken token=nextToken();
-		if (token.getType() != type)
+		Token token=nextToken();
+		if (!token.getType().equals(type))
 		{
 			throw new ParserException("Expected token " + type);
 		}

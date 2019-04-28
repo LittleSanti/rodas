@@ -1,114 +1,41 @@
-package com.samajackun.rodas.core.model;
+package com.samajackun.rodas.core.execution;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.IterableTableData;
+import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.RowData;
+
 public class DefaultCursor implements Cursor
 {
-	// public class ContextFacade implements Context
-	// {
-	//
-	// @Override
-	// public void putSubcontext(String name, Context context)
-	// throws NameAlreadyBoundException
-	// {
-	// throw new IllegalArgumentException();
-	// }
-	//
-	// @Override
-	// public Context getSubcontext(String prefix)
-	// throws ObjectNotBoundException
-	// {
-	// throw new ObjectNotBoundException(prefix, "?");
-	// }
-	//
-	// @Override
-	// public Object lookup(String name)
-	// throws ObjectNotBoundException
-	// {
-	// return getRowData().get(DefaultCursor.this.columnMap.get(name));
-	// }
-	//
-	// @Override
-	// public void bind(String alias, Object value)
-	// throws NameAlreadyBoundException
-	// {
-	// // TODO
-	// }
-	//
-	// @Override
-	// public RowResult getResult()
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Object getParameter(String name)
-	// throws ParameterNotFoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Object getValue(int index)
-	// throws ObjectNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context findIdentifier(String identifier)
-	// throws ObjectNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context fork()
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context addCursor(Cursor cursor)
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Context getContextForAlias(String alias)
-	// throws NameNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public int getColumn(String name)
-	// throws NameNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return 0;
-	// }
-	//
-	// }
-	//
-	// private final Context context=new ContextFacade();
 	private final Map<String, Integer> columnMap;
 
 	private final IterableTableData iterable;
 
 	private Iterator<RowData> iterator;
 
-	private RowData rowData;
+	private RowData iteratorRowData;
+
+	private final RowData rowData=new RowDataProxy();
+
+	private class RowDataProxy implements RowData
+	{
+		@Override
+		public Object get(int column)
+		{
+			return DefaultCursor.this.iteratorRowData.get(column);
+		}
+
+		@Override
+		public long position()
+		{
+			return DefaultCursor.this.iteratorRowData.position();
+		}
+	}
 
 	private final List<ColumnMetadata> metadata;
 
@@ -142,7 +69,7 @@ public class DefaultCursor implements Cursor
 	@Override
 	public void next()
 	{
-		this.rowData=this.iterator.next();
+		this.iteratorRowData=this.iterator.next();
 	}
 
 	@Override

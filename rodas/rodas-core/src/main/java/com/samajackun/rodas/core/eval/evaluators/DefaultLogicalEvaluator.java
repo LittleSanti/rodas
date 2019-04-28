@@ -17,7 +17,7 @@ public class DefaultLogicalEvaluator extends AbstractEvaluator implements Logica
 	private boolean toBoolean(Context context, Expression exp)
 		throws EvaluationException
 	{
-		Object value=exp.evaluate(context, getEvaluatorFactory());
+		Object value=context.evaluate(exp, getEvaluatorFactory());
 		boolean v;
 		if (value != null)
 		{

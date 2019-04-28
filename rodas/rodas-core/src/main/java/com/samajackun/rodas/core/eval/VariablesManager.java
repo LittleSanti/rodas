@@ -2,28 +2,32 @@ package com.samajackun.rodas.core.eval;
 
 public interface VariablesManager
 {
-	public Object getGlobalVariable(String name)
+	public Object getGlobalVariable(Name name)
 		throws VariableNotFoundException;
 
-	public void setGlobalVariable(String name, Object value);
+	public void setGlobalVariable(Name name, Object value);
 
-	public void removeGlobalVariable(String name);
+	public void removeGlobalVariable(Name name);
 
-	public Object getLocalVariable(String name)
+	public Object getLocalVariable(Name name)
 		throws VariableNotFoundException;
 
-	public Object getNearestVariable(String name)
+	public Object getNearestVariable(Name name)
 		throws VariableNotFoundException;
 
-	public void setLocalVariable(String name, Object value);
+	public void setNearestVariable(Name name, Object value);
 
-	public void removeLocalVariable(String name);
+	public void setLocalVariable(Name name, Object value);
 
-	public void pushLocalContext();
+	public void removeLocalVariable(Name name);
 
-	public void popLocalContext();
+	public void pushLocalContext(VariablesContext newContext);
 
-	public VariablesContext getVariablesContext(String variableName)
+	public VariablesContext peekLocalContext();
+
+	public VariablesContext popLocalContext();
+
+	public VariablesContext getVariablesContext(Name name)
 		throws VariableNotFoundException;
 
 	public VariablesContext getLocalVariablesContext();

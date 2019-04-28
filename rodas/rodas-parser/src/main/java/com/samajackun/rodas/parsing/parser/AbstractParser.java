@@ -2,8 +2,9 @@ package com.samajackun.rodas.parsing.parser;
 
 import java.io.IOException;
 
+import com.samajackun.rodas.sql.parser.ParserContext;
 import com.samajackun.rodas.sql.parser.ParserFactory;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
 
 public abstract class AbstractParser<T>
 {
@@ -15,7 +16,7 @@ public abstract class AbstractParser<T>
 		this.parserFactory=parserFactory;
 	}
 
-	public abstract T parse(SqlMatchingTokenizer tokenizer)
+	public abstract T parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException;
 

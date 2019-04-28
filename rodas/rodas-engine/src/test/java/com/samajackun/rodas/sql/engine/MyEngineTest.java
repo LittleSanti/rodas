@@ -8,9 +8,9 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.EngineException;
 import com.samajackun.rodas.core.model.MyProvider;
 import com.samajackun.rodas.core.model.Provider;
@@ -25,10 +25,11 @@ public class MyEngineTest
 		MyEngine engine=new MyEngine();
 		TableSource source=new TableSource("country");
 		Provider provider=new MyProvider();
-		Context context=null;
+		MyOpenContext context=new MyOpenContext();
+		context.setProvider(provider);
 		try
 		{
-			Cursor cursor=engine.execute(source, provider, context);
+			Cursor cursor=engine.execute(source, context);
 			assertNotNull(cursor);
 			assertEquals(3, cursor.getNumberOfColumns());
 			assertTrue(cursor.hasNext());

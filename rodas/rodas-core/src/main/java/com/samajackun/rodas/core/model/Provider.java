@@ -2,6 +2,8 @@ package com.samajackun.rodas.core.model;
 
 import java.util.Map;
 
+import com.samajackun.rodas.core.execution.Cursor;
+
 /**
  * Represents the data container.
  * Knows the whole schema's structure: Tables and columnas and its types.

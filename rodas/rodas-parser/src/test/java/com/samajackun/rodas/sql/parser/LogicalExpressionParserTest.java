@@ -27,20 +27,22 @@ import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
 import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings;
-import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings.WhitespaceBehaviour;
+import com.samajackun.rodas.sql.tokenizer.TokenizerSettings;
+import com.samajackun.rodas.sql.tokenizer.TokenizerSettings.WhitespaceBehaviour;
 
 public class LogicalExpressionParserTest
 {
+	private final ParserContext parserContext=new ParserContext();
+
 	private Expression parse(String src)
 		throws TokenizerException,
 		ParserException,
 		IOException
 	{
-		SqlTokenizerSettings settings=new SqlTokenizerSettings();
+		TokenizerSettings settings=new TokenizerSettings();
 		settings.setWhitespaceBehaviour(WhitespaceBehaviour.IGNORE);
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), settings));
-		Expression expression=LogicalExpressionParser.getInstance().parse(tokenizer);
+		Expression expression=LogicalExpressionParser.getInstance().parse(tokenizer, this.parserContext);
 		return expression;
 	}
 

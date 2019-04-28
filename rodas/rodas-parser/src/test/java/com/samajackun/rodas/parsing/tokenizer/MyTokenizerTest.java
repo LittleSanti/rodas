@@ -10,6 +10,8 @@ import org.junit.Test;
 
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
+import com.samajackun.rodas.sql.tokenizer.Token;
+import com.samajackun.rodas.sql.tokenizer.TokenizerSettings;
 
 public class MyTokenizerTest
 {
@@ -18,7 +20,7 @@ public class MyTokenizerTest
 		throws IOException
 	{
 		String src="";
-		MySettings settings=new MySettings();
+		TokenizerSettings settings=new TokenizerSettings();
 		try
 		{
 			MyTokenizer tokenizer=new MyTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
@@ -39,9 +41,12 @@ public class MyTokenizerTest
 		String src="a";
 		try
 		{
-			MySettings settings=new MySettings();
+			TokenizerSettings settings=new TokenizerSettings();
 			MyTokenizer tokenizer=new MyTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
-			assertEquals("a", tokenizer.nextToken());
+			Token token1=tokenizer.nextToken();
+			assertEquals("a", token1.getImage());
+			assertEquals("a", token1.getValue());
+			assertEquals("type1", token1.getType());
 			assertNull(tokenizer.nextToken());
 		}
 		catch (TokenizerException e)
@@ -58,10 +63,16 @@ public class MyTokenizerTest
 		String src="ab";
 		try
 		{
-			MySettings settings=new MySettings();
+			TokenizerSettings settings=new TokenizerSettings();
 			MyTokenizer tokenizer=new MyTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
-			assertEquals("a", tokenizer.nextToken());
-			assertEquals("b", tokenizer.nextToken());
+			Token token1=tokenizer.nextToken();
+			assertEquals("a", token1.getImage());
+			assertEquals("a", token1.getValue());
+			assertEquals("type1", token1.getType());
+			Token token2=tokenizer.nextToken();
+			assertEquals("b", token2.getImage());
+			assertEquals("b", token2.getValue());
+			assertEquals("type1", token2.getType());
 			assertNull(tokenizer.nextToken());
 		}
 		catch (TokenizerException e)
@@ -78,11 +89,23 @@ public class MyTokenizerTest
 		String src="abc";
 		try
 		{
-			MySettings settings=new MySettings();
+			TokenizerSettings settings=new TokenizerSettings();
 			MyTokenizer tokenizer=new MyTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
-			assertEquals("a", tokenizer.nextToken());
-			assertEquals("b", tokenizer.nextToken());
-			assertEquals("c", tokenizer.nextToken());
+			Token token1=tokenizer.nextToken();
+			assertEquals("a", token1.getImage());
+			assertEquals("a", token1.getValue());
+			assertEquals("type1", token1.getType());
+
+			Token token2=tokenizer.nextToken();
+			assertEquals("b", token2.getImage());
+			assertEquals("b", token2.getValue());
+			assertEquals("type1", token2.getType());
+
+			Token token3=tokenizer.nextToken();
+			assertEquals("c", token3.getImage());
+			assertEquals("c", token3.getValue());
+			assertEquals("type0", token3.getType());
+
 			assertNull(tokenizer.nextToken());
 		}
 		catch (TokenizerException e)
@@ -99,17 +122,20 @@ public class MyTokenizerTest
 		String src="abc";
 		try
 		{
-			MySettings settings=new MySettings();
+			TokenizerSettings settings=new TokenizerSettings();
 			MyTokenizer tokenizer=new MyTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
-			String token1=tokenizer.nextToken();
-			assertEquals("a", token1);
-			String token2=tokenizer.nextToken();
-			assertEquals("b", token2);
-			String token3=tokenizer.nextToken();
-			assertEquals("c", token3);
+
+			tokenizer.nextToken();
+			tokenizer.nextToken();
+			Token token3=tokenizer.nextToken();
+
 			tokenizer.pushBackToken(token3);
-			String token4=tokenizer.nextToken();
-			assertEquals("c", token4);
+
+			Token token4=tokenizer.nextToken();
+			assertEquals("c", token4.getImage());
+			assertEquals("c", token4.getValue());
+			assertEquals("type0", token4.getType());
+
 			assertNull(tokenizer.nextToken());
 		}
 		catch (TokenizerException e)
@@ -126,20 +152,25 @@ public class MyTokenizerTest
 		String src="abc";
 		try
 		{
-			MySettings settings=new MySettings();
+			TokenizerSettings settings=new TokenizerSettings();
 			MyTokenizer tokenizer=new MyTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
-			String token1=tokenizer.nextToken();
-			assertEquals("a", token1);
-			String token2=tokenizer.nextToken();
-			assertEquals("b", token2);
-			String token3=tokenizer.nextToken();
-			assertEquals("c", token3);
+			tokenizer.nextToken();
+			Token token2=tokenizer.nextToken();
+			Token token3=tokenizer.nextToken();
+
 			tokenizer.pushBackToken(token3);
 			tokenizer.pushBackToken(token2);
-			String token4=tokenizer.nextToken();
-			assertEquals("b", token4);
-			String token5=tokenizer.nextToken();
-			assertEquals("c", token5);
+
+			Token token4=tokenizer.nextToken();
+			assertEquals("b", token4.getImage());
+			assertEquals("b", token4.getValue());
+			assertEquals("type1", token4.getType());
+
+			Token token5=tokenizer.nextToken();
+			assertEquals("c", token5.getImage());
+			assertEquals("c", token5.getValue());
+			assertEquals("type0", token5.getType());
+
 			assertNull(tokenizer.nextToken());
 		}
 		catch (TokenizerException e)

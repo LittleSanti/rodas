@@ -9,7 +9,7 @@ import com.samajackun.rodas.core.model.ConcatExpression;
 import com.samajackun.rodas.core.model.DivideExpression;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.ExpressionCollection;
-import com.samajackun.rodas.core.model.FunctionExpression;
+import com.samajackun.rodas.core.model.FunctionCallExpression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.MultiplyExpression;
 import com.samajackun.rodas.core.model.NamedParameterExpression;
@@ -23,8 +23,9 @@ import com.samajackun.rodas.core.model.UnitPlusExpression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class GenericArithmeticExpressionParser extends AbstractParser<Expression> implements PartialParser
 {
@@ -38,14 +39,14 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 	}
 
 	@Override
-	public Expression parse(SqlMatchingTokenizer tokenizer)
+	public Expression parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
-		return parseAddingExpression(tokenizer);
+		return parseAddingExpression(tokenizer, parserContext);
 	};
 
-	Expression parseTerminal(SqlMatchingTokenizer tokenizer)
+	Expression parseTerminal(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -55,7 +56,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		State state=State.INITIAL;
 		do
 		{
-			SqlToken token=tokenizer.nextOptionalUsefulToken();
+			Token token=tokenizer.nextOptionalUsefulToken();
 			if (token == null)
 			{
 				break;
@@ -65,44 +66,43 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 				case INITIAL:
 					switch (token.getType())
 					{
-						case INTEGER_NUMBER_LITERAL:
+						case SqlTokenTypes.INTEGER_NUMBER_LITERAL:
 							expression=new NumericConstantExpression(token.getValue(), Long.parseLong(token.getValue()));
 							state=State.COMPLETE;
 							break;
-						case DECIMAL_NUMBER_LITERAL:
+						case SqlTokenTypes.DECIMAL_NUMBER_LITERAL:
 							expression=new NumericConstantExpression(token.getValue(), Double.parseDouble(token.getValue()));
 							state=State.COMPLETE;
 							break;
-						case TEXT_LITERAL:
+						case SqlTokenTypes.TEXT_LITERAL:
 							expression=new TextConstantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
-						case KEYWORD_NULL:
+						case SqlTokenTypes.KEYWORD_NULL:
 							expression=new NullConstantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
-						case TRUE:
+						case SqlTokenTypes.TRUE:
 							expression=BooleanConstantExpression.createTrueConstrantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
-						case FALSE:
+						case SqlTokenTypes.FALSE:
 							expression=BooleanConstantExpression.createFalseConstrantExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
-						case IDENTIFIER:
+						case SqlTokenTypes.IDENTIFIER:
 							// Lookahead
-							SqlToken token2=tokenizer.nextOptionalUsefulToken();
+							Token token2=tokenizer.nextOptionalUsefulToken();
 							if (token2 != null)
 							{
-								if (token2.getType() == SqlToken.Type.PARENTHESIS_START)
+								if (token2.getType().equals(SqlTokenTypes.PARENTHESIS_START))
 								{
-									ExpressionCollection argumentsExpressions=getParserFactory().getExpressionCollectionParser().parse(tokenizer);
-									FunctionExpression functionExpression=new FunctionExpression(token.getValue());
-									functionExpression.getArguments().addAll(argumentsExpressions.getExpressions());
-									tokenizer.matchToken(SqlToken.Type.PARENTHESIS_END);
+									ExpressionCollection argumentsExpressions=getParserFactory().getExpressionCollectionParser().parse(tokenizer, parserContext);
+									FunctionCallExpression functionExpression=new FunctionCallExpression(new IdentifierExpression(token.getValue()), argumentsExpressions.getExpressions());
+									tokenizer.matchToken(SqlTokenTypes.PARENTHESIS_END);
 									expression=functionExpression;
 								}
-								else if (token2.getType() == SqlToken.Type.PERIOD)
+								else if (token2.getType().equals(SqlTokenTypes.PERIOD))
 								{
 									expression=parsePrefixedExpression(tokenizer, token.getValue());
 								}
@@ -118,39 +118,48 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 							}
 							state=State.COMPLETE;
 							break;
-						case NAMED_PARAMETER:
+						case SqlTokenTypes.NAMED_PARAMETER:
 							expression=new NamedParameterExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
-						case PARENTHESIS_START:
-							expression=parseSelectOrExpression(tokenizer);
+						case SqlTokenTypes.PARENTHESIS_START:
+							expression=parseSelectOrExpression(tokenizer, parserContext);
 							// tokenizer.matchToken(SqlToken.Type.PARENTHESIS_END);
 							// expression=new ParehentesizedExpression(expression);
 							state=State.EXPECTING_COMMA_OR_PAREHENTESIS_CLOSING;
 							break;
-						case ASTERISK:
+						case SqlTokenTypes.ASTERISK:
 							expression=new AsteriskExpression(token.getValue());
 							state=State.COMPLETE;
 							break;
+						case SqlTokenTypes.KEYWORD_SELECT:
+							tokenizer.pushBack(token);
+							// TODO Aquí hay que comprobar si SelectSentenceParser podría necesitar delgar sobre SumaParser,
+							// si dentro de la select aparecieran fórmulas sintácticas de SumaScript.
+							expression=SelectSentenceParser.getInstance().parse(tokenizer, parserContext);
+							state=State.COMPLETE;
+							break;
 						default:
-							throw new UnexpectedTokenException(token);
+							expression=unexpectedToken(tokenizer, parserContext, token);
+							state=State.COMPLETE;
+							break;
 					}
 					break;
 				case EXPECTING_COMMA_OR_PAREHENTESIS_CLOSING:
 					switch (token.getType())
 					{
-						case PARENTHESIS_END:
+						case SqlTokenTypes.PARENTHESIS_END:
 							expression=new ParehentesizedExpression(expression);
 							state=State.COMPLETE;
 							break;
-						case COMMA:
+						case SqlTokenTypes.COMMA:
 							if (expressionList == null)
 							{
 								expressionList=new ExpressionCollection();
 								expressionList.add(expression);
 							}
 							expression=expressionList;
-							Expression t=getParserFactory().getExpressionParser().parse(tokenizer);
+							Expression t=getParserFactory().getExpressionParser().parse(tokenizer, parserContext);
 							if (t != null)
 							{
 								expressionList.add(t);
@@ -176,12 +185,18 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	private Expression parseSelectOrExpression(SqlMatchingTokenizer tokenizer)
+	protected Expression unexpectedToken(AbstractMatchingTokenizer tokenizer, ParserContext parserContext, Token token)
+		throws ParserException
+	{
+		throw new UnexpectedTokenException(token);
+	}
+
+	private Expression parseSelectOrExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
 		Expression expression;
-		SqlToken sqlToken=tokenizer.nextToken();
+		Token sqlToken=tokenizer.nextToken();
 		if (sqlToken == null)
 		{
 			throw new IncompleteExpressionException();
@@ -189,38 +204,38 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		tokenizer.pushBack(sqlToken);
 		switch (sqlToken.getType())
 		{
-			case KEYWORD_SELECT:
-				expression=getParserFactory().getSelectSentenceParser().parse(tokenizer);
+			case SqlTokenTypes.KEYWORD_SELECT:
+				expression=getParserFactory().getSelectSentenceParser().parse(tokenizer, parserContext);
 				break;
 			default:
-				expression=getParserFactory().getExpressionParser().parse(tokenizer);
+				expression=getParserFactory().getExpressionParser().parse(tokenizer, parserContext);
 		}
 		return expression;
 	}
 
-	Expression parseSignExpression(SqlMatchingTokenizer tokenizer)
+	Expression parseSignExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
 		Expression expression=null;
 		do
 		{
-			SqlToken token=tokenizer.nextToken();
+			Token token=tokenizer.nextToken();
 			if (token != null)
 			{
 				switch (token.getType())
 				{
-					case OPERATOR_PLUS:
-						expression=parseTerminal(tokenizer);
+					case SqlTokenTypes.OPERATOR_PLUS:
+						expression=parseTerminal(tokenizer, parserContext);
 						expression=new UnitPlusExpression(token.getValue(), expression);
 						break;
-					case OPERATOR_MINUS:
-						expression=parseTerminal(tokenizer);
+					case SqlTokenTypes.OPERATOR_MINUS:
+						expression=parseTerminal(tokenizer, parserContext);
 						expression=new UnitMinusExpression(token.getValue(), expression);
 						break;
 					default:
 						tokenizer.pushBack(token);
-						expression=parseTerminal(tokenizer);
+						expression=parseTerminal(tokenizer, parserContext);
 				}
 			}
 		}
@@ -228,7 +243,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parseMultiplyingExpression(SqlMatchingTokenizer tokenizer)
+	Expression parseMultiplyingExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -241,20 +256,20 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 			switch (state)
 			{
 				case INITIAL:
-					expression=parseSignExpression(tokenizer);
+					expression=parseSignExpression(tokenizer, parserContext);
 					state=State.EXPECTING_OPERATOR;
 					break;
 				case EXPECTING_OPERATOR:
-					SqlToken token=tokenizer.nextOptionalUsefulToken();
+					Token token=tokenizer.nextOptionalUsefulToken();
 					if (token != null)
 					{
 						switch (token.getType())
 						{
-							case ASTERISK:
+							case SqlTokenTypes.ASTERISK:
 								operator=token.getValue();
 								state=State.EXPECTING_TERMINAL_MULTIPLY;
 								break;
-							case OPERATOR_DIV:
+							case SqlTokenTypes.OPERATOR_DIV:
 								operator=token.getValue();
 								state=State.EXPECTING_TERMINAL_DIVIDE;
 								break;
@@ -265,7 +280,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 					}
 					break;
 				case EXPECTING_TERMINAL_MULTIPLY:
-					t=parseSignExpression(tokenizer);
+					t=parseSignExpression(tokenizer, parserContext);
 					if (t != null)
 					{
 						expression=new MultiplyExpression(operator, expression, t);
@@ -277,7 +292,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 					}
 					break;
 				case EXPECTING_TERMINAL_DIVIDE:
-					t=parseSignExpression(tokenizer);
+					t=parseSignExpression(tokenizer, parserContext);
 					if (t != null)
 					{
 						expression=new DivideExpression(operator, expression, t);
@@ -296,7 +311,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parseAddingExpression(SqlMatchingTokenizer tokenizer)
+	Expression parseAddingExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -309,26 +324,26 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 			switch (state)
 			{
 				case INITIAL:
-					expression=parseMultiplyingExpression(tokenizer);
+					expression=parseMultiplyingExpression(tokenizer, parserContext);
 					state=State.EXPECTING_OPERATOR;
 					break;
 				case EXPECTING_OPERATOR:
-					SqlToken token=tokenizer.nextOptionalUsefulToken();
+					Token token=tokenizer.nextOptionalUsefulToken();
 					if (token == null)
 					{
 						break;
 					}
 					switch (token.getType())
 					{
-						case OPERATOR_PLUS:
+						case SqlTokenTypes.OPERATOR_PLUS:
 							operator=token.getValue();
 							state=State.EXPECTING_TERMINAL_PLUS;
 							break;
-						case OPERATOR_MINUS:
+						case SqlTokenTypes.OPERATOR_MINUS:
 							operator=token.getValue();
 							state=State.EXPECTING_TERMINAL_MINUS;
 							break;
-						case OPERATOR_CONCATENATION:
+						case SqlTokenTypes.OPERATOR_CONCATENATION:
 							operator=token.getValue();
 							state=State.EXPECTING_TERMINAL_CONCATENATION;
 							break;
@@ -338,7 +353,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 					}
 					break;
 				case EXPECTING_TERMINAL_PLUS:
-					t=parseMultiplyingExpression(tokenizer);
+					t=parseMultiplyingExpression(tokenizer, parserContext);
 					if (t != null)
 					{
 						expression=new AddExpression(operator, expression, t);
@@ -350,7 +365,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 					}
 					break;
 				case EXPECTING_TERMINAL_MINUS:
-					t=parseMultiplyingExpression(tokenizer);
+					t=parseMultiplyingExpression(tokenizer, parserContext);
 					if (t != null)
 					{
 						expression=new SubstractExpression(operator, expression, t);
@@ -362,7 +377,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 					}
 					break;
 				case EXPECTING_TERMINAL_CONCATENATION:
-					t=parseMultiplyingExpression(tokenizer);
+					t=parseMultiplyingExpression(tokenizer, parserContext);
 					if (t != null)
 					{
 						expression=new ConcatExpression(operator, expression, t);
@@ -381,20 +396,20 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parsePrefixedExpression(SqlMatchingTokenizer tokenizer, String prefix)
+	Expression parsePrefixedExpression(AbstractMatchingTokenizer tokenizer, String prefix)
 		throws ParserException,
 		IOException
 	{
 		Expression expression=null;
-		SqlToken token=tokenizer.nextToken();
+		Token token=tokenizer.nextToken();
 		if (token != null)
 		{
 			switch (token.getType())
 			{
-				case IDENTIFIER:
+				case SqlTokenTypes.IDENTIFIER:
 					expression=new IdentifierExpression(prefix, token.getValue());
 					break;
-				case ASTERISK:
+				case SqlTokenTypes.ASTERISK:
 					expression=new AsteriskExpression(prefix, token.getValue());
 					break;
 				default:

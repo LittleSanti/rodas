@@ -1,6 +1,7 @@
 package com.samajackun.rodas.core.model;
 
 import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.DummyContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
@@ -19,7 +20,7 @@ public abstract class LogicalUnitExpression extends UnitExpression
 		Expression reduced1=getExpression().reduceAndReport(evaluatorFactory);
 		if (reduced1 instanceof BooleanConstantExpression)
 		{
-			Boolean result=compute(null, evaluatorFactory, reduced1);
+			Boolean result=compute(DummyContext.getInstance(), evaluatorFactory, reduced1);
 			reduced=new BooleanConstantExpression(result.toString(), result);
 		}
 		else

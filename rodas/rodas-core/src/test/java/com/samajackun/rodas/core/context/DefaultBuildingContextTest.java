@@ -3,23 +3,24 @@ package com.samajackun.rodas.core.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-import com.samajackun.rodas.core.context.DefaultBuildingContext;
 import com.samajackun.rodas.core.eval.ColumnNotFoundException;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.MapList;
 import com.samajackun.rodas.core.eval.NameAlreadyBoundException;
 import com.samajackun.rodas.core.eval.NameNotBoundException;
 import com.samajackun.rodas.core.eval.PrefixNotFoundException;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.MyProvider;
 import com.samajackun.rodas.core.model.Provider;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.TableSource;
 
+@Ignore("API obsoleto")
 public class DefaultBuildingContextTest
 {
 	@Test

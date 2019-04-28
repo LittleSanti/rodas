@@ -3,13 +3,14 @@ package com.samajackun.rodas.core.eval;
 public class StrictVariablesContext extends AbstractVariablesContext
 {
 	@Override
-	public Object get(String name)
+	public Object get(Name name)
 		throws VariableNotFoundException
 	{
-		Object value=getMap().get(name);
+		String nameAsString=name.asString();
+		Object value=getMap().get(nameAsString);
 		if (value == null)
 		{
-			if (!getMap().containsKey(name))
+			if (!getMap().containsKey(nameAsString))
 			{
 				throw new VariableNotFoundException(name);
 			}

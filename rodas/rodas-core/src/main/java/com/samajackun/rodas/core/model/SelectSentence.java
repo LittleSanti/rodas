@@ -10,28 +10,29 @@ import java.util.Map;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.execution.Cursor;
 
 public class SelectSentence implements Source, Sentence, Expression
 {
-	private final List<WithDeclaration> withDeclarations=new ArrayList<WithDeclaration>();
+	private final List<WithDeclaration> withDeclarations=new ArrayList<>();
 
-	private final List<AliasedExpression> selectExpressions=new ArrayList<AliasedExpression>();
+	private final List<AliasedExpression> selectExpressions=new ArrayList<>();
 
-	private final Map<String, AliasedExpression> selectExpressionsMap=new LinkedHashMap<String, AliasedExpression>();
+	private final Map<String, AliasedExpression> selectExpressionsMap=new LinkedHashMap<>();
 
 	private final List<String> columnNames=new ArrayList<>();
 
-	private final List<String> options=new ArrayList<String>();
+	private final List<String> options=new ArrayList<>();
 
-	private final List<Source> sourceDeclarations=new ArrayList<Source>();
+	private Source source;
 
 	private Expression whereExpression;
 
-	private final List<Expression> groupExpressions=new ArrayList<Expression>();
+	private final List<Expression> groupExpressions=new ArrayList<>();
 
 	private Expression havingExpression;
 
-	private final List<Expression> orderExpressions=new ArrayList<Expression>();
+	private final List<OrderClause> orderClauses=new ArrayList<>();
 
 	public List<WithDeclaration> getWithDeclarations()
 	{
@@ -72,9 +73,14 @@ public class SelectSentence implements Source, Sentence, Expression
 		return this.options;
 	}
 
-	public List<Source> getSourceDeclarations()
+	public Source getSource()
 	{
-		return this.sourceDeclarations;
+		return this.source;
+	}
+
+	public void setSource(Source source)
+	{
+		this.source=source;
 	}
 
 	public Expression getWhereExpression()
@@ -102,9 +108,9 @@ public class SelectSentence implements Source, Sentence, Expression
 		this.havingExpression=havingExpression;
 	}
 
-	public List<Expression> getOrderExpressions()
+	public List<OrderClause> getOrderClauses()
 	{
-		return this.orderExpressions;
+		return this.orderClauses;
 	}
 
 	@Override
@@ -119,7 +125,7 @@ public class SelectSentence implements Source, Sentence, Expression
 		codeToBuffer("SELECT", this.selectExpressions, stb);
 
 		// FROM
-		codeToBuffer("FROM", this.sourceDeclarations, stb);
+		codeToBuffer("FROM", this.source, stb);
 
 		// WHERE
 		codeToBuffer("WHERE", this.whereExpression, stb);
@@ -131,7 +137,7 @@ public class SelectSentence implements Source, Sentence, Expression
 		codeToBuffer("HAVING", this.havingExpression, stb);
 
 		// ORDER
-		codeToBuffer("ORDER BY", this.orderExpressions, stb);
+		codeToBuffer("ORDER BY", this.orderClauses, stb);
 		return stb.toString();
 	}
 
@@ -184,47 +190,20 @@ public class SelectSentence implements Source, Sentence, Expression
 	}
 
 	@Override
-	public boolean hasColumn(String column, Provider provider)
-		throws ProviderException
-	{
-		return this.selectExpressionsMap.containsKey(column);
-	}
-
-	@Override
-	public Cursor execute(Engine engine, Provider provider, Context context)
+	public Cursor execute(Engine engine, Context context)
 		throws EngineException,
 		EvaluationException,
 		ProviderException
 	{
-		return engine.execute(this, provider, context);
+		return engine.execute(this, context);
 		// return new Cursor(provider.getColumnNamesFromTable(this.table), provider.getTableData(this.table));
-	}
-
-	@Override
-	public List<String> getColumnNames(Provider provider)
-		throws ProviderException
-	{
-		// return this.selectExpressions.stream().map(e -> e.getAlias()).collect(Collectors.toCollection(ArrayList::new));
-		return this.columnNames;
 	}
 
 	@Override
 	public Expression reduce(EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
-		// TODO Hay que ejecutar la sentencia, si no hay tablas involucradas. Pero para eso necesito un Engine.
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ColumnMetadata getColumnMetadata(int column, Provider provider, Context context, EvaluatorFactory evaluatorFactory)
-		throws MetadataException,
-		ProviderException
-	{
-		AliasedExpression aliasedExpression=this.selectExpressions.get(column);
-		Datatype datatype=aliasedExpression.getExpression().getDatatype(context, evaluatorFactory);
-		ColumnMetadata columnMetadata=new ColumnMetadata(aliasedExpression.getAlias(), datatype, true);
-		return columnMetadata;
+		return this;
 	}
 
 	@Override
@@ -237,4 +216,31 @@ public class SelectSentence implements Source, Sentence, Expression
 		}
 		throw new ExpressionWithTooManyColumnsException(this);
 	}
+	// @Override
+	// public boolean hasColumn(String column)
+	// throws ProviderException
+	// {
+	// return this.selectExpressionsMap.containsKey(column);
+	// }
+	//
+	// @Override
+	// public List<String> getColumnNames()
+	// throws ProviderException
+	// {
+	// // return this.selectExpressions.stream().map(e -> e.getAlias()).collect(Collectors.toCollection(ArrayList::new));
+	// return this.columnNames;
+	// }
+	//
+	//
+	// @Override
+	// public ColumnMetadata getColumnMetadata(int column, Context context, EvaluatorFactory evaluatorFactory)
+	// throws MetadataException,
+	// ProviderException
+	// {
+	// AliasedExpression aliasedExpression=this.selectExpressions.get(column);
+	// Datatype datatype=aliasedExpression.getExpression().getDatatype(context, evaluatorFactory);
+	// ColumnMetadata columnMetadata=new ColumnMetadata(aliasedExpression.getAlias(), datatype, true);
+	// return columnMetadata;
+	// }
+
 }

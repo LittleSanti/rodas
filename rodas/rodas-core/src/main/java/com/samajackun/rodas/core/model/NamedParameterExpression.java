@@ -3,19 +3,20 @@ package com.samajackun.rodas.core.model;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.Name;
 
 public class NamedParameterExpression implements Expression
 {
-	private final String name;
+	private final Name name;
 
-	public NamedParameterExpression(String name)
+	public NamedParameterExpression(String parameter)
 	{
 		super();
-		this.name=name;
+		this.name=Name.instanceOf(parameter);
 	}
 
 	@Override
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
 	}
@@ -23,7 +24,7 @@ public class NamedParameterExpression implements Expression
 	@Override
 	public String toCode()
 	{
-		return ":" + this.name;
+		return ":" + this.name.asString();
 	}
 
 	@Override
@@ -47,7 +48,8 @@ public class NamedParameterExpression implements Expression
 	}
 
 	@Override
-	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory) throws MetadataException
+	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory)
+		throws MetadataException
 	{
 		return Datatype.UNKNOWN;
 	}

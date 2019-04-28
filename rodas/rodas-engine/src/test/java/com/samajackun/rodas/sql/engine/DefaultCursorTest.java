@@ -1,9 +1,10 @@
-package com.samajackun.rodas.core.eval;
+package com.samajackun.rodas.sql.engine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,22 +13,29 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.Name;
+import com.samajackun.rodas.core.eval.StrictVariablesContext;
+import com.samajackun.rodas.core.eval.StrictVariablesManager;
+import com.samajackun.rodas.core.eval.VariableNotFoundException;
+import com.samajackun.rodas.core.eval.VariablesContext;
+import com.samajackun.rodas.core.eval.VariablesManager;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.MyIterableTableData;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.RowData;
 
-public class MyCursorTest
+public class DefaultCursorTest
 {
 	@Test
 	public void getNumberOfColumns()
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor1();
+		DefaultCursor cursor=createCursor1();
 		assertEquals(4, cursor.getNumberOfColumns());
 	}
 
@@ -36,7 +44,7 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor1();
+		DefaultCursor cursor=createCursor1();
 		List<ColumnMetadata> metadata=cursor.getMetadata();
 		assertEquals(4, metadata.size());
 		ColumnMetadata columnMetadata;
@@ -67,7 +75,7 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor1();
+		DefaultCursor cursor=createCursor1();
 		Map<String, Integer> columnMap=cursor.getColumnMap();
 		assertEquals(4, columnMap.size());
 		assertEquals(0, columnMap.get("id").intValue());
@@ -82,30 +90,71 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor1();
-		RowData rowData;
-		assertTrue(cursor.hasNext());
-		cursor.next();
-		rowData=cursor.getRowData();
-		assertEquals("enero", rowData.get(1));
+		MyOpenContext context=new MyOpenContext();
+		DefaultCursor cursor=createCursor1();
+		VariablesContext globalVariablesContext=new StrictVariablesContext();
+		globalVariablesContext.set(Name.instanceOf("year"), 2019);
+		VariablesManager variablesManager=new StrictVariablesManager(globalVariablesContext);
+		context.setVariablesManager(variablesManager);
+		variablesManager.pushLocalContext(new CursorVariablesContext(null, cursor));
+		try
+		{
+			RowData rowData;
+			assertTrue(cursor.hasNext());
+			cursor.next();
+			rowData=cursor.getRowData();
+			assertEquals("enero", rowData.get(1));
+			assertEquals(1, variablesManager.getLocalVariable(Name.instanceOf("id")));
+			assertEquals("enero", variablesManager.getLocalVariable(Name.instanceOf("name")));
+			assertEquals(31, variablesManager.getLocalVariable(Name.instanceOf("days")));
+			assertEquals(0.1d, variablesManager.getLocalVariable(Name.instanceOf("amount")));
 
-		assertTrue(cursor.hasNext());
-		cursor.next();
-		assertEquals("febrero", rowData.get(1));
+			assertTrue(cursor.hasNext());
+			cursor.next();
+			assertEquals("febrero", rowData.get(1));
+			assertEquals(2, variablesManager.getLocalVariable(Name.instanceOf("id")));
+			assertEquals("febrero", variablesManager.getLocalVariable(Name.instanceOf("name")));
+			assertEquals(28, variablesManager.getLocalVariable(Name.instanceOf("days")));
+			assertEquals(0.2d, variablesManager.getLocalVariable(Name.instanceOf("amount")));
 
-		assertTrue(cursor.hasNext());
-		cursor.next();
-		assertEquals("marzo", rowData.get(1));
+			assertTrue(cursor.hasNext());
+			cursor.next();
+			assertEquals("marzo", rowData.get(1));
+			assertEquals(3, variablesManager.getLocalVariable(Name.instanceOf("id")));
+			assertEquals("marzo", variablesManager.getLocalVariable(Name.instanceOf("name")));
+			assertEquals(31, variablesManager.getLocalVariable(Name.instanceOf("days")));
+			assertEquals(0.3d, variablesManager.getLocalVariable(Name.instanceOf("amount")));
 
-		assertTrue(cursor.hasNext());
-		cursor.next();
-		assertEquals("abril", rowData.get(1));
+			assertTrue(cursor.hasNext());
+			cursor.next();
+			assertEquals("abril", rowData.get(1));
+			assertEquals(4, variablesManager.getLocalVariable(Name.instanceOf("id")));
+			assertEquals("abril", variablesManager.getLocalVariable(Name.instanceOf("name")));
+			assertEquals(30, variablesManager.getLocalVariable(Name.instanceOf("days")));
+			assertEquals(0.4d, variablesManager.getLocalVariable(Name.instanceOf("amount")));
 
-		assertTrue(cursor.hasNext());
-		cursor.next();
-		assertEquals("mayo", rowData.get(1));
+			assertTrue(cursor.hasNext());
+			cursor.next();
+			assertEquals("mayo", rowData.get(1));
+			assertEquals(5, variablesManager.getLocalVariable(Name.instanceOf("id")));
+			assertEquals("mayo", variablesManager.getLocalVariable(Name.instanceOf("name")));
+			assertEquals(31, variablesManager.getLocalVariable(Name.instanceOf("days")));
+			assertEquals(0.5d, variablesManager.getLocalVariable(Name.instanceOf("amount")));
 
-		assertFalse(cursor.hasNext());
+			assertFalse(cursor.hasNext());
+
+			// Comprobemos ahora qué pasa si pido un parámetro global:
+			assertEquals(2019, variablesManager.getGlobalVariable(Name.instanceOf("year")));
+		}
+		catch (VariableNotFoundException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
+		}
+		finally
+		{
+			variablesManager.popLocalContext();
+		}
 	}
 
 	private List<ColumnMetadata> createMetadata()
@@ -118,7 +167,7 @@ public class MyCursorTest
 		return metadata;
 	}
 
-	private MyCursor createCursor1()
+	private DefaultCursor createCursor1()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=createMetadata();
@@ -132,17 +181,17 @@ public class MyCursorTest
 			// @formatter:on
 		});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
-	private MyCursor createCursor0()
+	private DefaultCursor createCursor0()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=createMetadata();
 		List<Object[]> data=new ArrayList<>();
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
@@ -151,7 +200,7 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor0();
+		DefaultCursor cursor=createCursor0();
 		assertFalse(cursor.hasNext());
 	}
 
@@ -160,7 +209,7 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor1();
+		DefaultCursor cursor=createCursor1();
 		RowData rowData;
 		assertTrue(cursor.hasNext());
 		cursor.next();
@@ -200,7 +249,7 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor1();
+		DefaultCursor cursor=createCursor1();
 		RowData rowData;
 		assertTrue(cursor.hasNext());
 		rowData=cursor.getRowData();
@@ -218,7 +267,7 @@ public class MyCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyCursor cursor=createCursor0();
+		DefaultCursor cursor=createCursor0();
 		List<ColumnMetadata> metadata=cursor.getMetadata();
 		assertEquals(4, metadata.size());
 		ColumnMetadata columnMetadata;

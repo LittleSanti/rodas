@@ -6,6 +6,7 @@ import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.NameNotBoundException;
+import com.samajackun.rodas.core.execution.CursorException;
 
 public class IdentifierExecutor extends AbstractExecutor
 {

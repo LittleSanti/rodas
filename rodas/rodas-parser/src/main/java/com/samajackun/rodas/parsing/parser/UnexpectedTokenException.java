@@ -2,17 +2,17 @@ package com.samajackun.rodas.parsing.parser;
 
 import java.util.Arrays;
 
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class UnexpectedTokenException extends ParserException
 {
 	private static final long serialVersionUID=-7580269662415995272L;
 
-	private final SqlToken token;
+	private final Token token;
 
-	private final SqlToken.Type[] expected;
+	private final String[] expected;
 
-	public UnexpectedTokenException(SqlToken token, SqlToken.Type... expected)
+	public UnexpectedTokenException(Token token, String... expected)
 	{
 		super("Unexpected token " + token + (expected.length > 0
 			? " instead of one of these: " + Arrays.asList(expected)
@@ -21,14 +21,13 @@ public class UnexpectedTokenException extends ParserException
 		this.expected=expected;
 	}
 
-	public SqlToken getToken()
+	public Token getToken()
 	{
 		return this.token;
 	}
 
-	public SqlToken.Type[] getExpected()
+	public String[] getExpected()
 	{
 		return this.expected;
 	}
-
 }

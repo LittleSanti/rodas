@@ -13,73 +13,72 @@ import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
 import com.samajackun.rodas.parsing.tokenizer.UnclosedCommentException;
 import com.samajackun.rodas.parsing.tokenizer.UnclosedTextLiteralException;
 import com.samajackun.rodas.parsing.tokenizer.UnexpectedSymbolException;
-import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
 
-public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettings>
+public class SqlTokenizer extends AbstractTokenizer
 {
-	private static final Map<String, SqlToken.Type> OPERATORS=SqlTokenizer.createOperatorsMap();
+	private static final Map<String, String> OPERATORS=SqlTokenizer.createOperatorsMap();
 
-	private static final Map<String, SqlToken.Type> KEYWORDS=SqlTokenizer.createKeywordsMap();
+	private static final Map<String, String> KEYWORDS=SqlTokenizer.createKeywordsMap();
 
 	public SqlTokenizer(PushBackSource source) throws TokenizerException, IOException
 	{
-		this(source, new SqlTokenizerSettings());
+		this(source, new TokenizerSettings());
 	}
 
-	public SqlTokenizer(PushBackSource source, SqlTokenizerSettings settings) throws TokenizerException, IOException
+	public SqlTokenizer(PushBackSource source, TokenizerSettings settings) throws TokenizerException, IOException
 	{
 		super(source, settings);
 	}
 
-	private static Map<String, Type> createKeywordsMap()
+	private static Map<String, String> createKeywordsMap()
 	{
-		Map<String, Type> map=new HashMap<>(20);
-		map.put("SELECT", SqlToken.Type.KEYWORD_SELECT);
-		map.put("FROM", SqlToken.Type.KEYWORD_FROM);
-		map.put("WHERE", SqlToken.Type.KEYWORD_WHERE);
-		map.put("GROUP", SqlToken.Type.KEYWORD_GROUP);
-		map.put("HAVING", SqlToken.Type.KEYWORD_HAVING);
-		map.put("ORDER", SqlToken.Type.KEYWORD_ORDER);
-		map.put("AS", SqlToken.Type.KEYWORD_AS);
-		map.put("BY", SqlToken.Type.KEYWORD_BY);
-		map.put("NULL", SqlToken.Type.KEYWORD_NULL);
-		map.put("TRUE", SqlToken.Type.TRUE);
-		map.put("FALSE", SqlToken.Type.FALSE);
-		map.put("ALL", SqlToken.Type.KEYWORD_ALL);
-		map.put("DISTINCT", SqlToken.Type.KEYWORD_DISTINCT);
-		map.put("DISTINCTROW", SqlToken.Type.KEYWORD_DISTINCTROW);
-		map.put("INNER", SqlToken.Type.KEYWORD_INNER);
-		map.put("OUTER", SqlToken.Type.KEYWORD_OUTER);
-		map.put("JOIN", SqlToken.Type.KEYWORD_JOIN);
-		map.put("LEFT", SqlToken.Type.KEYWORD_LEFT);
-		map.put("RIGHT", SqlToken.Type.KEYWORD_RIGHT);
-		map.put("ON", SqlToken.Type.KEYWORD_ON);
-		map.put("ASC", SqlToken.Type.KEYWORD_ASC);
-		map.put("DESC", SqlToken.Type.KEYWORD_DESC);
-		map.put("FOR", SqlToken.Type.KEYWORD_FOR);
-		map.put("UPDATE", SqlToken.Type.KEYWORD_UPDATE);
-		map.put("USING", SqlToken.Type.KEYWORD_USING);
-		map.put("WITH", SqlToken.Type.KEYWORD_WITH);
+		Map<String, String> map=new HashMap<>(20);
+		map.put("SELECT", SqlTokenTypes.KEYWORD_SELECT);
+		map.put("FROM", SqlTokenTypes.KEYWORD_FROM);
+		map.put("WHERE", SqlTokenTypes.KEYWORD_WHERE);
+		map.put("GROUP", SqlTokenTypes.KEYWORD_GROUP);
+		map.put("HAVING", SqlTokenTypes.KEYWORD_HAVING);
+		map.put("ORDER", SqlTokenTypes.KEYWORD_ORDER);
+		map.put("AS", SqlTokenTypes.KEYWORD_AS);
+		map.put("BY", SqlTokenTypes.KEYWORD_BY);
+		map.put("NULL", SqlTokenTypes.KEYWORD_NULL);
+		map.put("TRUE", SqlTokenTypes.TRUE);
+		map.put("FALSE", SqlTokenTypes.FALSE);
+		map.put("ALL", SqlTokenTypes.KEYWORD_ALL);
+		map.put("DISTINCT", SqlTokenTypes.KEYWORD_DISTINCT);
+		map.put("DISTINCTROW", SqlTokenTypes.KEYWORD_DISTINCTROW);
+		map.put("INNER", SqlTokenTypes.KEYWORD_INNER);
+		map.put("OUTER", SqlTokenTypes.KEYWORD_OUTER);
+		map.put("JOIN", SqlTokenTypes.KEYWORD_JOIN);
+		map.put("LEFT", SqlTokenTypes.KEYWORD_LEFT);
+		map.put("RIGHT", SqlTokenTypes.KEYWORD_RIGHT);
+		map.put("ON", SqlTokenTypes.KEYWORD_ON);
+		map.put("ASC", SqlTokenTypes.KEYWORD_ASC);
+		map.put("DESC", SqlTokenTypes.KEYWORD_DESC);
+		map.put("FOR", SqlTokenTypes.KEYWORD_FOR);
+		map.put("UPDATE", SqlTokenTypes.KEYWORD_UPDATE);
+		map.put("USING", SqlTokenTypes.KEYWORD_USING);
+		map.put("WITH", SqlTokenTypes.KEYWORD_WITH);
 		return map;
 	}
 
-	private static Map<String, Type> createOperatorsMap()
+	private static Map<String, String> createOperatorsMap()
 	{
-		Map<String, Type> map=new HashMap<>(20);
-		map.put("AND", SqlToken.Type.OPERATOR_AND);
-		map.put("OR", SqlToken.Type.OPERATOR_OR);
-		map.put("NOT", SqlToken.Type.OPERATOR_NOT);
-		map.put("IS", SqlToken.Type.OPERATOR_IS);
-		map.put("OF", SqlToken.Type.OPERATOR_OF);
-		map.put("TYPE", SqlToken.Type.OPERATOR_TYPE);
-		map.put("LIKE", SqlToken.Type.OPERATOR_LIKE);
-		map.put("IN", SqlToken.Type.OPERATOR_IN);
-		map.put("ANY", SqlToken.Type.OPERATOR_ANY);
-		map.put("SOME", SqlToken.Type.OPERATOR_SOME);
-		map.put("EXISTS", SqlToken.Type.OPERATOR_EXISTS);
-		map.put("PRIOR", SqlToken.Type.OPERATOR_PRIOR);
-		map.put("CONNECT_BY_ROOT", SqlToken.Type.OPERATOR_CONNECT_BY_ROOT);
-		map.put("BETWEEN", SqlToken.Type.OPERATOR_BETWEEN);
+		Map<String, String> map=new HashMap<>(20);
+		map.put("AND", SqlTokenTypes.OPERATOR_AND);
+		map.put("OR", SqlTokenTypes.OPERATOR_OR);
+		map.put("NOT", SqlTokenTypes.OPERATOR_NOT);
+		map.put("IS", SqlTokenTypes.OPERATOR_IS);
+		map.put("OF", SqlTokenTypes.OPERATOR_OF);
+		map.put("TYPE", SqlTokenTypes.OPERATOR_TYPE);
+		map.put("LIKE", SqlTokenTypes.OPERATOR_LIKE);
+		map.put("IN", SqlTokenTypes.OPERATOR_IN);
+		map.put("ANY", SqlTokenTypes.OPERATOR_ANY);
+		map.put("SOME", SqlTokenTypes.OPERATOR_SOME);
+		map.put("EXISTS", SqlTokenTypes.OPERATOR_EXISTS);
+		map.put("PRIOR", SqlTokenTypes.OPERATOR_PRIOR);
+		map.put("CONNECT_BY_ROOT", SqlTokenTypes.OPERATOR_CONNECT_BY_ROOT);
+		map.put("BETWEEN", SqlTokenTypes.OPERATOR_BETWEEN);
 		return map;
 	}
 
@@ -88,12 +87,12 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 	};
 
 	@Override
-	protected SqlToken fetch(PushBackSource source)
+	protected Token fetch(PushBackSource source)
 		throws TokenizerException,
 		IOException
 	{
 		State state=State.INITIAL;
-		SqlToken token=null;
+		Token token=null;
 		// source.startRecord();
 		StringBuilder trailingText=new StringBuilder(80);
 
@@ -113,7 +112,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 							case IGNORE:
 								break;
 							case PRODUCE_TOKENS:
-								token=new SqlToken(Type.WHITESPACE, trailingText.toString() + c);
+								token=new Token(SqlTokenTypes.WHITESPACE, trailingText.toString() + c);
 								break;
 							case INCLUDE_IN_FOLLOWING_TOKEN:
 								trailingText.append(c);
@@ -134,7 +133,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == '*')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_ASTERISK);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_ASTERISK);
 					}
 					else if (c == '/')
 					{
@@ -146,7 +145,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						}
 						else
 						{
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_DIV);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_DIV);
 						}
 					}
 					else if (c == '\'')
@@ -172,47 +171,47 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == '?')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_UNNAMED_PARAMETER);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_UNNAMED_PARAMETER);
 					}
 					else if (c == '.')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_PERIOD);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PERIOD);
 					}
 					else if (c == ',')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_COMMA);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_COMMA);
 					}
 					else if (c == ';')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_SEMICOLON);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_SEMICOLON);
 					}
 					else if (c == '(')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_PAREHENTESES_START);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PAREHENTESES_START);
 					}
 					else if (c == ')')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_PAREHENTESES_END);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PAREHENTESES_END);
 					}
 					else if (c == '+')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_PLUS);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PLUS);
 					}
 					else if (c == '-')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_MINUS);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_MINUS);
 					}
 					else if (c == '!')
 					{
 						if (c2 == '=')
 						{
 							source.nextChar();
-							token=SqlToken.TOKEN_DISTINCT2;
+							token=SqlTokens.TOKEN_DISTINCT2;
 							// source.incCurrentIndex();
 						}
 						else
 						{
-							if (this.getSettings().getUnexpectedSymbolBehaviour() == SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
+							if (this.getSettings().getUnexpectedSymbolBehaviour() == TokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
 							{
 								throw new UnexpectedSymbolException(source, c);
 							}
@@ -228,12 +227,12 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						if (c2 == '|')
 						{
 							source.nextChar();
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_CONCATENATION);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_CONCATENATION);
 							// source.incCurrentIndex();
 						}
 						else
 						{
-							if (this.getSettings().getUnexpectedSymbolBehaviour() == SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
+							if (this.getSettings().getUnexpectedSymbolBehaviour() == TokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
 							{
 								throw new UnexpectedSymbolException(source, c);
 							}
@@ -246,28 +245,28 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else if (c == '=')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_EQUALS);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_EQUALS);
 					}
 					else if (c == '<')
 					{
 						if (c2 == '>')
 						{
 							source.nextChar();
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_DISTINCT1);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_DISTINCT1);
 						}
 						else if (c2 == '=')
 						{
 							source.nextChar();
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_LOWER_OR_EQUALS);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_LOWER_OR_EQUALS);
 						}
 						else if (c2 == '<')
 						{
 							source.nextChar();
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_LOWER_LOWER);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_LOWER_LOWER);
 						}
 						else
 						{
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_LOWER);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_LOWER);
 						}
 					}
 					else if (c == '>')
@@ -275,21 +274,21 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						if (c2 == '=')
 						{
 							source.nextChar();
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_GREATER_OR_EQUALS);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_GREATER_OR_EQUALS);
 						}
 						else if (c2 == '>')
 						{
 							source.nextChar();
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_GREATER_GREATER);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_GREATER_GREATER);
 						}
 						else
 						{
-							token=createNewTokenIfNecessary(trailingText, SqlToken.TOKEN_GREATER);
+							token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_GREATER);
 						}
 					}
 					else
 					{
-						if (this.getSettings().getUnexpectedSymbolBehaviour() == SqlTokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
+						if (this.getSettings().getUnexpectedSymbolBehaviour() == TokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)
 						{
 							throw new UnexpectedSymbolException(source, c);
 						}
@@ -309,7 +308,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 							case IGNORE:
 								break;
 							case PRODUCE_TOKENS:
-								token=new SqlToken(Type.COMMENT, trailingText.toString() + "/" + source.endRecord().toString());
+								token=new Token(SqlTokenTypes.COMMENT, trailingText.toString() + "/" + source.endRecord().toString());
 								break;
 							case INCLUDE_IN_FOLLOWING_TOKEN:
 								trailingText.append("/" + source.endRecord().toString());
@@ -352,7 +351,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					else
 					{
 						source.unget(c);
-						token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+						token=createToken(trailingText, SqlTokenTypes.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -372,7 +371,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+						token=createToken(trailingText, SqlTokenTypes.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -396,7 +395,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+						token=createToken(trailingText, SqlTokenTypes.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -416,7 +415,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+						token=createToken(trailingText, SqlTokenTypes.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -440,7 +439,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					}
 					else
 					{
-						token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+						token=createToken(trailingText, SqlTokenTypes.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -461,7 +460,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					else
 					{
 						source.unget(c);
-						token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+						token=createToken(trailingText, SqlTokenTypes.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -478,7 +477,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 						{
 							String image=source.endRecord().toString();
 							String value=image.substring(1, image.length() - 1).replaceAll("\'\'", "\'");
-							token=createToken(trailingText, SqlToken.Type.TEXT_LITERAL, image, value);
+							token=createToken(trailingText, SqlTokenTypes.TEXT_LITERAL, image, value);
 							state=State.INITIAL;
 						}
 					}
@@ -487,7 +486,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					if (c == '\"')
 					{
 						String image=source.endRecord().toString();
-						token=createToken(trailingText, SqlToken.Type.DOUBLE_QUOTED_TEXT_LITERAL, image, image.substring(1, image.length() - 1));
+						token=createToken(trailingText, SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL, image, image.substring(1, image.length() - 1));
 						state=State.INITIAL;
 					}
 					break;
@@ -500,7 +499,7 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 					{
 						source.unget(c);
 						String image=source.endRecord().toString();
-						token=createToken(trailingText, SqlToken.Type.NAMED_PARAMETER, image, image.substring(1));
+						token=createToken(trailingText, SqlTokenTypes.NAMED_PARAMETER, image, image.substring(1));
 						// source.decCurrentIndex();
 						state=State.INITIAL;
 					}
@@ -519,15 +518,15 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 				break;
 			case READING_INTEGER_DIGITS:
 			case READING_EXPONENT_DIGITS_WITHOUT_SIGN:
-				token=createToken(trailingText, SqlToken.Type.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
+				token=createToken(trailingText, SqlTokenTypes.INTEGER_NUMBER_LITERAL, source.endRecord().toString());
 				break;
 			case READING_DECIMAL_DIGITS:
 			case READING_DECIMAL_AND_EXPONENT_DIGITS_WITHOUT_SIGN:
-				token=createToken(trailingText, SqlToken.Type.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
+				token=createToken(trailingText, SqlTokenTypes.DECIMAL_NUMBER_LITERAL, source.endRecord().toString());
 				break;
 			case READING_NAMED_PARAMETER:
 				String image=source.endRecord().toString();
-				token=createToken(trailingText, SqlToken.Type.NAMED_PARAMETER, image, image.substring(1));
+				token=createToken(trailingText, SqlTokenTypes.NAMED_PARAMETER, image, image.substring(1));
 				break;
 			case READING_COMMENT:
 				throw new UnclosedCommentException(source);
@@ -540,52 +539,51 @@ public class SqlTokenizer extends AbstractTokenizer<SqlToken, SqlTokenizerSettin
 		return token;
 	}
 
-	private SqlToken createNewTokenIfNecessary(StringBuilder text, SqlToken token)
+	protected Token createNewTokenIfNecessary(StringBuilder text, Token token)
 	{
 		return text.length() == 0
 			? token
-			: new SqlToken(token.getType(), text.toString());
+			: new Token(token.getType(), text.toString());
 	}
 
-	// private SqlToken createToken(StringBuilder text, Source source, SqlToken.Type type, int initialIndex, int endIndex)
+	// private Token createToken(StringBuilder text, Source source, int type, int initialIndex, int endIndex)
 	// {
-	// return new SqlToken(type, text.toString() + source.endRecord().toString());
+	// return new Token(type, text.toString() + source.endRecord().toString());
 	// }
 
-	private SqlToken createToken(StringBuilder trailingText, SqlToken.Type type, String image, String value)
+	protected Token createToken(StringBuilder trailingText, String type, String image, String value)
 	{
-		return new SqlToken(type, trailingText.toString() + image, value);
+		return new Token(type, trailingText.toString() + image, value);
 	}
 
-	private SqlToken createToken(StringBuilder trailingText, SqlToken.Type type, String text)
+	protected Token createToken(StringBuilder trailingText, String type, String text)
 	{
-		return new SqlToken(type, trailingText.toString() + text);
+		return new Token(type, trailingText.toString() + text);
 	}
 
-	private SqlToken createTextToken(StringBuilder leftText, String text)
+	protected Token createTextToken(StringBuilder leftText, String text)
 	{
 		// Decide si se trata de una palabra reservada, un operador, o un identificador:
-		SqlToken.Type type=SqlTokenizer.KEYWORDS.get(text.toUpperCase());
+		String type=lookupKeywordOrOperator(text.toUpperCase());
 		if (type == null)
 		{
-			type=SqlTokenizer.OPERATORS.get(text.toUpperCase());
-			if (type == null)
-			{
-				type=SqlToken.Type.IDENTIFIER;
-			}
+			type=SqlTokenTypes.IDENTIFIER;
 		}
 		if (leftText.length() > 0)
 		{
 			text=leftText.toString() + text;
 		}
-		return new SqlToken(type, text);
+		return new Token(type, text);
 	}
 
-	@Override
-	protected void pushBackToken(SqlToken token, PushBackSource source)
-		throws IOException
+	protected String lookupKeywordOrOperator(String text)
 	{
-		source.unget(token.getImage());
+		// Decide si se trata de una palabra reservada o un operador:
+		String type=KEYWORDS.get(text.toUpperCase());
+		if (type == null)
+		{
+			type=OPERATORS.get(text.toUpperCase());
+		}
+		return type;
 	}
-
 }

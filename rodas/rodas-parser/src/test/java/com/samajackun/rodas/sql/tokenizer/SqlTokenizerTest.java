@@ -15,43 +15,43 @@ import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
 import com.samajackun.rodas.parsing.tokenizer.UnclosedCommentException;
 import com.samajackun.rodas.parsing.tokenizer.UnclosedTextLiteralException;
 import com.samajackun.rodas.parsing.tokenizer.UnexpectedSymbolException;
-import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings.CommentsBehaviour;
-import com.samajackun.rodas.sql.tokenizer.SqlTokenizerSettings.WhitespaceBehaviour;
+import com.samajackun.rodas.sql.tokenizer.TokenizerSettings.CommentsBehaviour;
+import com.samajackun.rodas.sql.tokenizer.TokenizerSettings.WhitespaceBehaviour;
 
 public class SqlTokenizerTest
 {
-	private void test(String src, SqlToken... expectedTokens)
+	private void test(String src, Token... expectedTokens)
 		throws IOException
 	{
-		test(src, new SqlTokenizerSettings(), expectedTokens);
+		test(src, new TokenizerSettings(), expectedTokens);
 	}
 
-	private void testWithProducingTokensForComments(String src, SqlToken... expectedTokens)
+	private void testWithProducingTokensForComments(String src, Token... expectedTokens)
 		throws IOException
 	{
-		SqlTokenizerSettings settings=new SqlTokenizerSettings();
+		TokenizerSettings settings=new TokenizerSettings();
 		settings.setCommentsBehaviour(CommentsBehaviour.PRODUCE_TOKENS);
 		test(src, settings, expectedTokens);
 	}
 
-	private void testWithProducingTokensForCommentsAndIncludingWhitespaceInFollowingToken(String src, SqlToken... expectedTokens)
+	private void testWithProducingTokensForCommentsAndIncludingWhitespaceInFollowingToken(String src, Token... expectedTokens)
 		throws IOException
 	{
-		SqlTokenizerSettings settings=new SqlTokenizerSettings();
+		TokenizerSettings settings=new TokenizerSettings();
 		settings.setCommentsBehaviour(CommentsBehaviour.PRODUCE_TOKENS);
 		settings.setWhitespaceBehaviour(WhitespaceBehaviour.INCLUDE_IN_FOLLOWING_TOKEN);
 		test(src, settings, expectedTokens);
 	}
 
-	private void test(String src, SqlTokenizerSettings settings, SqlToken... expectedTokens)
+	private void test(String src, TokenizerSettings settings, Token... expectedTokens)
 		throws IOException
 	{
 		try
 		{
 			SqlTokenizer tokenizer=new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), settings);
-			SqlToken token;
+			Token token;
 
-			for (SqlToken expectedToken : expectedTokens)
+			for (Token expectedToken : expectedTokens)
 			{
 				token=tokenizer.nextToken();
 				assertNotNull(token);
@@ -71,7 +71,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="";
-		SqlToken[] expectedTokens= {};
+		Token[] expectedTokens= {};
 		test(src, expectedTokens);
 	}
 
@@ -80,7 +80,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="12";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "12") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "12") };
 		test(src, expectedTokens);
 	}
 
@@ -89,7 +89,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="+12";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_PLUS, new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "12") };
+		Token[] expectedTokens= { SqlTokens.TOKEN_PLUS, new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "12") };
 		test(src, expectedTokens);
 	}
 
@@ -98,7 +98,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="-12";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_MINUS, new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "12") };
+		Token[] expectedTokens= { SqlTokens.TOKEN_MINUS, new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "12") };
 		test(src, expectedTokens);
 	}
 
@@ -107,7 +107,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="1.2";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.DECIMAL_NUMBER_LITERAL, "1.2") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.DECIMAL_NUMBER_LITERAL, "1.2") };
 		test(src, expectedTokens);
 	}
 
@@ -116,7 +116,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="9E4";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "9E4") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "9E4") };
 		test(src, expectedTokens);
 	}
 
@@ -125,7 +125,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="9E+4";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "9E+4") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "9E+4") };
 		test(src, expectedTokens);
 	}
 
@@ -134,7 +134,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="9E-4";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "9E-4") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "9E-4") };
 		test(src, expectedTokens);
 	}
 
@@ -143,7 +143,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="9E--4";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "9E--4") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "9E--4") };
 		test(src, expectedTokens);
 	}
 
@@ -152,7 +152,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="9.2E-4";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.DECIMAL_NUMBER_LITERAL, "9.2E-4") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.DECIMAL_NUMBER_LITERAL, "9.2E-4") };
 		test(src, expectedTokens);
 	}
 
@@ -161,7 +161,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*/";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.COMMENT, "/*enero*/") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.COMMENT, "/*enero*/") };
 		testWithProducingTokensForComments(src, expectedTokens);
 	}
 
@@ -170,7 +170,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*/";
-		SqlToken[] expectedTokens= {};
+		Token[] expectedTokens= {};
 		test(src, expectedTokens);
 	}
 
@@ -179,7 +179,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*/";
-		SqlToken[] expectedTokens= {};
+		Token[] expectedTokens= {};
 		test(src, expectedTokens);
 	}
 
@@ -188,7 +188,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=" /*enero*/";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.COMMENT, "/*enero*/") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.COMMENT, "/*enero*/") };
 		testWithProducingTokensForComments(src, expectedTokens);
 	}
 
@@ -197,7 +197,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=" /*enero*/";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.COMMENT, " /*enero*/") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.COMMENT, " /*enero*/") };
 		testWithProducingTokensForCommentsAndIncludingWhitespaceInFollowingToken(src, expectedTokens);
 	}
 
@@ -206,7 +206,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=" /*enero*/";
-		SqlToken[] expectedTokens= {};
+		Token[] expectedTokens= {};
 		test(src, expectedTokens);
 	}
 
@@ -215,7 +215,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*febrero*/";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.COMMENT, "/*enero*febrero*/") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.COMMENT, "/*enero*febrero*/") };
 		testWithProducingTokensForComments(src, expectedTokens);
 	}
 
@@ -224,7 +224,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*febrero*/";
-		SqlToken[] expectedTokens= {};
+		Token[] expectedTokens= {};
 		test(src, expectedTokens);
 	}
 
@@ -233,7 +233,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*//*febrero*/";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.COMMENT, "/*enero*/"), new SqlToken(SqlToken.Type.COMMENT, "/*febrero*/") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.COMMENT, "/*enero*/"), new Token(SqlTokenTypes.COMMENT, "/*febrero*/") };
 		testWithProducingTokensForComments(src, expectedTokens);
 	}
 
@@ -242,7 +242,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/*enero*//*febrero*/";
-		SqlToken[] expectedTokens= {};
+		Token[] expectedTokens= {};
 		test(src, expectedTokens);
 	}
 
@@ -251,7 +251,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="\"enero\"";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.DOUBLE_QUOTED_TEXT_LITERAL, "\"enero\"", "enero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL, "\"enero\"", "enero") };
 		test(src, expectedTokens);
 	}
 
@@ -260,7 +260,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="'enero'";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.TEXT_LITERAL, "'enero'", "enero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.TEXT_LITERAL, "'enero'", "enero") };
 		test(src, expectedTokens);
 	}
 
@@ -269,7 +269,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="'o''donell'";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.TEXT_LITERAL, "'o''donell'", "o'donell") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.TEXT_LITERAL, "'o''donell'", "o'donell") };
 		test(src, expectedTokens);
 	}
 
@@ -278,7 +278,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="enero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.IDENTIFIER, "enero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.IDENTIFIER, "enero") };
 		test(src, expectedTokens);
 	}
 
@@ -287,7 +287,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="_enero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.IDENTIFIER, "_enero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.IDENTIFIER, "_enero") };
 		test(src, expectedTokens);
 	}
 
@@ -296,7 +296,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="$enero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.IDENTIFIER, "$enero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.IDENTIFIER, "$enero") };
 		test(src, expectedTokens);
 	}
 
@@ -305,7 +305,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="enero_febrero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.IDENTIFIER, "enero_febrero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.IDENTIFIER, "enero_febrero") };
 		test(src, expectedTokens);
 	}
 
@@ -314,7 +314,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="enero$febrero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.IDENTIFIER, "enero$febrero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.IDENTIFIER, "enero$febrero") };
 		test(src, expectedTokens);
 	}
 
@@ -323,7 +323,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="enero.febrero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.IDENTIFIER, "enero"), SqlToken.TOKEN_PERIOD, new SqlToken(SqlToken.Type.IDENTIFIER, "febrero") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.IDENTIFIER, "enero"), SqlTokens.TOKEN_PERIOD, new Token(SqlTokenTypes.IDENTIFIER, "febrero") };
 		test(src, expectedTokens);
 	}
 
@@ -332,7 +332,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="select";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_SELECT, "select") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_SELECT, "select") };
 		test(src, expectedTokens);
 	}
 
@@ -341,7 +341,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="SELECT";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_SELECT, "SELECT") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_SELECT, "SELECT") };
 		test(src, expectedTokens);
 	}
 
@@ -350,7 +350,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="FROM";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_FROM, "FROM") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_FROM, "FROM") };
 		test(src, expectedTokens);
 	}
 
@@ -359,7 +359,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="WHERE";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_WHERE, "WHERE") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_WHERE, "WHERE") };
 		test(src, expectedTokens);
 	}
 
@@ -368,7 +368,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="AS";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_AS, "AS") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_AS, "AS") };
 		test(src, expectedTokens);
 	}
 
@@ -377,7 +377,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="HAVING";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_HAVING, "HAVING") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_HAVING, "HAVING") };
 		test(src, expectedTokens);
 	}
 
@@ -386,7 +386,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="*";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_ASTERISK };
+		Token[] expectedTokens= { SqlTokens.TOKEN_ASTERISK };
 		test(src, expectedTokens);
 	}
 
@@ -395,7 +395,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="<>";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_DISTINCT1 };
+		Token[] expectedTokens= { SqlTokens.TOKEN_DISTINCT1 };
 		test(src, expectedTokens);
 	}
 
@@ -404,7 +404,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="!=";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_DISTINCT2 };
+		Token[] expectedTokens= { SqlTokens.TOKEN_DISTINCT2 };
 		test(src, expectedTokens);
 	}
 
@@ -413,7 +413,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="/";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_DIV };
+		Token[] expectedTokens= { SqlTokens.TOKEN_DIV };
 		test(src, expectedTokens);
 	}
 
@@ -422,7 +422,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="=";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_EQUALS };
+		Token[] expectedTokens= { SqlTokens.TOKEN_EQUALS };
 		test(src, expectedTokens);
 	}
 
@@ -431,7 +431,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=">";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_GREATER };
+		Token[] expectedTokens= { SqlTokens.TOKEN_GREATER };
 		test(src, expectedTokens);
 	}
 
@@ -440,7 +440,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=">=";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_GREATER_OR_EQUALS };
+		Token[] expectedTokens= { SqlTokens.TOKEN_GREATER_OR_EQUALS };
 		test(src, expectedTokens);
 	}
 
@@ -449,7 +449,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="<";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_LOWER };
+		Token[] expectedTokens= { SqlTokens.TOKEN_LOWER };
 		test(src, expectedTokens);
 	}
 
@@ -458,7 +458,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="<=";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_LOWER_OR_EQUALS };
+		Token[] expectedTokens= { SqlTokens.TOKEN_LOWER_OR_EQUALS };
 		test(src, expectedTokens);
 	}
 
@@ -467,7 +467,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="+";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_PLUS };
+		Token[] expectedTokens= { SqlTokens.TOKEN_PLUS };
 		test(src, expectedTokens);
 	}
 
@@ -476,7 +476,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="-";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_MINUS };
+		Token[] expectedTokens= { SqlTokens.TOKEN_MINUS };
 		test(src, expectedTokens);
 	}
 
@@ -485,7 +485,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="(";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_PAREHENTESES_START };
+		Token[] expectedTokens= { SqlTokens.TOKEN_PAREHENTESES_START };
 		test(src, expectedTokens);
 	}
 
@@ -494,7 +494,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=")";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_PAREHENTESES_END };
+		Token[] expectedTokens= { SqlTokens.TOKEN_PAREHENTESES_END };
 		test(src, expectedTokens);
 	}
 
@@ -502,7 +502,7 @@ public class SqlTokenizerTest
 	// public void period() throws IOException
 	// {
 	// String src=".";
-	// Token[] expectedTokens= { Token.TOKEN_PERIOD };
+	// Token[] expectedTokens= { SqlTokens.TOKEN_PERIOD };
 	// test(src, expectedTokens);
 	// }
 
@@ -511,7 +511,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=";";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_SEMICOLON };
+		Token[] expectedTokens= { SqlTokens.TOKEN_SEMICOLON };
 		test(src, expectedTokens);
 	}
 
@@ -520,7 +520,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=",";
-		SqlToken[] expectedTokens= { SqlToken.TOKEN_COMMA };
+		Token[] expectedTokens= { SqlTokens.TOKEN_COMMA };
 		test(src, expectedTokens);
 	}
 
@@ -529,19 +529,19 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="SELECT a, b FROM c WHERE z=10+x";
-		SqlToken[] expectedTokens= {
-						new SqlToken(SqlToken.Type.KEYWORD_SELECT, "SELECT"),
-						new SqlToken(SqlToken.Type.IDENTIFIER, "a"),
-						SqlToken.TOKEN_COMMA,
-						new SqlToken(SqlToken.Type.IDENTIFIER, "b"),
-						new SqlToken(SqlToken.Type.KEYWORD_FROM, "FROM"),
-						new SqlToken(SqlToken.Type.IDENTIFIER, "c"),
-						new SqlToken(SqlToken.Type.KEYWORD_WHERE, "WHERE"),
-						new SqlToken(SqlToken.Type.IDENTIFIER, "z"),
-						SqlToken.TOKEN_EQUALS,
-						new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "10"),
-						SqlToken.TOKEN_PLUS,
-						new SqlToken(SqlToken.Type.IDENTIFIER, "x"), };
+		Token[] expectedTokens= {
+						new Token(SqlTokenTypes.KEYWORD_SELECT, "SELECT"),
+						new Token(SqlTokenTypes.IDENTIFIER, "a"),
+						SqlTokens.TOKEN_COMMA,
+						new Token(SqlTokenTypes.IDENTIFIER, "b"),
+						new Token(SqlTokenTypes.KEYWORD_FROM, "FROM"),
+						new Token(SqlTokenTypes.IDENTIFIER, "c"),
+						new Token(SqlTokenTypes.KEYWORD_WHERE, "WHERE"),
+						new Token(SqlTokenTypes.IDENTIFIER, "z"),
+						SqlTokens.TOKEN_EQUALS,
+						new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "10"),
+						SqlTokens.TOKEN_PLUS,
+						new Token(SqlTokenTypes.IDENTIFIER, "x"), };
 		test(src, expectedTokens);
 	}
 
@@ -611,7 +611,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=":enero";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.NAMED_PARAMETER, ":enero", "enero"), };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.NAMED_PARAMETER, ":enero", "enero"), };
 		test(src, expectedTokens);
 	}
 
@@ -620,7 +620,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=":enero+12";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.NAMED_PARAMETER, ":enero", "enero"), new SqlToken(SqlToken.Type.OPERATOR_PLUS, "+"), new SqlToken(SqlToken.Type.INTEGER_NUMBER_LITERAL, "12"), };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.NAMED_PARAMETER, ":enero", "enero"), new Token(SqlTokenTypes.OPERATOR_PLUS, "+"), new Token(SqlTokenTypes.INTEGER_NUMBER_LITERAL, "12"), };
 		test(src, expectedTokens);
 	}
 
@@ -629,7 +629,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="?";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.UNNAMED_PARAMETER, "?"), };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.UNNAMED_PARAMETER, "?"), };
 		test(src, expectedTokens);
 	}
 
@@ -638,7 +638,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=" SELECT";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.KEYWORD_SELECT, "SELECT") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.KEYWORD_SELECT, "SELECT") };
 		test(src, expectedTokens);
 	}
 
@@ -647,7 +647,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="IS";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.OPERATOR_IS, "IS") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.OPERATOR_IS, "IS") };
 		test(src, expectedTokens);
 	}
 
@@ -656,7 +656,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="IS NOT";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.OPERATOR_IS, "IS"), new SqlToken(SqlToken.Type.OPERATOR_NOT, "NOT") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.OPERATOR_IS, "IS"), new Token(SqlTokenTypes.OPERATOR_NOT, "NOT") };
 		test(src, expectedTokens);
 	}
 
@@ -665,7 +665,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="true";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.TRUE, "true") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.TRUE, "true") };
 		test(src, expectedTokens);
 	}
 
@@ -674,7 +674,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="false";
-		SqlToken[] expectedTokens= { new SqlToken(SqlToken.Type.FALSE, "false") };
+		Token[] expectedTokens= { new Token(SqlTokenTypes.FALSE, "false") };
 		test(src, expectedTokens);
 	}
 }

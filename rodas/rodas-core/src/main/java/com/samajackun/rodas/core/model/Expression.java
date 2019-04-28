@@ -6,6 +6,7 @@ import java.util.List;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.Name;
 
 public interface Expression extends Codeable
 {
@@ -26,7 +27,12 @@ public interface Expression extends Codeable
 		}
 	}
 
-	default public String getName()
+	public default Name getCodeAsName()
+	{
+		return Name.instanceOf(toCode());
+	}
+
+	public default Name getName()
 	{
 		return null;
 	}
@@ -48,7 +54,7 @@ public interface Expression extends Codeable
 		}
 	}
 
-	default public Executor createExecutor(Context context, EvaluatorFactory evaluatorFactory)
+	public default Executor createExecutor(Context context, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
 		return new OperationExecutor(context, evaluatorFactory, reduce(evaluatorFactory));
@@ -57,7 +63,7 @@ public interface Expression extends Codeable
 	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory)
 		throws MetadataException;
 
-	default public List<Expression> toPhysicalExpressions(Provider provider)
+	public default List<Expression> toPhysicalExpressions(Provider provider)
 		throws ProviderException
 	{
 		return Collections.singletonList(this);

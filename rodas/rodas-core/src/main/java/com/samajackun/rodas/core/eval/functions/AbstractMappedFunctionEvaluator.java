@@ -1,36 +1,40 @@
 package com.samajackun.rodas.core.eval.functions;
 
-import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.eval.AbstractEvaluator;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.FunctionEvaluator;
 import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.IdentifierExpression;
 
-public abstract class AbstractMappedFunctionEvaluator extends AbstractEvaluator implements FunctionEvaluator
+public abstract class AbstractMappedFunctionEvaluator extends AbstractFunctionEvaluator
 {
 	private final Map<String, Function> map;
 
 	public AbstractMappedFunctionEvaluator(EvaluatorFactory evaluatorFactory)
 	{
 		super(evaluatorFactory);
-		this.map=createMap(evaluatorFactory);
+		map=createMap(evaluatorFactory);
 	}
 
 	protected abstract Map<String, Function> createMap(EvaluatorFactory evaluatorFactory);
 
 	@Override
-	public Object evaluate(Context context, String functionName, List<Expression> arguments)
+	protected Object resolveFunction(Context context, Expression functionExpression)
 		throws EvaluationException
 	{
-		Function function=this.map.get(functionName);
-		if (function == null)
+		Object resolved;
+		// FIXME Quizá no sea IdentifierExpression, sino VariableExpression, o algo así.
+		if (functionExpression instanceof IdentifierExpression)
 		{
-			throw new UnsuportedFunctionException(functionName);
+			String functionName=((IdentifierExpression)functionExpression).getIdentifier();
+			resolved=map.get(functionName);
 		}
-		return function.evaluate(context, arguments);
+		else
+		{
+			resolved=super.resolveFunction(context, functionExpression);
+		}
+		return resolved;
 	}
 }

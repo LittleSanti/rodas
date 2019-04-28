@@ -1,7 +1,10 @@
-package com.samajackun.rodas.core.model;
+package com.samajackun.rodas.core.execution;
 
 import java.util.List;
 import java.util.Map;
+
+import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.RowData;
 
 /**
  * Represents a set of rows which may be iterated.
@@ -23,6 +26,12 @@ public interface Cursor
 	public RowData getRowData()
 		throws CursorException;
 
+	public default RowData getCachedRowData()
+		throws CursorException
+	{
+		return new CachedRowData(getRowData(), getNumberOfColumns(), getRowData().position());
+	}
+
 	public Map<String, Integer> getColumnMap()
 		throws CursorException;
 
@@ -33,4 +42,15 @@ public interface Cursor
 		throws CursorException;
 
 	public int getNumberOfColumns();
+
+	public default boolean isCached()
+	{
+		return false;
+	}
+
+	public default CachedCursor toCachedCursor()
+		throws CursorException
+	{
+		return new DefaultCachedCursor(this);
+	}
 }

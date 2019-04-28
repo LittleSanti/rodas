@@ -1,9 +1,9 @@
 package com.samajackun.rodas.core.eval.functions;
 
 import java.util.Date;
+import java.util.List;
 
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class MaxFunction extends AbstractFunction
@@ -14,8 +14,8 @@ public class MaxFunction extends AbstractFunction
 	}
 
 	@Override
-	protected Object evaluateFunction(Context context, Object[] values)
-		throws EvaluationException
+	protected Object evaluateFunction(Context context, List<Object> values)
+		throws FunctionEvaluationException
 	{
 		Object result;
 		if (hasAnyNull(values))
@@ -24,16 +24,16 @@ public class MaxFunction extends AbstractFunction
 		}
 		else
 		{
-			Object value1=values[0];
+			Object value1=values.get(0);
 			if (value1 instanceof Number)
 			{
 				Class<?> scale=getMaxScaleType(values);
 				if (scale == Integer.class)
 				{
 					int number1=((Number)value1).intValue();
-					for (int i=1; i < values.length; i++)
+					for (int i=1; i < values.size(); i++)
 					{
-						Object value2=values[i];
+						Object value2=values.get(i);
 						int number2=((Number)value2).intValue();
 						number1=(number1 > number2)
 							? number1
@@ -44,9 +44,9 @@ public class MaxFunction extends AbstractFunction
 				else if (scale == Long.class)
 				{
 					long number1=((Number)value1).longValue();
-					for (int i=1; i < values.length; i++)
+					for (int i=1; i < values.size(); i++)
 					{
-						Object value2=values[i];
+						Object value2=values.get(i);
 						long number2=((Number)value2).longValue();
 						number1=(number1 > number2)
 							? number1
@@ -57,9 +57,9 @@ public class MaxFunction extends AbstractFunction
 				else if (scale == Float.class)
 				{
 					float number1=((Number)value1).floatValue();
-					for (int i=1; i < values.length; i++)
+					for (int i=1; i < values.size(); i++)
 					{
-						Object value2=values[i];
+						Object value2=values.get(i);
 						float number2=((Number)value2).floatValue();
 						number1=(number1 > number2)
 							? number1
@@ -70,9 +70,9 @@ public class MaxFunction extends AbstractFunction
 				else if (scale == Double.class)
 				{
 					double number1=((Number)value1).doubleValue();
-					for (int i=1; i < values.length; i++)
+					for (int i=1; i < values.size(); i++)
 					{
-						Object value2=values[i];
+						Object value2=values.get(i);
 						double number2=((Number)value2).doubleValue();
 						number1=(number1 > number2)
 							? number1
@@ -88,9 +88,9 @@ public class MaxFunction extends AbstractFunction
 			else if (value1 instanceof String)
 			{
 				String string1=((String)value1);
-				for (int i=1; i < values.length; i++)
+				for (int i=1; i < values.size(); i++)
 				{
-					Object value2=values[i];
+					Object value2=values.get(i);
 					String string2=((String)value2);
 					string1=(string1.compareTo(string2) > 0)
 						? string1
@@ -101,9 +101,9 @@ public class MaxFunction extends AbstractFunction
 			else if (value1 instanceof Date)
 			{
 				Date date1=((Date)value1);
-				for (int i=1; i < values.length; i++)
+				for (int i=1; i < values.size(); i++)
 				{
-					Object value2=values[i];
+					Object value2=values.get(i);
 					Date date2=((Date)value2);
 					date1=(date1.compareTo(date2) > 0)
 						? date1
@@ -113,7 +113,7 @@ public class MaxFunction extends AbstractFunction
 			}
 			else
 			{
-				throw new EvaluationException("Unsupported parameter type " + value1.getClass().getName());
+				throw new FunctionEvaluationException("max", "Unsupported parameter type " + value1.getClass().getName());
 			}
 		}
 		return result;

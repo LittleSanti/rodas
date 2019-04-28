@@ -1,6 +1,5 @@
 package com.samajackun.rodas.sql.engine;
 
-import static com.samajackun.rodas.sql.engine.CursorsUtils.combineCursors;
 import static com.samajackun.rodas.sql.engine.CursorsUtils.concatMetadata;
 import static com.samajackun.rodas.sql.engine.CursorsUtils.toColumnMap;
 
@@ -10,9 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.RowData;
 
 public class CrossCursor implements Cursor
@@ -26,6 +25,8 @@ public class CrossCursor implements Cursor
 	private final Map<String, Integer> columnMap;
 
 	private final RowData rowData;
+
+	private long myPosition;
 
 	private boolean justReset=true;
 
@@ -41,7 +42,7 @@ public class CrossCursor implements Cursor
 		}
 		this.metadata=concatMetadata(cursors);
 		this.columnMap=toColumnMap(this.metadata);
-		this.rowData=combineCursors(this.cursors);
+		this.rowData=new CombinedRowData(this.cursors);
 	}
 
 	// private boolean currentAndAllFollowingHaveNext()
@@ -180,6 +181,7 @@ public class CrossCursor implements Cursor
 				}
 			}
 		}
+		this.myPosition++;
 	}
 
 	@Override
@@ -288,4 +290,64 @@ public class CrossCursor implements Cursor
 	// return x;
 	// }
 	// }
+	class CombinedRowData implements RowData
+	{
+		private final CursorColumn[] map;
+
+		public CombinedRowData(List<Cursor> cursors)
+			throws CursorException
+		{
+			int numberOfColumns=0;
+			for (Cursor cursor : cursors)
+			{
+				numberOfColumns+=cursor.getNumberOfColumns();
+			}
+			this.map=new CursorColumn[numberOfColumns];
+			int i=0;
+			for (Cursor cursor : cursors)
+			{
+				for (int j=0; j < cursor.getNumberOfColumns(); j++)
+				{
+					this.map[i++]=new CursorColumn(cursor.getRowData(), j);
+				}
+			}
+		}
+
+		@Override
+		public long position()
+		{
+			return CrossCursor.this.myPosition;
+		}
+
+		@Override
+		public Object get(int column)
+		{
+			CursorColumn cursorColumn=this.map[column];
+			return cursorColumn.getRowData().get(cursorColumn.getColumn());
+		}
+
+		private class CursorColumn
+		{
+			private final RowData rowData;
+
+			private final int column;
+
+			public CursorColumn(RowData rowData, int column)
+			{
+				super();
+				this.rowData=rowData;
+				this.column=column;
+			}
+
+			public RowData getRowData()
+			{
+				return this.rowData;
+			}
+
+			public int getColumn()
+			{
+				return this.column;
+			}
+		}
+	}
 }

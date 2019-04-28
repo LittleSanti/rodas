@@ -7,37 +7,37 @@ import java.util.List;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.UnsuportedDatatypeException;
 
-public class FunctionExpression implements Expression
+public class FunctionCallExpression implements Expression
 {
-	private final String function;
+	private final Expression functionObject;
 
-	private final List<Expression> arguments=new ArrayList<Expression>();
+	private final List<Expression> arguments;
 
-	public FunctionExpression(String function)
+	public FunctionCallExpression(Expression functionObject, List<Expression> arguments)
 	{
 		super();
-		this.function=function;
+		this.functionObject=functionObject;
+		this.arguments=arguments;
 	}
 
-	public String getFunction()
+	public Expression getFunctionObject()
 	{
-		return this.function;
+		return functionObject;
 	}
 
 	public List<Expression> getArguments()
 	{
-		return this.arguments;
+		return arguments;
 	}
 
 	@Override
 	public String toCode()
 	{
-		String functionSerial=this.function;
-		StringBuilder stb=new StringBuilder(2 + functionSerial.length() + 100 * this.arguments.size());
+		String functionSerial=functionObject.toCode();
+		StringBuilder stb=new StringBuilder(2 + functionSerial.length() + 100 * arguments.size());
 		stb.append(functionSerial).append('(');
-		for (Iterator<Expression> iterator=this.arguments.iterator(); iterator.hasNext();)
+		for (Iterator<Expression> iterator=arguments.iterator(); iterator.hasNext();)
 		{
 			Expression argument=iterator.next();
 			stb.append(argument.toCode());
@@ -54,65 +54,45 @@ public class FunctionExpression implements Expression
 	public Object evaluate(Context context, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
-		return evaluatorFactory.getFunctionEvaluator().evaluate(context, this.function, this.arguments);
+		return evaluatorFactory.getFunctionEvaluator().evaluate(context, functionObject, arguments);
 	}
 
 	@Override
 	public Expression reduce(EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
-		List<Expression> reducedArguments=new ArrayList<Expression>(this.arguments.size());
-		// this.arguments.stream().forEach(arg -> reducedArguments.add(arg.reduce(evaluatorFactory)));
-		for (Expression argument : this.arguments)
-		{
-			reducedArguments.add(argument.reduce(evaluatorFactory));
-		}
-		// reducedArguments.stream().forEach(arg -> allArgumentsAreConstants=allArgumentsAreConstants && (arg instanceof ConstantExpression));
-		boolean allArgumentsAreConstants=true;
-		for (Iterator<Expression> iterator=reducedArguments.iterator(); iterator.hasNext() && allArgumentsAreConstants;)
+		Expression reducedExpression;
+		List<Expression> reducedArguments=new ArrayList<>(arguments.size());
+		boolean allConstants=true;
+		for (Iterator<Expression> iterator=arguments.iterator(); iterator.hasNext() && allConstants;)
 		{
 			Expression argument=iterator.next();
-			allArgumentsAreConstants=allArgumentsAreConstants && (argument instanceof ConstantExpression);
-		}
-		Expression reduced;
-		if (allArgumentsAreConstants)
-		{
-			Object result=evaluatorFactory.getFunctionEvaluator().evaluate(null, this.getFunction(), reducedArguments);
-			if (result == null)
+			Expression reducedArgument=argument.reduce(evaluatorFactory);
+			if (reducedArgument instanceof ConstantExpression)
 			{
-				reduced=new NullConstantExpression("null");
-			}
-			else if (result instanceof Number)
-			{
-				reduced=new NumericConstantExpression(result.toString(), (Number)result);
-			}
-			else if (result instanceof String)
-			{
-				reduced=new TextConstantExpression((String)result);
-			}
-			// else if (result instanceof Date)
-			// {
-			// reduced=new DateConstantExpression((String)result);
-			// }
-			else if (result instanceof Boolean)
-			{
-				reduced=new BooleanConstantExpression(result.toString(), (Boolean)result);
+				reducedArguments.add(reducedArgument);
 			}
 			else
 			{
-				throw new UnsuportedDatatypeException(result.getClass());
+				allConstants=false;
 			}
+		}
+		if (allConstants)
+		{
+			reducedExpression=new FunctionCallExpression(functionObject, reducedArguments);
 		}
 		else
 		{
-			reduced=this;
+			reducedExpression=this;
 		}
-		return reduced;
+		return reducedExpression;
 	}
 
 	@Override
-	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory) throws MetadataException
+	public Datatype getDatatype(Context context, EvaluatorFactory evaluatorFactory)
+		throws MetadataException
 	{
-		return evaluatorFactory.getFunctionEvaluator().getDatatype(context, this.function, this.arguments);
+		// return this.functionObject.getDatatype(context, evaluatorFactory);
+		return functionObject.getDatatype(context, evaluatorFactory);
 	}
 }

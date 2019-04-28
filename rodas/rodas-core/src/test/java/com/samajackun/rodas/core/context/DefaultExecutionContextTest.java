@@ -3,25 +3,14 @@ package com.samajackun.rodas.core.context;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 
-import com.samajackun.rodas.core.context.DefaultExecutionContext;
-import com.samajackun.rodas.core.context.IdentifierCoordinates;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.MapList;
-import com.samajackun.rodas.core.eval.MyCursor;
 import com.samajackun.rodas.core.eval.NameNotBoundException;
 import com.samajackun.rodas.core.eval.PrefixNotFoundException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
-import com.samajackun.rodas.core.model.Datatype;
-import com.samajackun.rodas.core.model.IterableTableData;
-import com.samajackun.rodas.core.model.MyIterableTableData;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ProviderException;
 
 public class DefaultExecutionContextTest
@@ -31,7 +20,7 @@ public class DefaultExecutionContextTest
 		throws ProviderException,
 		PrefixNotFoundException
 	{
-		Cursor cursor1=createCursor();
+		Cursor cursor1=TestUtils.createCursor("month");
 		MapList<String, Cursor> cursors=new MapList<>();
 		cursors.put("x1", cursor1);
 		MapList<String, IdentifierCoordinates> identifierCoordinatesMap=new MapList<>();
@@ -73,7 +62,7 @@ public class DefaultExecutionContextTest
 		throws ProviderException,
 		PrefixNotFoundException
 	{
-		Cursor cursor1=createCursor();
+		Cursor cursor1=TestUtils.createCursor("month");
 		MapList<String, Cursor> cursors=new MapList<>();
 		cursors.put("x1", cursor1);
 		MapList<String, IdentifierCoordinates> identifierCoordinatesMap=new MapList<>();
@@ -152,31 +141,31 @@ public class DefaultExecutionContextTest
 	// }
 	// }
 
-	private Cursor createCursor()
-		throws ProviderException
-	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
-		metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
-		IterableTableData iterable=new MyIterableTableData(Arrays.asList(new Object[][] {
-			// @formatter:off
-			new Object[] {1,"enero",31},
-			new Object[] {2,"febrero",28},
-			new Object[] {3,"marzo",31},
-			new Object[] {4,"abril",30},
-			new Object[] {5,"mayo",31},
-			new Object[] {6,"junio",30},
-			new Object[] {7,"julio",31},
-			new Object[] {8,"agosto",31},
-			new Object[] {9,"septiembre",30},
-			new Object[] {10,"octubre",31},
-			new Object[] {11,"noviembre",30},
-			new Object[] {12,"diciembre",31},
-			new Object[] {13,"triciembre",41},
-			// @formatter:on
-		}));
-		Cursor cursor=new MyCursor(metadata, iterable);
-		return cursor;
-	}
+	// private Cursor createCursor()
+	// throws ProviderException
+	// {
+	// List<ColumnMetadata> metadata=new ArrayList<>();
+	// metadata.add(new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false));
+	// metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
+	// metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
+	// IterableTableData iterable=new MyIterableTableData(Arrays.asList(new Object[][] {
+//			// @formatter:off
+//			new Object[] {1,"enero",31},
+//			new Object[] {2,"febrero",28},
+//			new Object[] {3,"marzo",31},
+//			new Object[] {4,"abril",30},
+//			new Object[] {5,"mayo",31},
+//			new Object[] {6,"junio",30},
+//			new Object[] {7,"julio",31},
+//			new Object[] {8,"agosto",31},
+//			new Object[] {9,"septiembre",30},
+//			new Object[] {10,"octubre",31},
+//			new Object[] {11,"noviembre",30},
+//			new Object[] {12,"diciembre",31},
+//			new Object[] {13,"triciembre",41},
+//			// @formatter:on
+	// }));
+	// Cursor cursor=new MyCursor(metadata, iterable);
+	// return cursor;
+	// }
 }

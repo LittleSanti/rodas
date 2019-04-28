@@ -1,5 +1,7 @@
 package com.samajackun.rodas.core.eval.functions;
 
+import java.util.List;
+
 import com.samajackun.rodas.core.eval.EvaluationException;
 
 public class FunctionEvaluationException extends EvaluationException
@@ -8,14 +10,14 @@ public class FunctionEvaluationException extends EvaluationException
 
 	private final String function;
 
-	private final Object[] arguments;
+	private final List<Object> arguments;
 
 	public FunctionEvaluationException(String message, String function)
 	{
 		this(message, function, null);
 	}
 
-	public FunctionEvaluationException(String message, String function, Object[] arguments)
+	public FunctionEvaluationException(String message, String function, List<Object> arguments)
 	{
 		super(message);
 		this.function=function;
@@ -27,7 +29,7 @@ public class FunctionEvaluationException extends EvaluationException
 		return this.function;
 	}
 
-	public Object[] getArguments()
+	public List<Object> getArguments()
 	{
 		return this.arguments;
 	}

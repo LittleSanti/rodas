@@ -6,12 +6,13 @@ import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.ExpressionCollection;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class GenericExpressionCollectionParser extends AbstractParser<ExpressionCollection>
 {
-	protected GenericExpressionCollectionParser(ParserFactory parserFactory)
+	public GenericExpressionCollectionParser(ParserFactory parserFactory)
 	{
 		super(parserFactory);
 	}
@@ -21,7 +22,7 @@ public class GenericExpressionCollectionParser extends AbstractParser<Expression
 	}
 
 	@Override
-	public ExpressionCollection parse(SqlMatchingTokenizer tokenizer)
+	public ExpressionCollection parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -32,10 +33,10 @@ public class GenericExpressionCollectionParser extends AbstractParser<Expression
 			switch (state)
 			{
 				case INITIAL:
-					SqlToken token=tokenizer.nextOptionalUsefulToken();
+					Token token=tokenizer.nextOptionalUsefulToken();
 					if (token != null)
 					{
-						if (token.getType() == SqlToken.Type.PARENTHESIS_END)
+						if (token.getType().equals(SqlTokenTypes.PARENTHESIS_END))
 						{
 							tokenizer.pushBack(token);
 							state=State.COMPLETE;
@@ -43,7 +44,7 @@ public class GenericExpressionCollectionParser extends AbstractParser<Expression
 						else
 						{
 							tokenizer.pushBack(token);
-							Expression expression=getParserFactory().getExpressionParser().parse(tokenizer);
+							Expression expression=getParserFactory().getExpressionParser().parse(tokenizer, parserContext);
 							if (expression != null)
 							{
 								expressionList.add(expression);
@@ -53,12 +54,12 @@ public class GenericExpressionCollectionParser extends AbstractParser<Expression
 					state=State.EXPECTING_COMMA;
 					break;
 				case EXPECTING_COMMA:
-					SqlToken token2=tokenizer.nextOptionalUsefulToken();
+					Token token2=tokenizer.nextOptionalUsefulToken();
 					if (token2 != null)
 					{
 						switch (token2.getType())
 						{
-							case COMMA:
+							case SqlTokenTypes.COMMA:
 								state=State.INITIAL;
 								break;
 							default:

@@ -3,6 +3,7 @@ package com.samajackun.rodas.core.model;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.Name;
 
 public class AliasedExpression implements Codeable
 {
@@ -24,9 +25,25 @@ public class AliasedExpression implements Codeable
 
 	public String getAlias()
 	{
-		return this.alias == null
-			? this.expression.getName()
-			: this.alias;
+		String alias;
+		if (this.alias == null)
+		{
+			Name name=this.expression.getName();
+			if (name == null)
+			{
+				alias=null;
+			}
+			else
+			{
+				Name base=name.getBase();
+				alias=base.asString();
+			}
+		}
+		else
+		{
+			alias=this.alias;
+		}
+		return alias;
 	}
 
 	@Override

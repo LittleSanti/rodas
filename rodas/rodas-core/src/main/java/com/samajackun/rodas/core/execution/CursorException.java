@@ -1,4 +1,6 @@
-package com.samajackun.rodas.core.model;
+package com.samajackun.rodas.core.execution;
+
+import com.samajackun.rodas.core.model.EngineException;
 
 public class CursorException extends EngineException
 {

@@ -1,6 +1,7 @@
 package com.samajackun.rodas.core.model;
 
 import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.DummyContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
@@ -27,10 +28,10 @@ public class AddExpression extends BinaryExpression
 		Expression reduced2=getExpression2().reduceAndReport(evaluatorFactory);
 		if (reduced1 instanceof NumericConstantExpression && reduced2 instanceof NumericConstantExpression)
 		{
-			Number result=evaluatorFactory.getArithmeticEvaluator().evaluateAdd(null, reduced1, reduced2);
+			Number result=evaluatorFactory.getArithmeticEvaluator().evaluateAdd(DummyContext.getInstance(), reduced1, reduced2);
 			reduced=new NumericConstantExpression(result.toString(), result);
 		}
-		else if (getExpression1() instanceof TextConstantExpression && getExpression2() instanceof TextConstantExpression)
+		else if (reduced1 instanceof TextConstantExpression || reduced2 instanceof TextConstantExpression)
 		{
 			String result=evaluatorFactory.getTextEvaluator().evaluateConcat(null, reduced1, reduced2);
 			reduced=new TextConstantExpression(result);

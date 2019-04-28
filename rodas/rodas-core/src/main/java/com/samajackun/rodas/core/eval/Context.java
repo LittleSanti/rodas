@@ -1,10 +1,14 @@
 package com.samajackun.rodas.core.eval;
 
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
+import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.Provider;
 
 public interface Context
 {
+	public Provider getProvider();
+
 	MapList<String, Cursor> getCursors();
 
 	Object getColumnByName(String column, String prefix)
@@ -27,4 +31,7 @@ public interface Context
 	public VariablesManager getVariablesManager();
 
 	public Runtime getRuntime();
+
+	public Object evaluate(Expression expression, EvaluatorFactory evaluatorFactory)
+		throws EvaluationException;
 }

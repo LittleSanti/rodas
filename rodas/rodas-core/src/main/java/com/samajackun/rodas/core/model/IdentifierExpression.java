@@ -3,18 +3,16 @@ package com.samajackun.rodas.core.model;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.Name;
 
 public class IdentifierExpression implements Expression, Prefixed
 {
-	private final String prefix;
-
-	private final String identifier;
+	private final Name name;
 
 	public IdentifierExpression(String prefix, String identifier)
 	{
 		super();
-		this.prefix=prefix;
-		this.identifier=identifier;
+		this.name=Name.instanceOf(prefix, identifier);
 	}
 
 	public IdentifierExpression(String identifier)
@@ -25,20 +23,18 @@ public class IdentifierExpression implements Expression, Prefixed
 	@Override
 	public String getPrefix()
 	{
-		return this.prefix;
+		return this.name.getPrefix();
 	}
 
 	public String getIdentifier()
 	{
-		return this.identifier;
+		return this.name.getBase().asString();
 	}
 
 	@Override
 	public String toCode()
 	{
-		return (this.prefix != null
-			? this.prefix + "."
-			: "") + this.identifier;
+		return this.name.asString();
 	}
 
 	@Override
@@ -55,9 +51,9 @@ public class IdentifierExpression implements Expression, Prefixed
 	}
 
 	@Override
-	public String getName()
+	public Name getName()
 	{
-		return this.identifier;
+		return this.name;
 	}
 
 	@Override

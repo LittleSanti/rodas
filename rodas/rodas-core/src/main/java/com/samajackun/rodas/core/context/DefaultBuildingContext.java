@@ -1,18 +1,16 @@
 package com.samajackun.rodas.core.context;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import com.samajackun.rodas.core.eval.ColumnNotFoundException;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.MapList;
 import com.samajackun.rodas.core.eval.NameAlreadyBoundException;
 import com.samajackun.rodas.core.eval.PrefixNotFoundException;
-import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.Provider;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.Source;
 
+// TODO Clase en ensayo que no se ha llegado a completar. Seguramente para desechar por completo.
 public class DefaultBuildingContext
 {
 	private final MapList<String, IdentifierCoordinates> identifierCoordinatesMap=new MapList<>(57);
@@ -72,18 +70,19 @@ public class DefaultBuildingContext
 		ProviderException
 	{
 		Source found=null;
-		for (Iterator<Source> iterator=this.sources.values().iterator(); iterator.hasNext() && found == null;)
-		{
-			Source source=iterator.next();
-			if (source.getColumnNamesMap(this.provider).containsKey(column))
-			{
-				found=source;
-			}
-		}
-		if (found == null)
-		{
-			throw new ColumnNotFoundException(column);
-		}
+		// TODO
+		// for (Iterator<Source> iterator=this.sources.values().iterator(); iterator.hasNext() && found == null;)
+		// {
+		// Source source=iterator.next();
+		// if (source.getColumnNamesMap().containsKey(column))
+		// {
+		// found=source;
+		// }
+		// }
+		// if (found == null)
+		// {
+		// throw new ColumnNotFoundException(column);
+		// }
 		return found;
 	}
 
@@ -101,26 +100,26 @@ public class DefaultBuildingContext
 	{
 		String prefixAndColumn=prefixColumn(column, prefix);
 		IdentifierCoordinates identifierCoordinates=this.identifierCoordinatesMap.get(prefixAndColumn);
-		if (identifierCoordinates == null)
-		{
-			Source source=(prefix != null)
-				? this.sources.get(prefix)
-				: lookupColumn(column);
-			if (source == null)
-			{
-				throw new PrefixNotFoundException(prefix);
-			}
-			Map<String, Integer> columnNamesMap=source.getColumnNamesMap(this.provider);
-			Integer columnIndex=columnNamesMap.get(column);
-			if (columnIndex == null)
-			{
-				throw new ColumnNotFoundException(column, prefix);
-			}
-			int sourceIndex=this.sources.indexOf(prefix);
-			identifierCoordinates=new IdentifierCoordinates(sourceIndex, columnIndex);
-			this.identifierCoordinatesMap.put(prefixAndColumn, identifierCoordinates);
-		}
-
+		// TODO
+		// if (identifierCoordinates == null)
+		// {
+		// Source source=(prefix != null)
+		// ? this.sources.get(prefix)
+		// : lookupColumn(column);
+		// if (source == null)
+		// {
+		// throw new PrefixNotFoundException(prefix);
+		// }
+		// Map<String, Integer> columnNamesMap=source.getColumnNamesMap();
+		// Integer columnIndex=columnNamesMap.get(column);
+		// if (columnIndex == null)
+		// {
+		// throw new ColumnNotFoundException(column, prefix);
+		// }
+		// int sourceIndex=this.sources.indexOf(prefix);
+		// identifierCoordinates=new IdentifierCoordinates(sourceIndex, columnIndex);
+		// this.identifierCoordinatesMap.put(prefixAndColumn, identifierCoordinates);
+		// }
 		return identifierCoordinates;
 	}
 

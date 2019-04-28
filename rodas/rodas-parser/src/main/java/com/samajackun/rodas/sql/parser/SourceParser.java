@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.samajackun.rodas.core.model.AliasedSource;
 import com.samajackun.rodas.core.model.BooleanExpression;
+import com.samajackun.rodas.core.model.CrossSource;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.OnJoinedSource;
@@ -16,22 +17,27 @@ import com.samajackun.rodas.core.model.UsingJoinedSource;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
-public class SourceListParser extends AbstractParser<List<Source>>
+public class SourceParser extends AbstractParser<Source>
 {
-	private static final SourceListParser INSTANCE=new SourceListParser();
+	private static final SourceParser INSTANCE=new SourceParser();
 
-	public static SourceListParser getInstance()
+	private SourceParser(ParserFactory parserFactory)
 	{
-		return SourceListParser.INSTANCE;
+		super(parserFactory);
 	}
 
-	private SourceListParser()
+	public static SourceParser getInstance()
 	{
-		super(DefaultParserFactory.getInstance());
+		return INSTANCE;
+	}
+
+	private SourceParser()
+	{
+		this(DefaultParserFactory.getInstance());
 	}
 
 	private enum State {
@@ -39,7 +45,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 	};
 
 	@Override
-	public List<Source> parse(SqlMatchingTokenizer tokenizer)
+	public Source parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -49,12 +55,12 @@ public class SourceListParser extends AbstractParser<List<Source>>
 		{
 			switch (state)
 			{
-				case EXPECTING_SOURCE:
 				case INITIAL:
-					Source source=parseSource(tokenizer);
+				case EXPECTING_SOURCE:
+					Source source=parseSingleSource(tokenizer, parserContext);
 					if (source == null)
 					{
-						state=State.COMPLETE;
+						throw new SourceExpectedException();
 					}
 					else
 					{
@@ -63,10 +69,10 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					}
 					break;
 				case EXPECTING_COMMA:
-					SqlToken token=tokenizer.nextOptionalUsefulToken();
+					Token token=tokenizer.nextOptionalUsefulToken();
 					if (token != null)
 					{
-						if (token.getType() == SqlToken.Type.COMMA)
+						if (token.getType().equals(SqlTokenTypes.COMMA))
 						{
 							state=State.EXPECTING_SOURCE;
 						}
@@ -76,24 +82,22 @@ public class SourceListParser extends AbstractParser<List<Source>>
 							state=State.COMPLETE;
 						}
 					}
+					else
+					{
+						state=State.COMPLETE;
+					}
 					break;
 				default: // Ignorar.
 			}
 		}
 		while (state != State.COMPLETE && tokenizer.tokenWasRead());
-		switch (state)
-		{
-			case INITIAL:
-				// Lista vacía.
-				throw new ParserException("Empty source list not allowed");
-			case EXPECTING_SOURCE:
-				throw new ParserException("Expecting a source after comma");
-			default: // Ignorar.
-		}
-		return sources;
+		Source sourceTotal=sources.size() == 1
+			? sources.get(0)
+			: new CrossSource(sources);
+		return sourceTotal;
 	}
 
-	public Source parseSource(SqlMatchingTokenizer tokenizer)
+	public Source parseSingleSource(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -103,7 +107,7 @@ public class SourceListParser extends AbstractParser<List<Source>>
 		OnJoinedSource.Type joinType=null;
 		do
 		{
-			SqlToken token=tokenizer.nextOptionalUsefulToken();
+			Token token=tokenizer.nextOptionalUsefulToken();
 			if (token != null)
 			{
 				switch (state)
@@ -111,15 +115,20 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					case INITIAL:
 						switch (token.getType())
 						{
-							case IDENTIFIER:
-							case DOUBLE_QUOTED_TEXT_LITERAL:
+							case SqlTokenTypes.IDENTIFIER:
+							case SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL:
 								source=new TableSource(token.getValue());
 								state=State.READ_SOURCE;
 								break;
-							case PARENTHESIS_START:
-								Source source1=SelectSentenceParser.getInstance().parse(tokenizer);
-								tokenizer.matchToken(Type.PARENTHESIS_END);
+							case SqlTokenTypes.PARENTHESIS_START:
+								Source source1=parseSingleSource(tokenizer, parserContext);
+								tokenizer.matchToken(SqlTokenTypes.PARENTHESIS_END);
 								source=new ParehentesizedSource(source1);
+								state=State.READ_SOURCE;
+								break;
+							case SqlTokenTypes.KEYWORD_SELECT:
+								tokenizer.pushBack(token);
+								source=SelectSentenceParser.getInstance().parse(tokenizer, parserContext);
 								state=State.READ_SOURCE;
 								break;
 							default:
@@ -129,30 +138,27 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					case READ_SOURCE:
 						switch (token.getType())
 						{
-							case KEYWORD_INNER:
+							case SqlTokenTypes.KEYWORD_INNER:
 								joinType=OnJoinedSource.Type.INNER;
 								state=State.EXPECTING_JOIN;
 								break;
-							case KEYWORD_OUTER:
+							case SqlTokenTypes.KEYWORD_OUTER:
 								joinType=OnJoinedSource.Type.OUTER;
 								state=State.EXPECTING_JOIN;
 								break;
-							case KEYWORD_LEFT:
+							case SqlTokenTypes.KEYWORD_LEFT:
 								joinType=OnJoinedSource.Type.LEFT;
 								state=State.EXPECTING_JOIN;
 								break;
-							case KEYWORD_RIGHT:
+							case SqlTokenTypes.KEYWORD_RIGHT:
 								joinType=OnJoinedSource.Type.RIGHT;
 								state=State.EXPECTING_JOIN;
 								break;
-							case KEYWORD_AS:
+							case SqlTokenTypes.KEYWORD_AS:
 								state=State.EXPECTING_ALIAS;
 								break;
-							case DOUBLE_QUOTED_TEXT_LITERAL:
-								source=new AliasedSource(source, token.getValue());
-								state=State.COMPLETE;
-								break;
-							case IDENTIFIER:
+							case SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL:
+							case SqlTokenTypes.IDENTIFIER:
 								source=new AliasedSource(source, token.getValue());
 								state=State.COMPLETE;
 								break;
@@ -165,8 +171,8 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					case EXPECTING_JOIN:
 						switch (token.getType())
 						{
-							case KEYWORD_JOIN:
-								source2=parseSource(tokenizer);
+							case SqlTokenTypes.KEYWORD_JOIN:
+								source2=parseSingleSource(tokenizer, parserContext);
 								state=State.EXPECTING_ON_OR_USING;
 								break;
 							default:
@@ -176,14 +182,14 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					case EXPECTING_ON_OR_USING:
 						switch (token.getType())
 						{
-							case KEYWORD_ON:
-								Expression on=LogicalExpressionParser.getInstance().parse(tokenizer);
+							case SqlTokenTypes.KEYWORD_ON:
+								Expression on=LogicalExpressionParser.getInstance().parse(tokenizer, parserContext);
 								BooleanExpression booleanOnExpression=toBooleanExpression(on);
 								source=new OnJoinedSource(source, source2, joinType, booleanOnExpression);
 								state=State.COMPLETE;
 								break;
-							case KEYWORD_USING:
-								SqlToken token2=tokenizer.matchToken(Type.IDENTIFIER);
+							case SqlTokenTypes.KEYWORD_USING:
+								Token token2=tokenizer.matchToken(SqlTokenTypes.IDENTIFIER);
 								if (token2 == null)
 								{
 									throw new IncompleteExpressionException();
@@ -199,8 +205,8 @@ public class SourceListParser extends AbstractParser<List<Source>>
 					case EXPECTING_ALIAS:
 						switch (token.getType())
 						{
-							case DOUBLE_QUOTED_TEXT_LITERAL:
-							case IDENTIFIER:
+							case SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL:
+							case SqlTokenTypes.IDENTIFIER:
 								source=new AliasedSource(source, token.getValue());
 								state=State.COMPLETE;
 								break;

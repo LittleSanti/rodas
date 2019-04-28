@@ -2,30 +2,35 @@ package com.samajackun.rodas.sql.tokenizer;
 
 import java.io.IOException;
 
+import com.samajackun.rodas.parsing.parser.ParserException;
+import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.parsing.tokenizer.EndOfStreamException;
 import com.samajackun.rodas.parsing.tokenizer.Tokenizer;
 import com.samajackun.rodas.parsing.tokenizer.TokenizerException;
 
-public abstract class AbstractMatchingTokenizer<T>
+public abstract class AbstractMatchingTokenizer
 {
-	private final Tokenizer<T> tokenizer;
+	private final Tokenizer tokenizer;
 
-	private T lastToken;
+	private Token lastToken;
 
 	private boolean lastTokenIsNotNull=true;
 
-	public AbstractMatchingTokenizer(Tokenizer<T> tokenizer)
+	private final TokenEvaluator tokenEvaluator;
+
+	public AbstractMatchingTokenizer(Tokenizer tokenizer, TokenEvaluator tokenEvaluator)
 	{
 		this.tokenizer=tokenizer;
+		this.tokenEvaluator=tokenEvaluator;
 	}
 
-	public T nextOptionalUsefulToken()
+	public Token nextOptionalUsefulToken()
 		throws TokenizerException,
 		IOException
 	{
-		T found=null;
-		T token;
+		Token found=null;
+		Token token;
 		do
 		{
 			token=nextOptionalToken();
@@ -38,21 +43,24 @@ public abstract class AbstractMatchingTokenizer<T>
 		return found;
 	}
 
-	protected abstract boolean isUseful(T token);
+	protected boolean isUseful(Token token)
+	{
+		return this.tokenEvaluator.isUseful(token);
+	}
 
-	public T nextToken()
+	public Token nextToken()
 		throws TokenizerException,
 		IOException
 	{
-		T token=nextOptionalToken();
-		if (token == null)
-		{
-			throw new EndOfStreamException(this.tokenizer.getSource());
-		}
+		Token token=nextOptionalToken();
+		// if (token == null)
+		// {
+		// throw new EndOfStreamException(this.tokenizer.getSource());
+		// }
 		return token;
 	}
 
-	public T nextOptionalToken()
+	public Token nextOptionalToken()
 		throws TokenizerException,
 		IOException
 	{
@@ -61,11 +69,11 @@ public abstract class AbstractMatchingTokenizer<T>
 		return this.lastToken;
 	}
 
-	public T nextUsefulToken()
+	public Token nextUsefulToken()
 		throws TokenizerException,
 		IOException
 	{
-		T token=nextOptionalUsefulToken();
+		Token token=nextOptionalUsefulToken();
 		if (token == null)
 		{
 			throw new EndOfStreamException(this.tokenizer.getSource());
@@ -73,7 +81,7 @@ public abstract class AbstractMatchingTokenizer<T>
 		return token;
 	}
 
-	public void pushBack(T token)
+	public void pushBack(Token token)
 		throws IOException
 	{
 		this.tokenizer.pushBackToken(token);
@@ -88,4 +96,17 @@ public abstract class AbstractMatchingTokenizer<T>
 	{
 		return this.tokenizer.getSource();
 	}
+
+	public Token matchToken(String type)
+		throws ParserException,
+		IOException
+	{
+		Token token=nextOptionalUsefulToken();
+		if (token == null || !token.getType().equals(type))
+		{
+			throw new UnexpectedTokenException(token, type);
+		}
+		return token;
+	}
+
 }

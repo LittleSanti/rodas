@@ -21,8 +21,8 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	public Number evaluateAdd(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException
 	{
-		Object value1=expression1.evaluate(context, getEvaluatorFactory());
-		Object value2=expression2.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression1, getEvaluatorFactory());
+		Object value2=context.evaluate(expression2, getEvaluatorFactory());
 		return ArithmeticUtils.computeAdd(value1, value2);
 	}
 
@@ -30,8 +30,8 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	public Number evaluateSubstract(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException
 	{
-		Object value1=expression1.evaluate(context, getEvaluatorFactory());
-		Object value2=expression2.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression1, getEvaluatorFactory());
+		Object value2=context.evaluate(expression2, getEvaluatorFactory());
 		return ArithmeticUtils.computeSubstract(value1, value2);
 	}
 
@@ -39,8 +39,8 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	public Number evaluateMultiply(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException
 	{
-		Object value1=expression1.evaluate(context, getEvaluatorFactory());
-		Object value2=expression2.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression1, getEvaluatorFactory());
+		Object value2=context.evaluate(expression2, getEvaluatorFactory());
 		return ArithmeticUtils.computeMultiply(value1, value2);
 	}
 
@@ -48,8 +48,8 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	public Number evaluateDivide(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException
 	{
-		Object value1=expression1.evaluate(context, getEvaluatorFactory());
-		Object value2=expression2.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression1, getEvaluatorFactory());
+		Object value2=context.evaluate(expression2, getEvaluatorFactory());
 		return ArithmeticUtils.computeDivide(value1, value2);
 	}
 
@@ -57,7 +57,7 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	public Number evaluateUnitMinus(Context context, Expression expression)
 		throws EvaluationException
 	{
-		Object value1=expression.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression, getEvaluatorFactory());
 		return ArithmeticUtils.computeUnitMinus(value1);
 	}
 
@@ -65,7 +65,7 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	public Number evaluateUnitPlus(Context context, Expression expression)
 		throws EvaluationException
 	{
-		Object value1=expression.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression, getEvaluatorFactory());
 		return ArithmeticUtils.computeUnitPlus(value1);
 	}
 

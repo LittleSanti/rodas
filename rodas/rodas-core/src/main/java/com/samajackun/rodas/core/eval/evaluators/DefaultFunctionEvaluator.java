@@ -1,10 +1,8 @@
 package com.samajackun.rodas.core.eval.evaluators;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.FunctionEvaluator;
 import com.samajackun.rodas.core.eval.functions.AbstractMappedFunctionEvaluator;
@@ -12,9 +10,6 @@ import com.samajackun.rodas.core.eval.functions.Function;
 import com.samajackun.rodas.core.eval.functions.LenFunction;
 import com.samajackun.rodas.core.eval.functions.MaxFunction;
 import com.samajackun.rodas.core.eval.functions.MinFunction;
-import com.samajackun.rodas.core.model.Datatype;
-import com.samajackun.rodas.core.model.Expression;
-import com.samajackun.rodas.core.model.MetadataException;
 
 public class DefaultFunctionEvaluator extends AbstractMappedFunctionEvaluator implements FunctionEvaluator
 {
@@ -33,53 +28,53 @@ public class DefaultFunctionEvaluator extends AbstractMappedFunctionEvaluator im
 		return map;
 	}
 
-	@Override
-	public Datatype getDatatype(Context context, String function, List<Expression> arguments)
-		throws MetadataException
-	{
-		Datatype datatype;
-		switch (function)
-		{
-			case "len":
-				if (arguments.size() == 1)
-				{
-					if (arguments.get(0) == null)
-					{
-						datatype=Datatype.NULL;
-					}
-					else
-					{
-						datatype=Datatype.INTEGER_NUMBER;
-					}
-				}
-				else
-				{
-					throw new IllegalArgumentException();
-				}
-				break;
-			case "min":
-			case "max":
-				if (arguments.size() == 1)
-				{
-					if (arguments.get(0) == null)
-					{
-						datatype=Datatype.NULL;
-					}
-					else
-					{
-						datatype=super.getEvaluatorFactory().getBaseEvaluator().guessDatatype(context, arguments.get(0));
-					}
-				}
-				else
-				{
-					throw new IllegalArgumentException();
-				}
-				break;
-			default:
-				throw new IllegalArgumentException("Unsupported function " + function);
-		}
-		return datatype;
-	}
+	// @Override
+	// public Datatype getDatatype(Context context, Expression functionExpression, List<Expression> arguments)
+	// throws MetadataException
+	// {
+	// Datatype datatype;
+	// switch (function)
+	// {
+	// case "len":
+	// if (arguments.size() == 1)
+	// {
+	// if (arguments.get(0) == null)
+	// {
+	// datatype=Datatype.NULL;
+	// }
+	// else
+	// {
+	// datatype=Datatype.INTEGER_NUMBER;
+	// }
+	// }
+	// else
+	// {
+	// throw new IllegalArgumentException();
+	// }
+	// break;
+	// case "min":
+	// case "max":
+	// if (arguments.size() == 1)
+	// {
+	// if (arguments.get(0) == null)
+	// {
+	// datatype=Datatype.NULL;
+	// }
+	// else
+	// {
+	// datatype=super.getEvaluatorFactory().getBaseEvaluator().guessDatatype(context, arguments.get(0));
+	// }
+	// }
+	// else
+	// {
+	// throw new IllegalArgumentException();
+	// }
+	// break;
+	// default:
+	// throw new IllegalArgumentException("Unsupported function " + function);
+	// }
+	// return datatype;
+	// }
 
 	// @Override
 	// public Object evaluate(Context context, FunctionExpression expression)

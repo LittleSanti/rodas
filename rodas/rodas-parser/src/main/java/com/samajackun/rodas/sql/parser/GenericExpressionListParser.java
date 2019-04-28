@@ -8,8 +8,9 @@ import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class GenericExpressionListParser extends AbstractParser<List<Expression>>
 {
@@ -23,7 +24,7 @@ public class GenericExpressionListParser extends AbstractParser<List<Expression>
 	}
 
 	@Override
-	public List<Expression> parse(SqlMatchingTokenizer tokenizer)
+	public List<Expression> parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -31,7 +32,7 @@ public class GenericExpressionListParser extends AbstractParser<List<Expression>
 		State state=State.INITIAL;
 		do
 		{
-			SqlToken token=tokenizer.nextOptionalUsefulToken();
+			Token token=tokenizer.nextOptionalUsefulToken();
 			if (token != null)
 			{
 				switch (state)
@@ -39,9 +40,9 @@ public class GenericExpressionListParser extends AbstractParser<List<Expression>
 					case INITIAL:
 						switch (token.getType())
 						{
-							case PARENTHESIS_START:
-								SqlToken token2=tokenizer.nextOptionalUsefulToken();
-								if (token2.getType() == SqlToken.Type.PARENTHESIS_END)
+							case SqlTokenTypes.PARENTHESIS_START:
+								Token token2=tokenizer.nextOptionalUsefulToken();
+								if (token2.getType().equals(SqlTokenTypes.PARENTHESIS_END))
 								{
 									tokenizer.pushBack(token2);
 									state=State.COMPLETE;
@@ -50,7 +51,7 @@ public class GenericExpressionListParser extends AbstractParser<List<Expression>
 								{
 									tokenizer.pushBack(token2);
 
-									Expression expression=ExpressionParser.getInstance().parse(tokenizer);
+									Expression expression=ExpressionParser.getInstance().parse(tokenizer, parserContext);
 									if (expression != null)
 									{
 										expressions.add(expression);
@@ -65,8 +66,8 @@ public class GenericExpressionListParser extends AbstractParser<List<Expression>
 					case READ_EXPRESSION:
 						switch (token.getType())
 						{
-							case COMMA:
-								Expression expression=ExpressionParser.getInstance().parse(tokenizer);
+							case SqlTokenTypes.COMMA:
+								Expression expression=ExpressionParser.getInstance().parse(tokenizer, parserContext);
 								if (expression == null)
 								{
 									throw new ParserException("An expression was expected after a comma");

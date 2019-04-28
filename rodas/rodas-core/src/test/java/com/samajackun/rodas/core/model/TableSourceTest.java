@@ -1,52 +1,50 @@
 package com.samajackun.rodas.core.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-
-import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.core.model.ProviderException;
-import com.samajackun.rodas.core.model.TableSource;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.execution.Cursor;
 
 public class TableSourceTest
 {
 	@Test
-	public void getColumnNames()
+	public void getTable()
 	{
 		TableSource source=new TableSource("country");
-		MyProvider provider=new MyProvider();
-		try
-		{
-			List<String> columnNames=source.getColumnNames(provider);
-			assertEquals("idCountry", columnNames.get(0));
-			assertEquals("name", columnNames.get(1));
-			assertEquals("area", columnNames.get(2));
-		}
-		catch (ProviderException e)
-		{
-			e.printStackTrace();
-			fail(e.toString());
-		}
+		assertEquals("country", source.getTable());
+		assertNull(source.getAlias());
 	}
 
 	@Test
-	public void getColumnNamesMap()
+	public void getAlias()
 	{
 		TableSource source=new TableSource("country");
-		MyProvider provider=new MyProvider();
+		assertNull(source.getAlias());
+	}
+
+	@Test
+	public void execute()
+	{
+		TableSource source=new TableSource("country");
+		MyEngine engine=new MyEngine();
+		MyOpenContext context=new MyOpenContext();
+		Provider provider=new MyProvider();
+		context.setProvider(provider);
 		try
 		{
-			Map<String, Integer> map=source.getColumnNamesMap(provider);
-			System.out.println("map=" + map);
-			assertEquals(3, map.size());
-			assertEquals(Integer.valueOf(0), map.get("idCountry"));
-			assertEquals(Integer.valueOf(1), map.get("name"));
-			assertEquals(Integer.valueOf(2), map.get("area"));
+			Cursor cursor=source.execute(engine, context);
+			System.out.println(cursor.getColumnMap());
+			assertEquals(3, cursor.getColumnMap().size());
+			assertEquals(Integer.valueOf(0), cursor.getColumnMap().get("idCountry"));
+			assertEquals(Integer.valueOf(1), cursor.getColumnMap().get("name"));
+			assertEquals(Integer.valueOf(2), cursor.getColumnMap().get("area"));
 		}
-		catch (ProviderException e)
+		catch (EngineException | EvaluationException | ProviderException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());

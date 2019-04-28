@@ -1,31 +1,30 @@
-package com.samajackun.rodas.core.eval;
+package com.samajackun.rodas.sql.engine;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.RowData;
 
-public class MyCursor implements Cursor
+public class DefaultCursor implements Cursor
 {
-	// private enum IterationState {
-	// RESET, ITERATING, EXAHUSTED
-	// };
-
-	// private IterationState iterationState;
-
 	public class PrivateRowData implements RowData
 	{
 		@Override
 		public Object get(int column)
 		{
 			return getSrcRowData().get(column);
+		}
+
+		@Override
+		public long position()
+		{
+			return DefaultCursor.this.myPosition;
 		}
 	}
 
@@ -36,6 +35,8 @@ public class MyCursor implements Cursor
 	private final IterableTableData iterable;
 
 	private Iterator<RowData> iterator;
+
+	private long myPosition;
 
 	private final RowData rowData=new PrivateRowData();
 
@@ -50,25 +51,14 @@ public class MyCursor implements Cursor
 		return this.srcRowData;
 	}
 
-	public MyCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
+	public DefaultCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
 		throws ProviderException
 	{
 		super();
 		this.metadata=metadata;
-		this.columnMap=toColumnMap(metadata);
+		this.columnMap=CursorsUtils.toColumnMap(metadata);
 		this.iterable=iterable;
 		reset();
-	}
-
-	private static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
-	{
-		Map<String, Integer> map=new HashMap<>((int)(1.7 * metadata.size()));
-		int i=0;
-		for (ColumnMetadata column : metadata)
-		{
-			map.put(column.getName(), i++);
-		}
-		return map;
 	}
 
 	@Override
@@ -85,6 +75,7 @@ public class MyCursor implements Cursor
 	@Override
 	public boolean hasNext()
 	{
+		this.myPosition++;
 		return this.iterator.hasNext();
 	}
 

@@ -27,7 +27,6 @@ public final class DefaultParserFactory implements ParserFactory
 
 	private DefaultParserFactory()
 	{
-		System.out.println("DefaultParserFactory: expressionParser=ExpressionParser=" + this.expressionParser);
 	}
 
 	@Override

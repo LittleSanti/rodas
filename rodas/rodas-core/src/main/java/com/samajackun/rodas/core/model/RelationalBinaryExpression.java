@@ -1,6 +1,7 @@
 package com.samajackun.rodas.core.model;
 
 import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.DummyContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
@@ -24,7 +25,7 @@ public abstract class RelationalBinaryExpression extends BinaryExpression implem
             || ((reduced1 instanceof TextConstantExpression && reduced2 instanceof TextConstantExpression)))
 		// @formatter:on
 		{
-			Boolean result=compute(null, evaluatorFactory, reduced1, reduced2);
+			Boolean result=compute(DummyContext.getInstance(), evaluatorFactory, reduced1, reduced2);
 			reduced=new BooleanConstantExpression(result.toString(), result);
 		}
 		else

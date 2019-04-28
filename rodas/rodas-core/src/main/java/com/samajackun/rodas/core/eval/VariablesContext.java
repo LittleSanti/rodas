@@ -1,14 +1,19 @@
 package com.samajackun.rodas.core.eval;
 
+import java.util.function.Supplier;
+
 public interface VariablesContext
 {
-	public boolean contains(String name);
+	public boolean contains(Name name);
 
-	public Object get(String name)
+	public Object get(Name name)
 		throws VariableNotFoundException;
 
-	public void set(String name, Object value);
+	public void set(Name name, Object value);
 
-	public void remove(String name);
+	public Object setIfAbsent(Name name, Supplier<Object> supplier);
 
+	public void remove(Name name);
+
+	public void clear();
 }

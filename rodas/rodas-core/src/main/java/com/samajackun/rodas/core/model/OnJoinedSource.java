@@ -1,13 +1,8 @@
 package com.samajackun.rodas.core.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.execution.Cursor;
 
 public class OnJoinedSource implements Source
 {
@@ -23,7 +18,7 @@ public class OnJoinedSource implements Source
 
 	private final BooleanExpression on;
 
-	private final Map<String, Source> sourceByColumn=new HashMap<String, Source>(33);
+	// private final Map<String, Source> sourceByColumn=new HashMap<>(33);
 
 	public OnJoinedSource(Source leftSource, Source rightSource, Type type, BooleanExpression on)
 	{
@@ -55,72 +50,73 @@ public class OnJoinedSource implements Source
 		return this.leftSource.toCode() + " " + this.type + " " + "ON " + this.on.toCode();
 	}
 
-	@Override
-	public boolean hasColumn(String column, Provider provider)
-		throws ProviderException
-	{
-		boolean x;
-		if (x=this.leftSource.hasColumn(column, provider))
-		{
-			this.sourceByColumn.put(column, this.leftSource);
-		}
-		else if (x=this.rightSource.hasColumn(column, provider))
-		{
-			this.sourceByColumn.put(column, this.rightSource);
-		}
-		return x;
-	}
-
 	public BooleanExpression getOn()
 	{
 		return this.on;
 	}
 
 	@Override
-	public List<String> getColumnNames(Provider provider)
-		throws ProviderException
-	{
-		List<String> columnNamesLeft=this.leftSource.getColumnNames(provider);
-		List<String> columnNamesRight=this.rightSource.getColumnNames(provider);
-		List<String> columnNames=new ArrayList<>(columnNamesLeft.size() + columnNamesRight.size());
-		columnNames.addAll(columnNamesLeft);
-		columnNames.addAll(columnNamesRight);
-		return columnNames;
-	}
-
-	@Override
-	public Cursor execute(Engine engine, Provider provider, Context context)
+	public Cursor execute(Engine engine, Context context)
 		throws EngineException,
 		EvaluationException,
 		ProviderException
 	{
-		return engine.execute(this, provider, context);
+		return engine.execute(this, context);
 	}
 
-	@Override
-	public ColumnMetadata getColumnMetadata(int column, Provider provider, Context context, EvaluatorFactory evaluatorFactory)
-		throws MetadataException,
-		ProviderException
-	{
-		ColumnMetadata columnMetadata;
-		List<String> columnNamesLeft=this.leftSource.getColumnNames(provider);
-		List<String> columnNamesRight=this.rightSource.getColumnNames(provider);
-		if (column < columnNamesLeft.size())
-		{
-			columnMetadata=this.leftSource.getColumnMetadata(column, provider, context, evaluatorFactory);
-		}
-		else
-		{
-			column-=columnNamesLeft.size();
-			if (column < columnNamesRight.size())
-			{
-				columnMetadata=this.rightSource.getColumnMetadata(column, provider, context, evaluatorFactory);
-			}
-			else
-			{
-				throw new MetadataException("Column index too high");
-			}
-		}
-		return columnMetadata;
-	}
+	// @Override
+	// public boolean hasColumn(String column)
+	// throws ProviderException
+	// {
+	// boolean x;
+	// if (x=this.leftSource.hasColumn(column))
+	// {
+	// this.sourceByColumn.put(column, this.leftSource);
+	// }
+	// else if (x=this.rightSource.hasColumn(column))
+	// {
+	// this.sourceByColumn.put(column, this.rightSource);
+	// }
+	// return x;
+	// }
+	//
+
+	// @Override
+	// public List<String> getColumnNames()
+	// throws ProviderException
+	// {
+	// List<String> columnNamesLeft=this.leftSource.getColumnNames();
+	// List<String> columnNamesRight=this.rightSource.getColumnNames();
+	// List<String> columnNames=new ArrayList<>(columnNamesLeft.size() + columnNamesRight.size());
+	// columnNames.addAll(columnNamesLeft);
+	// columnNames.addAll(columnNamesRight);
+	// return columnNames;
+	// }
+	//
+	// @Override
+	// public ColumnMetadata getColumnMetadata(int column, Context context, EvaluatorFactory evaluatorFactory)
+	// throws MetadataException,
+	// ProviderException
+	// {
+	// ColumnMetadata columnMetadata;
+	// List<String> columnNamesLeft=this.leftSource.getColumnNames();
+	// List<String> columnNamesRight=this.rightSource.getColumnNames();
+	// if (column < columnNamesLeft.size())
+	// {
+	// columnMetadata=this.leftSource.getColumnMetadata(column, context, evaluatorFactory);
+	// }
+	// else
+	// {
+	// column-=columnNamesLeft.size();
+	// if (column < columnNamesRight.size())
+	// {
+	// columnMetadata=this.rightSource.getColumnMetadata(column, context, evaluatorFactory);
+	// }
+	// else
+	// {
+	// throw new MetadataException("Column index too high");
+	// }
+	// }
+	// return columnMetadata;
+	// }
 }

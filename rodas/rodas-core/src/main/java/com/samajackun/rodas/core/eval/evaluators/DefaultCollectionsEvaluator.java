@@ -1,5 +1,6 @@
 package com.samajackun.rodas.core.eval.evaluators;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.samajackun.rodas.core.eval.AbstractEvaluator;
@@ -20,8 +21,8 @@ public class DefaultCollectionsEvaluator extends AbstractEvaluator implements Co
 	public boolean evaluateIn(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException
 	{
-		Object value1=expression1.evaluate(context, getEvaluatorFactory());
-		Object value2=expression2.evaluate(context, getEvaluatorFactory());
+		Object value1=context.evaluate(expression1, getEvaluatorFactory());
+		Object value2=context.evaluate(expression2, getEvaluatorFactory());
 		boolean x;
 		if (value2.getClass().isArray())
 		{
@@ -50,7 +51,7 @@ public class DefaultCollectionsEvaluator extends AbstractEvaluator implements Co
 		throws EvaluationException
 	{
 		boolean x;
-		Object value=expression1.evaluate(context, getEvaluatorFactory());
+		Object value=context.evaluate(expression1, getEvaluatorFactory());
 		if (value.getClass().isArray())
 		{
 			Object[] array=(Object[])value;
@@ -75,11 +76,10 @@ public class DefaultCollectionsEvaluator extends AbstractEvaluator implements Co
 	public Object evaluateList(Context context, List<Expression> expressions)
 		throws EvaluationException
 	{
-		Object[] result=new Object[expressions.size()];
-		int i=0;
+		List<Object> result=new ArrayList<>(expressions.size());
 		for (Expression expression : expressions)
 		{
-			result[i++]=expression.evaluate(context, getEvaluatorFactory());
+			result.add(context.evaluate(expression, getEvaluatorFactory()));
 		}
 		return result;
 	}

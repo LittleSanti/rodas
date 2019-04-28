@@ -1,22 +1,35 @@
-package com.samajackun.rodas.core.eval;
+package com.samajackun.rodas.sql.engine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ServiceConfigurationError;
 
 import org.junit.Test;
 
 import com.samajackun.rodas.core.context.TestUtils;
+import com.samajackun.rodas.core.eval.ColumnNotFoundException;
+import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.Name;
+import com.samajackun.rodas.core.eval.StrictVariablesContext;
+import com.samajackun.rodas.core.eval.StrictVariablesManager;
+import com.samajackun.rodas.core.eval.VariableNotFoundException;
+import com.samajackun.rodas.core.eval.VariablesContext;
+import com.samajackun.rodas.core.eval.VariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.BooleanConstantExpression;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.NamedParameterExpression;
 import com.samajackun.rodas.core.model.NullConstantExpression;
 import com.samajackun.rodas.core.model.NumericConstantExpression;
+import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.TextConstantExpression;
 
 public class MyBaseEvaluatorTest
@@ -89,19 +102,30 @@ public class MyBaseEvaluatorTest
 
 	@Test
 	public void evaluateExistingIdentifierExpression()
+		throws ProviderException
 	{
-		Context context=TestUtils.createContext();
-		Cursor cursor1=context.getCursors().get(0);
+		// Context context=TestUtils.createContext();
+		MyOpenContext context=new MyOpenContext();
+		Cursor cursor=TestUtils.createCursor("month");
+		VariablesContext globalVariablesContext=new StrictVariablesContext();
+		globalVariablesContext.set(Name.instanceOf("year"), 2019);
+		VariablesManager variablesManager=new StrictVariablesManager(globalVariablesContext);
+		context.setVariablesManager(variablesManager);
+		variablesManager.pushLocalContext(new CursorVariablesContext(null, cursor));
 		IdentifierExpression expression=new IdentifierExpression("name");
 		try
 		{
-			cursor1.next();
+			cursor.next();
 			assertEquals("enero", this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression));
 		}
 		catch (EvaluationException | CursorException e)
 		{
 			e.printStackTrace();
 			fail(e.toString());
+		}
+		finally
+		{
+			variablesManager.popLocalContext();
 		}
 	}
 
@@ -115,10 +139,9 @@ public class MyBaseEvaluatorTest
 			this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression);
 			fail("Expected NameNotBoundException");
 		}
-		catch (NameNotBoundException e)
+		catch (VariableNotFoundException e)
 		{
-			assertNull(e.getContext());
-			assertEquals("wrong", e.getName());
+			assertEquals("wrong", e.getName().asString());
 		}
 		catch (EvaluationException e)
 		{
@@ -145,11 +168,17 @@ public class MyBaseEvaluatorTest
 
 	@Test
 	public void evaluateIdentifierExpressionWithAlias()
+		throws ProviderException
 	{
 		try
 		{
-			Context context=TestUtils.createContext();
-			Cursor cursor1=context.getCursors().get(0);
+			Cursor cursor1=TestUtils.createCursor("month");
+			MyOpenContext context=new MyOpenContext();
+			context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
+			Map<String, Cursor> cursorMap=new HashMap<>();
+			cursorMap.put("mes", cursor1);
+			VariablesContext newVariablesContext=new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap);
+			context.getVariablesManager().pushLocalContext(newVariablesContext);
 			cursor1.next();
 			IdentifierExpression expression=new IdentifierExpression("mes", "name");
 			assertEquals("enero", this.myEvaluatorFactory.getBaseEvaluator().evaluate(context, expression));
@@ -167,11 +196,14 @@ public class MyBaseEvaluatorTest
 
 	@Test
 	public void evaluateIdentifierExpressionAndIterate()
+		throws ProviderException
 	{
 		try
 		{
-			Context context=TestUtils.createContext();
-			Cursor cursor1=context.getCursors().get(0);
+			Cursor cursor1=TestUtils.createCursor("month");
+			MyOpenContext context=new MyOpenContext();
+			VariablesManager variablesManager=new StrictVariablesManager(new CursorVariablesContext(null, cursor1));
+			context.setVariablesManager(variablesManager);
 
 			IdentifierExpression expression=new IdentifierExpression("name");
 			cursor1.next();
@@ -196,7 +228,7 @@ public class MyBaseEvaluatorTest
 	public void evaluateExistingParameterExpression()
 	{
 		Context context=TestUtils.createContext();
-		context.getVariablesManager().setGlobalVariable("dia", "lunes");
+		context.getVariablesManager().setGlobalVariable(Name.instanceOf("dia"), "lunes");
 		NamedParameterExpression expression=new NamedParameterExpression("dia");
 		try
 		{

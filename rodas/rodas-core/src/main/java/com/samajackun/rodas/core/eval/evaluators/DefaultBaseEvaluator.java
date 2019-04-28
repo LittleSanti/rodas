@@ -9,9 +9,9 @@ import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.NameNotBoundException;
 import com.samajackun.rodas.core.eval.VariableNotFoundException;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.AliasedExpression;
 import com.samajackun.rodas.core.model.BooleanConstantExpression;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.DatetimeConstantExpression;
 import com.samajackun.rodas.core.model.Expression;
@@ -33,19 +33,31 @@ public class DefaultBaseEvaluator extends AbstractEvaluator implements BaseEvalu
 	public Object evaluate(Context context, IdentifierExpression expression)
 		throws EvaluationException
 	{
-		try
-		{
-			Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
-			if (value == null)
-			{
-				throw new NameNotBoundException(expression.getIdentifier(), expression.getPrefix());
-			}
-			return value;
-		}
-		catch (CursorException e)
-		{
-			throw new EvaluationException(e);
-		}
+		return context.getVariablesManager().getNearestVariable(expression.getName());
+		// Object value;
+		// if (expression.getPrefix() == null)
+		// {
+		// value=context.getVariablesManager().getNearestVariable(expression.getName());
+		// }
+		// else
+		// {
+		// VariablesContext variablesContext=context.getVariablesManager().getVariablesContextByAlias(expression.getName().getPrefix());
+		// value=variablesContext.get(expression.getIdentifier());
+		// }
+		// return value;
+		// try
+		// {
+		// // Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
+		// if (value == null)
+		// {
+		// throw new NameNotBoundException(expression.getIdentifier(), expression.getPrefix());
+		// }
+		// return value;
+		// }
+		// catch (CursorException e)
+		// {
+		// throw new EvaluationException(e);
+		// }
 	}
 
 	@Override
@@ -80,7 +92,7 @@ public class DefaultBaseEvaluator extends AbstractEvaluator implements BaseEvalu
 	public Object evaluate(Context context, AliasedExpression expression)
 		throws EvaluationException
 	{
-		Object value=expression.evaluate(context, getEvaluatorFactory());
+		Object value=context.evaluate(expression.getExpression(), getEvaluatorFactory());
 		// context.getResult().addAlias(expression.getAlias(), value);
 		return value;
 	}
@@ -152,7 +164,10 @@ public class DefaultBaseEvaluator extends AbstractEvaluator implements BaseEvalu
 			{
 				datatype=Datatype.DATE;
 			}
-			throw new IllegalArgumentException("Unknown datatype " + cl.getName());
+			else
+			{
+				throw new IllegalArgumentException("Unknown datatype " + cl.getName());
+			}
 		}
 		return datatype;
 	}

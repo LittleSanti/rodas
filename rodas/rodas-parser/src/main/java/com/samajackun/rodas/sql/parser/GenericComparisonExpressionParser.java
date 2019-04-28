@@ -14,9 +14,9 @@ import com.samajackun.rodas.core.model.NullConstantExpression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
 import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
-import com.samajackun.rodas.sql.tokenizer.SqlToken.Type;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class GenericComparisonExpressionParser extends AbstractParser<Expression> implements PartialParser
 {
@@ -30,14 +30,14 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 	}
 
 	@Override
-	public Expression parse(SqlMatchingTokenizer tokenizer)
+	public Expression parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
-		return parseComparisonExpression(tokenizer);
+		return parseComparisonExpression(tokenizer, parserContext);
 	};
 
-	Expression parseNotExpression(SqlMatchingTokenizer tokenizer)
+	Expression parseNotExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -47,19 +47,19 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 		Expression t;
 		while (tokenizer.tokenWasRead() && state != State.COMPLETE)
 		{
-			SqlToken token=tokenizer.nextOptionalUsefulToken();
+			Token token=tokenizer.nextOptionalUsefulToken();
 			if (token != null)
 			{
 				switch (token.getType())
 				{
-					case OPERATOR_NOT:
+					case SqlTokenTypes.OPERATOR_NOT:
 						operator=token.getValue();
-						t=parseNotExpression(tokenizer);
+						t=parseNotExpression(tokenizer, parserContext);
 						expression=new NotExpression(operator, t);
 						break;
 					default:
 						tokenizer.pushBack(token);
-						expression=parseComparisonExpression(tokenizer);
+						expression=parseComparisonExpression(tokenizer, parserContext);
 				}
 			}
 			state=State.COMPLETE;
@@ -67,7 +67,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parseComparisonExpression(SqlMatchingTokenizer tokenizer)
+	Expression parseComparisonExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -78,7 +78,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 		IExpressionFactory expressionFactory=null;
 		if (tokenizer.tokenWasRead())
 		{
-			Expression t=getParserFactory().getRelationalExpressionParser().parse(tokenizer);
+			Expression t=getParserFactory().getRelationalExpressionParser().parse(tokenizer, parserContext);
 			if (t != null)
 			{
 				expression=expression == null
@@ -92,7 +92,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 			}
 			while (tokenizer.tokenWasRead() && state != State.COMPLETE)
 			{
-				SqlToken token=tokenizer.nextOptionalUsefulToken();
+				Token token=tokenizer.nextOptionalUsefulToken();
 				if (token != null)
 				{
 					switch (state)
@@ -100,16 +100,16 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 						case EXPECTING_OPERATOR:
 							switch (token.getType())
 							{
-								case OPERATOR_IS:
+								case SqlTokenTypes.OPERATOR_IS:
 									// t=parseNotExpression(tokenizer);
 									// expression=new IsExpression(token.getValue(), expression, t);
 									expressionFactory=BinaryExpressionsFactories.getInstance().createIsExpressionFactory(token.getValue(), expression);
 									operator=token.getValue();
 									state=State.EXPECTING_OF_OR_NOT_OR_NULL;
 									break;
-								case OPERATOR_LIKE:
+								case SqlTokenTypes.OPERATOR_LIKE:
 									expressionFactory=BinaryExpressionsFactories.getInstance().createLikeExpressionFactory(token.getValue(), expression);
-									t=getParserFactory().getRelationalExpressionParser().parse(tokenizer);
+									t=getParserFactory().getRelationalExpressionParser().parse(tokenizer, parserContext);
 									if (t != null)
 									{
 										expression=expression == null
@@ -122,17 +122,17 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 										throw new IncompleteExpressionException();
 									}
 									break;
-								// case OPERATOR_EXISTS:
+								// case SqlTokenTypes.OPERATOR_EXISTS:
 								// state=State.EXPECTING_RELATIONAL_EXPRESSION;
 								// break;
-								case OPERATOR_IN:
+								case SqlTokenTypes.OPERATOR_IN:
 									expressionFactory=BinaryExpressionsFactories.getInstance().createInExpressionFactory(token.getValue(), expression);
-									Expression t2=getParserFactory().getRelationalExpressionParser().parse(tokenizer);
+									Expression t2=getParserFactory().getRelationalExpressionParser().parse(tokenizer, parserContext);
 									expression=expressionFactory.create(t2);
 									state=State.EXPECTING_OPERATOR;
 									break;
-								case OPERATOR_BETWEEN:
-									AndExpression andExp=parseAndExpression(tokenizer);
+								case SqlTokenTypes.OPERATOR_BETWEEN:
+									AndExpression andExp=parseAndExpression(tokenizer, parserContext);
 									expression=new BetweenExpression(token.getValue(), expression, andExp);
 									break;
 								default:
@@ -155,7 +155,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 						case EXPECTING_OF_OR_NOT_OR_NULL:
 							switch (token.getType())
 							{
-								case OPERATOR_OF:
+								case SqlTokenTypes.OPERATOR_OF:
 									// FIXME Pendiente.
 									// t=parseTypeExpression(tokenizer);
 									// expression=new BinaryExpression(operator, expression, t);
@@ -163,11 +163,11 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 									operator=operator + token.getValue();
 									state=State.EXPECTING_TYPE;
 									break;
-								case OPERATOR_NOT:
+								case SqlTokenTypes.OPERATOR_NOT:
 									expressionFactory=BinaryExpressionsFactories.getInstance().createNotExpressionFactory(token.getValue(), expressionFactory);
 									state=State.EXPECTING_NOT_OR_NULL;
 									break;
-								case KEYWORD_NULL:
+								case SqlTokenTypes.KEYWORD_NULL:
 									expression=expressionFactory.create(new NullConstantExpression(token.getValue()));
 									state=State.COMPLETE;
 									break;
@@ -178,10 +178,10 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 						case EXPECTING_NOT_OR_NULL:
 							switch (token.getType())
 							{
-								case OPERATOR_NOT:
+								case SqlTokenTypes.OPERATOR_NOT:
 									expressionFactory=BinaryExpressionsFactories.getInstance().createNotExpressionFactory(token.getValue(), expressionFactory);
 									break;
-								case KEYWORD_NULL:
+								case SqlTokenTypes.KEYWORD_NULL:
 									expression=expressionFactory.create(new NullConstantExpression(token.getValue()));
 									state=State.COMPLETE;
 									break;
@@ -192,29 +192,29 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 						case EXPECTING_TYPE:
 							switch (token.getType())
 							{
-								case OPERATOR_TYPE:
+								case SqlTokenTypes.OPERATOR_TYPE:
 									operator=operator + token.getValue();
 									state=State.EXPECTING_TYPE_NAME;
 									break;
 								default:
-									throw new UnexpectedTokenException(token, Type.OPERATOR_TYPE);
+									throw new UnexpectedTokenException(token, SqlTokenTypes.OPERATOR_TYPE);
 							}
 							break;
 						case EXPECTING_TYPE_NAME:
 							switch (token.getType())
 							{
-								case IDENTIFIER:
+								case SqlTokenTypes.IDENTIFIER:
 									expression=new IsOfTypeExpression(operator, expression, new IdentifierExpression(token.getValue()));
 									state=State.COMPLETE;
 									break;
 								default:
-									throw new UnexpectedTokenException(token, Type.OPERATOR_TYPE);
+									throw new UnexpectedTokenException(token, SqlTokenTypes.OPERATOR_TYPE);
 							}
 							break;
 						case EXPECTING_NULL:
 							switch (token.getType())
 							{
-								case KEYWORD_NULL:
+								case SqlTokenTypes.KEYWORD_NULL:
 									expression=expressionFactory.create(new NullConstantExpression(token.getValue()));
 									state=State.COMPLETE;
 									break;
@@ -226,13 +226,13 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 						// SqlToken token5=tokenizer.nextUsefulToken();
 						// switch (token5.getType())
 						// {
-						// case OPERATOR_IN:
+						// case SqlTokenTypes.OPERATOR_IN:
 						// operator=operator + token5.getValue();
 						// tgetParserFactory().getExpressionParser().parse(tokenizer);
 						// expression=new BinaryExpression(operator, expression, t);
 						// state=State.EXPECTING_RELATIONAL_EXPRESSION;
 						// break;
-						// case OPERATOR_BETWEEN:
+						// case SqlTokenTypes.OPERATOR_BETWEEN:
 						// expressionFactory=BinaryExpressionsFactories.getInstance().createBetweenExpressionFactory(token5.getValue(), expression);
 						// tgetParserFactory().getArithmeticExpressionParser().parse(tokenizer);
 						// expression=expressionFactory.create(t);
@@ -257,7 +257,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	// Expression parseTypeExpression(SqlMatchingTokenizer tokenizer)
+	// Expression parseTypeExpression(AbstractMatchingTokenizer tokenizer)
 	// throws ParserException,IOException
 	// {
 	// Expression expression=null;
@@ -289,7 +289,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 	// return expression;
 	// }
 
-	Expression parseNullConstant(SqlMatchingTokenizer tokenizer)
+	Expression parseNullConstant(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -300,12 +300,12 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 			switch (state)
 			{
 				case INITIAL:
-					SqlToken token2=tokenizer.nextOptionalUsefulToken();
+					Token token2=tokenizer.nextOptionalUsefulToken();
 					if (token2 != null)
 					{
 						switch (token2.getType())
 						{
-							case KEYWORD_NULL:
+							case SqlTokenTypes.KEYWORD_NULL:
 								expression=new NullConstantExpression(token2.getValue());
 								break;
 							default:
@@ -321,7 +321,7 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	AndExpression parseAndExpression(SqlMatchingTokenizer tokenizer)
+	AndExpression parseAndExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -335,17 +335,17 @@ public class GenericComparisonExpressionParser extends AbstractParser<Expression
 			switch (state)
 			{
 				case INITIAL:
-					expression=getParserFactory().getArithmeticExpressionParser().parse(tokenizer);
+					expression=getParserFactory().getArithmeticExpressionParser().parse(tokenizer, parserContext);
 					state=State.EXPECTING_OPERATOR_AND;
 					break;
 				case EXPECTING_OPERATOR_AND:
-					SqlToken token6=tokenizer.nextOptionalUsefulToken();
+					Token token6=tokenizer.nextOptionalUsefulToken();
 					if (token6 != null)
 					{
-						if (token6.getType() == Type.OPERATOR_AND)
+						if (token6.getType().equals(SqlTokenTypes.OPERATOR_AND))
 						{
 							operator=token6.getValue();
-							t=getParserFactory().getArithmeticExpressionParser().parse(tokenizer);
+							t=getParserFactory().getArithmeticExpressionParser().parse(tokenizer, parserContext);
 							andExpression=new AndExpression(operator, expression, t);
 						}
 						else

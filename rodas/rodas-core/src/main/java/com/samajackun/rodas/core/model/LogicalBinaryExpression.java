@@ -1,6 +1,7 @@
 package com.samajackun.rodas.core.model;
 
 import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.DummyContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
@@ -20,7 +21,7 @@ public abstract class LogicalBinaryExpression extends BinaryExpression implement
 		Expression reduced2=getExpression2().reduceAndReport(evaluatorFactory);
 		if (reduced1 instanceof BooleanConstantExpression && reduced2 instanceof BooleanConstantExpression)
 		{
-			Boolean result=compute(null, evaluatorFactory, reduced1, reduced2);
+			Boolean result=compute(DummyContext.getInstance(), evaluatorFactory, reduced1, reduced2);
 			reduced=new BooleanConstantExpression(result.toString(), result);
 		}
 		else

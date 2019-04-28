@@ -5,48 +5,51 @@ import java.util.Deque;
 
 public abstract class AbstractVariablesManager implements VariablesManager
 {
-	private final VariablesContext globalVariables=createVariablesContext();
+	private final VariablesContext globalVariables;
 
 	private final Deque<VariablesContext> localVariables=new ArrayDeque<>();
 
+	protected AbstractVariablesManager(VariablesContext globalVariables)
+	{
+		super();
+		this.globalVariables=globalVariables;
+	}
+
 	@Override
-	public Object getGlobalVariable(String name)
+	public Object getGlobalVariable(Name name)
 		throws VariableNotFoundException
 	{
-		return this.globalVariables.get(name);
+		return getGlobalVariablesContext().get(name);
 	}
 
 	@Override
-	public void setGlobalVariable(String name, Object value)
+	public void setGlobalVariable(Name name, Object value)
 	{
-		this.globalVariables.set(name, value);
+		getGlobalVariablesContext().set(name, value);
 	}
 
 	@Override
-	public void removeGlobalVariable(String name)
+	public void removeGlobalVariable(Name name)
 	{
-		this.globalVariables.remove(name);
+		getGlobalVariablesContext().remove(name);
 	}
 
 	private VariablesContext currentLocalVariables()
 	{
-		VariablesContext variablesContext=this.localVariables.peek();
-		if (variablesContext == null)
-		{
-			throw new IllegalStateException("No local context!");
-		}
-		return variablesContext;
+		return this.localVariables.isEmpty()
+			? getGlobalVariablesContext()
+			: this.localVariables.peek();
 	}
 
 	@Override
-	public Object getLocalVariable(String name)
+	public Object getLocalVariable(Name name)
 		throws VariableNotFoundException
 	{
 		return currentLocalVariables().get(name);
 	}
 
 	@Override
-	public Object getNearestVariable(String name)
+	public Object getNearestVariable(Name name)
 		throws VariableNotFoundException
 	{
 		Object value;
@@ -57,9 +60,9 @@ public abstract class AbstractVariablesManager implements VariablesManager
 		}
 		else
 		{
-			if (this.globalVariables.contains(name))
+			if (getGlobalVariablesContext().contains(name))
 			{
-				value=this.globalVariables.get(name);
+				value=getGlobalVariablesContext().get(name);
 			}
 			else
 			{
@@ -70,39 +73,52 @@ public abstract class AbstractVariablesManager implements VariablesManager
 	}
 
 	@Override
-	public void setLocalVariable(String name, Object value)
+	public void setNearestVariable(Name name, Object value)
+	{
+		VariablesContext variablesContext=this.localVariables.peek();
+		if (variablesContext != null && variablesContext.contains(name))
+		{
+			variablesContext.set(name, value);
+		}
+		else
+		{
+			// Por defecto, la consideraremos global:
+			getGlobalVariablesContext().set(name, value);
+		}
+	}
+
+	@Override
+	public void setLocalVariable(Name name, Object value)
 	{
 		currentLocalVariables().set(name, value);
 	}
 
 	@Override
-	public void removeLocalVariable(String name)
+	public void removeLocalVariable(Name name)
 	{
 		currentLocalVariables().remove(name);
 	}
 
 	@Override
-	public void pushLocalContext()
+	public void pushLocalContext(VariablesContext newContext)
 	{
-		this.localVariables.push(createVariablesContext());
+		this.localVariables.push(newContext);
 	}
 
 	@Override
-	public void popLocalContext()
+	public VariablesContext popLocalContext()
 	{
-		this.localVariables.pop();
+		return this.localVariables.pop();
 	}
 
-	protected abstract VariablesContext createVariablesContext();
-
 	@Override
-	public VariablesContext getVariablesContext(String name)
+	public VariablesContext getVariablesContext(Name name)
 		throws VariableNotFoundException
 	{
 		VariablesContext variablesContext=this.localVariables.peek();
 		if (variablesContext == null || !variablesContext.contains(name))
 		{
-			variablesContext=this.globalVariables;
+			variablesContext=getGlobalVariablesContext();
 			if (variablesContext == null || !variablesContext.contains(name))
 			{
 				variablesContext=getVariablesContextForVariableNotFound(name);
@@ -111,11 +127,13 @@ public abstract class AbstractVariablesManager implements VariablesManager
 		return variablesContext;
 	}
 
-	protected abstract Object getValueForVariableNotFound(String name)
+	protected abstract Object getValueForVariableNotFound(Name name)
 		throws VariableNotFoundException;
 
-	protected abstract VariablesContext getVariablesContextForVariableNotFound(String name)
-		throws VariableNotFoundException;
+	protected VariablesContext getVariablesContextForVariableNotFound(Name name)
+	{
+		return getGlobalVariablesContext();
+	}
 
 	public VariablesContext getGlobalVariablesContext()
 	{
@@ -128,4 +146,9 @@ public abstract class AbstractVariablesManager implements VariablesManager
 		return this.localVariables.peek();
 	}
 
+	@Override
+	public final VariablesContext peekLocalContext()
+	{
+		return currentLocalVariables();
+	}
 }

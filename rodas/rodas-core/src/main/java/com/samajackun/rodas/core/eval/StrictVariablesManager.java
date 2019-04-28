@@ -2,21 +2,13 @@ package com.samajackun.rodas.core.eval;
 
 public class StrictVariablesManager extends AbstractVariablesManager
 {
-	@Override
-	protected VariablesContext createVariablesContext()
+	public StrictVariablesManager(VariablesContext globalVariables)
 	{
-		return new StrictVariablesContext();
+		super(globalVariables);
 	}
 
 	@Override
-	protected Object getValueForVariableNotFound(String name)
-		throws VariableNotFoundException
-	{
-		throw new VariableNotFoundException(name);
-	}
-
-	@Override
-	protected VariablesContext getVariablesContextForVariableNotFound(String name)
+	protected Object getValueForVariableNotFound(Name name)
 		throws VariableNotFoundException
 	{
 		throw new VariableNotFoundException(name);

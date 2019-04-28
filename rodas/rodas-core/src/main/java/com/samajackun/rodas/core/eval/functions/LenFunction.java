@@ -1,9 +1,9 @@
 package com.samajackun.rodas.core.eval.functions;
 
+import java.util.List;
+
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.functions.AbstractFunction;
 
 public class LenFunction extends AbstractFunction
 {
@@ -13,11 +13,11 @@ public class LenFunction extends AbstractFunction
 	}
 
 	@Override
-	protected Object evaluateFunction(Context context, Object[] values)
-		throws EvaluationException
+	protected Object evaluateFunction(Context context, List<Object> values)
+		throws FunctionEvaluationException
 	{
 		Object result;
-		Object value=values[0];
+		Object value=values.get(0);
 		if (value == null)
 		{
 			result=null;
@@ -29,7 +29,7 @@ public class LenFunction extends AbstractFunction
 		}
 		else
 		{
-			throw new EvaluationException("LEN parameter type must be a STRING");
+			throw new FunctionEvaluationException("len", "parameter type must be a STRING");
 		}
 		return result;
 	}

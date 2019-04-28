@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
-import com.samajackun.rodas.core.model.RowData;
 
 final class CursorsUtils
 {
@@ -30,12 +29,6 @@ final class CursorsUtils
 			metadata.addAll(cursor.getMetadata());
 		}
 		return metadata;
-	}
-
-	public static RowData combineCursors(List<Cursor> cursors)
-		throws CursorException
-	{
-		return new CombinedRowData(cursors);
 	}
 
 	public static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)

@@ -11,4 +11,11 @@ public final class TextUtils
 		return value1 + value2;
 	}
 
+	public static String toString(Object value)
+	{
+		return value == null
+			? "null"
+			: value.toString();
+	}
+
 }

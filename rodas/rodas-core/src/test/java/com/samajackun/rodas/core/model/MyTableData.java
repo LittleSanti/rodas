@@ -1,11 +1,8 @@
 package com.samajackun.rodas.core.model;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import com.samajackun.rodas.core.model.ProviderException;
-import com.samajackun.rodas.core.model.RowData;
-import com.samajackun.rodas.core.model.TableData;
 
 class MyTableData implements TableData
 {
@@ -41,6 +38,8 @@ class MyTableData implements TableData
 	{
 		private final Iterator<Object[]> src;
 
+		private long myPosition;
+
 		public MyIterator(Iterator<Object[]> src)
 		{
 			super();
@@ -56,23 +55,38 @@ class MyTableData implements TableData
 		@Override
 		public RowData next()
 		{
-			return new MyRowData(this.src.next());
+			return new MyRowData(this.src.next(), this.myPosition++);
 		}
 
 		private class MyRowData implements RowData
 		{
 			private final Object[] map;
 
-			public MyRowData(Object[] map)
+			private final long myPosition;
+
+			public MyRowData(Object[] map, long myPosition)
 			{
 				super();
 				this.map=map;
+				this.myPosition=myPosition;
 			}
 
 			@Override
 			public Object get(int column)
 			{
 				return this.map[column];
+			}
+
+			@Override
+			public long position()
+			{
+				return this.myPosition;
+			}
+
+			@Override
+			public String toString()
+			{
+				return Arrays.asList(this.map).toString();
 			}
 		}
 	}

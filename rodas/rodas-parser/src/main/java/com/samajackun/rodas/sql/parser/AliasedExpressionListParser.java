@@ -8,8 +8,9 @@ import com.samajackun.rodas.core.model.AliasedExpression;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
+import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpression>>
 {
@@ -30,7 +31,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 	};
 
 	@Override
-	public List<AliasedExpression> parse(SqlMatchingTokenizer tokenizer)
+	public List<AliasedExpression> parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -39,7 +40,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 		State state=State.INITIAL;
 		while (state != State.COMPLETE)
 		{
-			SqlToken token=tokenizer.nextOptionalUsefulToken();
+			Token token=tokenizer.nextOptionalUsefulToken();
 			if (token == null)
 			{
 				break;
@@ -48,23 +49,23 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 			{
 				case INITIAL:
 					tokenizer.pushBack(token);
-					expression=ExpressionParser.getInstance().parse(tokenizer);
+					expression=ExpressionParser.getInstance().parse(tokenizer, parserContext);
 					// expressions.add(new AliasedExpression(expression, null));
 					state=State.READ_EXPRESSION;
 					break;
 				case READ_EXPRESSION:
 					switch (token.getType())
 					{
-						case COMMA:
-							String alias=expression.getName();
+						case SqlTokenTypes.COMMA:
+							String alias=expression.getName().asString();
 							expressions.add(new AliasedExpression(expression, alias));
 							state=State.INITIAL;
 							break;
-						case KEYWORD_AS:
+						case SqlTokenTypes.KEYWORD_AS:
 							state=State.EXPECTING_ALIAS;
 							break;
-						case IDENTIFIER:
-						case DOUBLE_QUOTED_TEXT_LITERAL:
+						case SqlTokenTypes.IDENTIFIER:
+						case SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL:
 							AliasedExpression aliasedExpression=new AliasedExpression(expression, token.getValue());
 							expressions.add(aliasedExpression);
 							state=State.READ_ALIAS;
@@ -77,8 +78,8 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 				case EXPECTING_ALIAS:
 					switch (token.getType())
 					{
-						case IDENTIFIER:
-						case DOUBLE_QUOTED_TEXT_LITERAL:
+						case SqlTokenTypes.IDENTIFIER:
+						case SqlTokenTypes.DOUBLE_QUOTED_TEXT_LITERAL:
 							AliasedExpression aliasedExpression=new AliasedExpression(expression, token.getValue());
 							expressions.add(aliasedExpression);
 							expression=null;
@@ -91,7 +92,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 				case READ_ALIAS:
 					switch (token.getType())
 					{
-						case COMMA:
+						case SqlTokenTypes.COMMA:
 							if (expression == null)
 							{
 								throw new RuntimeException("expression no debería ser null");

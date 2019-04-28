@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
 import com.samajackun.rodas.parsing.parser.ParserException;
-import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
+import com.samajackun.rodas.sql.tokenizer.AbstractMatchingTokenizer;
 
 public class GenericExpressionParser extends AbstractParser<Expression> implements PartialParser
 {
@@ -15,12 +15,11 @@ public class GenericExpressionParser extends AbstractParser<Expression> implemen
 	}
 
 	@Override
-	public Expression parse(SqlMatchingTokenizer tokenizer)
+	public Expression parse(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
 		// return SelectSentenceParser.getInstance().parse(tokenizer);
-		return getParserFactory().getLogicalExpressionParser().parse(tokenizer);
+		return getParserFactory().getLogicalExpressionParser().parse(tokenizer, parserContext);
 	};
-
 }

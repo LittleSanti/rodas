@@ -12,9 +12,8 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.core.eval.MyCursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.MyIterableTableData;
@@ -92,7 +91,7 @@ public class CrossCursorTest
 	}
 
 	@Test
-	public void iterateData()
+	public void crossBetweenTwoFull()
 		throws ProviderException,
 		CursorException
 	{
@@ -193,7 +192,7 @@ public class CrossCursorTest
 		return crossCursor;
 	}
 
-	private MyCursor createCursor0()
+	private DefaultCursor createCursor0()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();
@@ -203,11 +202,11 @@ public class CrossCursorTest
 		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
 		List<Object[]> data=Arrays.asList(new Object[][] {});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
-	private MyCursor createCursor1()
+	private DefaultCursor createCursor1()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();
@@ -225,11 +224,11 @@ public class CrossCursorTest
 			// @formatter:on
 		});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
-	private MyCursor createCursor2()
+	private DefaultCursor createCursor2()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();
@@ -243,7 +242,7 @@ public class CrossCursorTest
 			// @formatter:on
 		});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
@@ -301,17 +300,16 @@ public class CrossCursorTest
 		assertEquals(Datatype.TEXT, columnMetadata.getDatatype());
 		assertFalse(columnMetadata.isNullable());
 
-		RowData rowData=cursor.getRowData();
-		while (cursor.hasNext())
-		{
-			cursor.next();
-			for (int j=0; j < cursor.getNumberOfColumns(); i++)
-			{
-				System.out.print(rowData.get(j) + "\t");
-			}
-			System.out.println();
-		}
-		// hasNext:
+		// RowData rowData=cursor.getRowData();
+		// while (cursor.hasNext())
+		// {
+		// cursor.next();
+		// for (int j=0; j < cursor.getNumberOfColumns(); i++)
+		// {
+		// System.out.print(rowData.get(j) + "\t");
+		// }
+		// System.out.println();
+		// }
 		assertFalse(cursor.hasNext());
 	}
 
@@ -369,17 +367,16 @@ public class CrossCursorTest
 		assertEquals(Datatype.DECIMAL_NUMBER, columnMetadata.getDatatype());
 		assertTrue(columnMetadata.isNullable());
 
-		RowData rowData=cursor.getRowData();
-		while (cursor.hasNext())
-		{
-			cursor.next();
-			for (int j=0; j < cursor.getNumberOfColumns(); i++)
-			{
-				System.out.print(rowData.get(j) + "\t");
-			}
-			System.out.println();
-		}
-		// hasNext:
+		// RowData rowData=cursor.getRowData();
+		// while (cursor.hasNext())
+		// {
+		// cursor.next();
+		// for (int j=0; j < cursor.getNumberOfColumns(); i++)
+		// {
+		// System.out.print(rowData.get(j) + "\t");
+		// }
+		// System.out.println();
+		// }
 		assertFalse(cursor.hasNext());
 	}
 }

@@ -8,10 +8,10 @@ import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.MapList;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.BooleanExpression;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.RowData;
 
 public class JoinedCursor implements Cursor
@@ -33,6 +33,8 @@ public class JoinedCursor implements Cursor
 	private final Object[] fetched;
 
 	private final Object[] currentRow;
+
+	public long currentPosition;
 
 	public JoinedCursor(Cursor left, Cursor right, BooleanExpression condition, EvaluatorFactory evaluatorFactory, Context context)
 		throws CursorException
@@ -85,6 +87,9 @@ public class JoinedCursor implements Cursor
 		if (this.canIterate=this.crossCursor.hasNext())
 		{
 			this.crossCursor.next();
+			this.currentPosition++;
+			// Este clear sirve para limpiar la caché de datos del registro anteriormente fetchado:
+			this.context.getVariablesManager().peekLocalContext().clear();
 		}
 	}
 
@@ -174,6 +179,12 @@ public class JoinedCursor implements Cursor
 
 	private class MemoryRowData implements RowData
 	{
+		@Override
+		public long position()
+		{
+			return JoinedCursor.this.currentPosition;
+		}
+
 		@Override
 		public Object get(int column)
 		{

@@ -2,6 +2,7 @@ package com.samajackun.rodas.core.eval;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public abstract class AbstractVariablesContext implements VariablesContext
 {
@@ -13,25 +14,38 @@ public abstract class AbstractVariablesContext implements VariablesContext
 	}
 
 	@Override
-	public void set(String name, Object value)
+	public void set(Name name, Object value)
 	{
-		this.map.put(name, value);
+		map.put(name.asString(), value);
 	}
 
 	@Override
-	public void remove(String name)
+	public Object setIfAbsent(Name name, Supplier<Object> supplier)
 	{
-		this.map.remove(name);
+		// Sin cacheo:
+		return supplier.get();
+	}
+
+	@Override
+	public void remove(Name name)
+	{
+		map.remove(name.asString());
 	}
 
 	protected Map<String, Object> getMap()
 	{
-		return this.map;
+		return map;
 	}
 
 	@Override
-	public boolean contains(String name)
+	public boolean contains(Name name)
 	{
-		return getMap().containsKey(name);
+		return getMap().containsKey(name.asString());
+	}
+
+	@Override
+	public void clear()
+	{
+		map.clear();
 	}
 }

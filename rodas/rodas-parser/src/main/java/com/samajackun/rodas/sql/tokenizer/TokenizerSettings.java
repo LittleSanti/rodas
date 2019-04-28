@@ -1,6 +1,6 @@
 package com.samajackun.rodas.sql.tokenizer;
 
-public class SqlTokenizerSettings
+public class TokenizerSettings
 {
 	public enum WhitespaceBehaviour {
 		IGNORE, PRODUCE_TOKENS, INCLUDE_IN_FOLLOWING_TOKEN
@@ -20,7 +20,7 @@ public class SqlTokenizerSettings
 
 	private UnexpectedSymbolBehaviour unexpectedSymbolBehaviour=UnexpectedSymbolBehaviour.THROW_EXCEPTION;
 
-	public SqlTokenizerSettings(WhitespaceBehaviour whitespaceBehaviour, CommentsBehaviour commentsBehaviour, UnexpectedSymbolBehaviour unexpectedSymbolBehaviour)
+	public TokenizerSettings(WhitespaceBehaviour whitespaceBehaviour, CommentsBehaviour commentsBehaviour, UnexpectedSymbolBehaviour unexpectedSymbolBehaviour)
 	{
 		super();
 		this.whitespaceBehaviour=whitespaceBehaviour;
@@ -28,7 +28,7 @@ public class SqlTokenizerSettings
 		this.unexpectedSymbolBehaviour=unexpectedSymbolBehaviour;
 	}
 
-	public SqlTokenizerSettings()
+	public TokenizerSettings()
 	{
 		this(WhitespaceBehaviour.IGNORE, CommentsBehaviour.IGNORE, UnexpectedSymbolBehaviour.THROW_EXCEPTION);
 	}
@@ -38,7 +38,7 @@ public class SqlTokenizerSettings
 		return this.whitespaceBehaviour;
 	}
 
-	public SqlTokenizerSettings setWhitespaceBehaviour(WhitespaceBehaviour whitespaceBehaviour)
+	public TokenizerSettings setWhitespaceBehaviour(WhitespaceBehaviour whitespaceBehaviour)
 	{
 		this.whitespaceBehaviour=whitespaceBehaviour;
 		return this;
@@ -49,7 +49,7 @@ public class SqlTokenizerSettings
 		return this.commentsBehaviour;
 	}
 
-	public SqlTokenizerSettings setCommentsBehaviour(CommentsBehaviour commentsBehaviour)
+	public TokenizerSettings setCommentsBehaviour(CommentsBehaviour commentsBehaviour)
 	{
 		this.commentsBehaviour=commentsBehaviour;
 		return this;
@@ -60,7 +60,7 @@ public class SqlTokenizerSettings
 		return this.unexpectedSymbolBehaviour;
 	}
 
-	public SqlTokenizerSettings setUnexpectedSymbolBehaviour(UnexpectedSymbolBehaviour unexpectedSymbolBehaviour)
+	public TokenizerSettings setUnexpectedSymbolBehaviour(UnexpectedSymbolBehaviour unexpectedSymbolBehaviour)
 	{
 		this.unexpectedSymbolBehaviour=unexpectedSymbolBehaviour;
 		return this;

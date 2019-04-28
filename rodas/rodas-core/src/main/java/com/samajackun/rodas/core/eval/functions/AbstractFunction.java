@@ -1,12 +1,11 @@
 package com.samajackun.rodas.core.eval.functions;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.model.Expression;
 
 public abstract class AbstractFunction implements Function
 {
@@ -32,24 +31,24 @@ public abstract class AbstractFunction implements Function
 		return this.evaluatorFactory;
 	}
 
-	protected abstract Object evaluateFunction(Context context, Object[] values)
-		throws EvaluationException;
+	protected abstract Object evaluateFunction(Context context, List<Object> values)
+		throws FunctionEvaluationException;
 
-	protected void validateNumberOfArguments(List<Expression> arguments)
+	protected void validateNumberOfArguments(int numberOfArguments)
 		throws FunctionEvaluationException
 	{
 		if (this.minArguments > 0)
 		{
 			if (this.maxArguments == this.minArguments)
 			{
-				if (arguments.size() != this.minArguments)
+				if (numberOfArguments != this.minArguments)
 				{
 					throw new ExactNumberOfArgumentsRequiredException(this.name, this.minArguments);
 				}
 			}
 			else
 			{
-				if (arguments.size() < this.minArguments)
+				if (numberOfArguments < this.minArguments)
 				{
 					throw new MinimumNumberOfArgumentsRequiredException(this.name, this.minArguments);
 				}
@@ -58,36 +57,24 @@ public abstract class AbstractFunction implements Function
 	}
 
 	@Override
-	public Object evaluate(Context context, List<Expression> arguments)
-		throws EvaluationException
+	public Object call(Context context, List<Object> arguments)
+		throws FunctionEvaluationException
 	{
-		validateNumberOfArguments(arguments);
-		return evaluateFunction(context, evaluateArguments(context, arguments));
+		validateNumberOfArguments(arguments.size());
+		return evaluateFunction(context, arguments);
 	}
 
-	private Object[] evaluateArguments(Context context, List<Expression> arguments)
-		throws EvaluationException
-	{
-		Object[] argumentValues=new Object[arguments.size()];
-		int i=0;
-		for (Expression argumentExpression : arguments)
-		{
-			argumentValues[i++]=argumentExpression.evaluate(context, this.evaluatorFactory);
-		}
-		return argumentValues;
-	}
-
-	protected boolean hasAnyNull(Object[] values)
+	protected boolean hasAnyNull(List<Object> values)
 	{
 		boolean x=false;
-		for (int i=0; !x && i < values.length; i++)
+		for (Iterator<Object> iterator=values.iterator(); !x && iterator.hasNext();)
 		{
-			x=(values[i] == null);
+			x=(iterator.next() == null);
 		}
 		return x;
 	}
 
-	protected Class<?> getMaxScaleType(Object[] values)
+	protected Class<?> getMaxScaleType(List<Object> values)
 		throws FunctionEvaluationException
 	{
 		int scale=0;

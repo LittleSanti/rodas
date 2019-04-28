@@ -1,18 +1,18 @@
 package com.samajackun.rodas.core.eval;
 
-public class VariableNotFoundException extends Exception
+public class VariableNotFoundException extends EvaluationException
 {
 	private static final long serialVersionUID=-3876535480389152497L;
 
-	private final String name;
+	private final Name name;
 
-	public VariableNotFoundException(String name)
+	public VariableNotFoundException(Name name)
 	{
-		super();
+		super("Variable '" + name.asString() + "' not found");
 		this.name=name;
 	}
 
-	public String getName()
+	public Name getName()
 	{
 		return this.name;
 	}

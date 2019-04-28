@@ -1,33 +1,38 @@
 package com.samajackun.rodas.parsing.tokenizer;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import com.samajackun.rodas.parsing.source.PushBackSource;
+import com.samajackun.rodas.sql.tokenizer.Token;
+import com.samajackun.rodas.sql.tokenizer.TokenizerSettings;
 
 /**
  *
  * @author Santi
  * @version 2017.00
- * @param <T>
- * @param <S>
  */
-public abstract class AbstractTokenizer<T, S> implements Tokenizer<T>
+public abstract class AbstractTokenizer implements Tokenizer
 {
-	private final S settings;
+	private final TokenizerSettings settings;
 
+	// private final PushBackSource source;
 	private final PushBackSource source;
 
-	// private T fetched;
+	private final Deque<Token> pushbackBuffer=new ArrayDeque<Token>();
 
-	protected AbstractTokenizer(PushBackSource source, S settings) throws TokenizerException, IOException
+	private Token fetched;
+
+	protected AbstractTokenizer(PushBackSource source, TokenizerSettings settings) throws TokenizerException, IOException
 	{
 		super();
 		this.source=source;
 		this.settings=settings;
-		// this.fetched=fetch(this.source);
+		this.fetched=fetch(this.source);
 	}
 
-	public S getSettings()
+	public TokenizerSettings getSettings()
 	{
 		return this.settings;
 	}
@@ -43,33 +48,47 @@ public abstract class AbstractTokenizer<T, S> implements Tokenizer<T>
 	 * @see dev.parser.Tokenizer#nextToken()
 	 */
 	@Override
-	public T nextToken()
+	public Token nextToken()
 		throws TokenizerException,
 		IOException
 	{
-		T fetched=fetch(this.source);
-		return fetched;
+		Token x;
+		if (this.pushbackBuffer.isEmpty())
+		{
+			x=this.fetched;
+			this.fetched=fetch(this.source);
+		}
+		else
+		{
+			x=this.pushbackBuffer.pop();
+		}
+		return x;
 	}
 
-	protected abstract T fetch(PushBackSource source)
+	protected abstract Token fetch(PushBackSource source)
 		throws TokenizerException,
 		IOException;
 
 	@Override
-	public void pushBackToken(T token)
+	public void pushBackToken(Token token)
 		throws IOException
 	{
 		pushBackToken(token, this.source);
 	}
 
-	protected abstract void pushBackToken(T token, PushBackSource source)
-		throws IOException;
+	protected void pushBackToken(Token token, PushBackSource source)
+		throws IOException
+	{
+		this.pushbackBuffer.push(token);
+	}
+
 	//
 	// protected PushBackSource getSource()
 	// {
 	// return this.source;
 	// }
 
+	@Override
 	public PushBackSource getSource()
 	{
 		return this.source;

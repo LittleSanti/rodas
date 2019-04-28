@@ -1,5 +1,8 @@
 package com.samajackun.rodas.sql.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -7,24 +10,26 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.model.AliasedSource;
+import com.samajackun.rodas.core.model.CrossSource;
 import com.samajackun.rodas.core.model.EqualsExpression;
 import com.samajackun.rodas.core.model.GreaterThanExpression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.OnJoinedSource;
 import com.samajackun.rodas.core.model.ParehentesizedSource;
+import com.samajackun.rodas.core.model.SelectSentence;
 import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.TableSource;
 import com.samajackun.rodas.core.model.UsingJoinedSource;
 import com.samajackun.rodas.parsing.parser.ParserException;
-import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class SourceListParserTest
 {
+	private final ParserContext parserContext=new ParserContext();
+
 	@Test
 	public void parseSourceForIdentifier()
 		throws IOException
@@ -33,7 +38,7 @@ public class SourceListParserTest
 		{
 			String src="b";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof TableSource);
 			Assert.assertEquals("b", ((TableSource)source).getTable());
 		}
@@ -52,12 +57,14 @@ public class SourceListParserTest
 		{
 			String src="SELECT x FROM y";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			SourceListParser.getInstance().parseSource(tokenizer);
-			Assert.fail("Expected UnexpectedTokenException");
-		}
-		catch (UnexpectedTokenException e)
-		{
-			Assert.assertEquals(SqlToken.Type.KEYWORD_SELECT, e.getToken().getType());
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
+			assertTrue(source instanceof SelectSentence);
+			SelectSentence select=(SelectSentence)source;
+			assertEquals(1, select.getSelectExpressions().size());
+			assertEquals("x", ((IdentifierExpression)select.getSelectExpressions().get(0).getExpression()).getIdentifier());
+			assertTrue(select.getSource() instanceof TableSource);
+			TableSource tableSource=(TableSource)select.getSource();
+			assertEquals("y", tableSource.getTable());
 		}
 		catch (ParserException e)
 		{
@@ -74,7 +81,7 @@ public class SourceListParserTest
 		{
 			String src="(SELECT x FROM y)";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source.getClass().getName(), source instanceof ParehentesizedSource);
 			Assert.assertEquals("(SELECT x FROM y)", ((ParehentesizedSource)source).toCode());
 		}
@@ -93,7 +100,7 @@ public class SourceListParserTest
 		{
 			String src="(SELECT x FROM y) AS z";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof AliasedSource);
 			Assert.assertEquals("z", ((AliasedSource)source).getAlias());
 			Assert.assertTrue(((AliasedSource)source).getSource() instanceof ParehentesizedSource);
@@ -114,7 +121,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER JOIN b";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			SourceListParser.getInstance().parseSource(tokenizer);
+			SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.fail("Expecting IncompleteJoinException");
 		}
 		catch (IncompleteJoinException e)
@@ -136,7 +143,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER JOIN b ON c=d";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof OnJoinedSource);
 			OnJoinedSource onJoinedSource=(OnJoinedSource)source;
 			Assert.assertEquals(OnJoinedSource.Type.INNER, onJoinedSource.getType());
@@ -165,7 +172,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER JOIN b ON c>d";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof OnJoinedSource);
 			OnJoinedSource onJoinedSource=(OnJoinedSource)source;
 			Assert.assertEquals(OnJoinedSource.Type.INNER, onJoinedSource.getType());
@@ -194,7 +201,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER JOIN b USING c";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof UsingJoinedSource);
 			UsingJoinedSource usingJoinedSource=(UsingJoinedSource)source;
 			Assert.assertEquals(UsingJoinedSource.Type.INNER, usingJoinedSource.getType());
@@ -222,7 +229,7 @@ public class SourceListParserTest
 		{
 			String src="a OUTER JOIN b ON c=d";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof OnJoinedSource);
 			OnJoinedSource onJoinedSource=(OnJoinedSource)source;
 			Assert.assertEquals(OnJoinedSource.Type.OUTER, onJoinedSource.getType());
@@ -251,7 +258,7 @@ public class SourceListParserTest
 		{
 			String src="a LEFT JOIN b ON c=d";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof OnJoinedSource);
 			OnJoinedSource onJoinedSource=(OnJoinedSource)source;
 			Assert.assertEquals(OnJoinedSource.Type.LEFT, onJoinedSource.getType());
@@ -280,7 +287,7 @@ public class SourceListParserTest
 		{
 			String src="a RIGHT JOIN b ON c=d";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			Source source=SourceListParser.getInstance().parseSource(tokenizer);
+			Source source=SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof OnJoinedSource);
 			OnJoinedSource onJoinedSource=(OnJoinedSource)source;
 			Assert.assertEquals(OnJoinedSource.Type.RIGHT, onJoinedSource.getType());
@@ -309,7 +316,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			SourceListParser.getInstance().parseSource(tokenizer);
+			SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.fail("Expected IncompleteJoinException");
 		}
 		catch (IncompleteJoinException e)
@@ -331,7 +338,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER JOIN";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			SourceListParser.getInstance().parseSource(tokenizer);
+			SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.fail("Expected IncompleteJoinException");
 		}
 		catch (IncompleteJoinException e)
@@ -353,7 +360,7 @@ public class SourceListParserTest
 		{
 			String src="a INNER JOIN b";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			SourceListParser.getInstance().parseSource(tokenizer);
+			SourceParser.getInstance().parseSingleSource(tokenizer, this.parserContext);
 			Assert.fail("Expected IncompleteJoinException");
 		}
 		catch (IncompleteJoinException e)
@@ -375,9 +382,7 @@ public class SourceListParserTest
 		{
 			String src="b";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
-			Assert.assertEquals(1, sources.size());
-			Source source=sources.get(0);
+			Source source=SourceParser.getInstance().parse(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof TableSource);
 			Assert.assertEquals("b", ((TableSource)source).getTable());
 		}
@@ -396,9 +401,7 @@ public class SourceListParserTest
 		{
 			String src="(SELECT x FROM y)";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
-			Assert.assertEquals(1, sources.size());
-			Source source=sources.get(0);
+			Source source=SourceParser.getInstance().parse(tokenizer, this.parserContext);
 			Assert.assertSame(ParehentesizedSource.class, source.getClass());
 			Assert.assertEquals("(SELECT x FROM y)", ((ParehentesizedSource)source).toCode());
 		}
@@ -417,7 +420,9 @@ public class SourceListParserTest
 		{
 			String src="b,c";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
+			Source globalSource=SourceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertTrue(globalSource instanceof CrossSource);
+			List<Source> sources=((CrossSource)globalSource).getSources();
 			Assert.assertEquals(2, sources.size());
 			Source source=sources.get(0);
 			Assert.assertTrue(source instanceof TableSource);
@@ -441,9 +446,7 @@ public class SourceListParserTest
 		{
 			String src="mytable AS m1";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
-			Assert.assertEquals(1, sources.size());
-			Source source=sources.get(0);
+			Source source=SourceParser.getInstance().parse(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof AliasedSource);
 			AliasedSource aliasedSource=(AliasedSource)source;
 			Assert.assertTrue(aliasedSource.getSource() instanceof TableSource);
@@ -465,9 +468,7 @@ public class SourceListParserTest
 		{
 			String src="mytable m1";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
-			Assert.assertEquals(1, sources.size());
-			Source source=sources.get(0);
+			Source source=SourceParser.getInstance().parse(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof AliasedSource);
 			AliasedSource aliasedSource=(AliasedSource)source;
 			Assert.assertTrue(aliasedSource.getSource() instanceof TableSource);
@@ -489,9 +490,7 @@ public class SourceListParserTest
 		{
 			String src="mytable \"m1 m2\"";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
-			Assert.assertEquals(1, sources.size());
-			Source source=sources.get(0);
+			Source source=SourceParser.getInstance().parse(tokenizer, this.parserContext);
 			Assert.assertTrue(source instanceof AliasedSource);
 			AliasedSource aliasedSource=(AliasedSource)source;
 			Assert.assertTrue(aliasedSource.getSource() instanceof TableSource);
@@ -513,8 +512,9 @@ public class SourceListParserTest
 		{
 			String src="mytable AS m1, (SELECT x FROM y) AS m2";
 			SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-			List<Source> sources=SourceListParser.getInstance().parse(tokenizer);
-			Assert.assertEquals(2, sources.size());
+			Source globalSource=SourceParser.getInstance().parse(tokenizer, this.parserContext);
+			Assert.assertTrue(globalSource instanceof CrossSource);
+			List<Source> sources=((CrossSource)globalSource).getSources();
 			Source source=sources.get(0);
 			Assert.assertTrue(source instanceof AliasedSource);
 			AliasedSource aliasedSource=(AliasedSource)source;

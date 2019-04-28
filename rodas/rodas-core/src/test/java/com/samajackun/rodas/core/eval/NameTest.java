@@ -16,14 +16,14 @@ public class NameTest
 	@Test
 	public void onlyBase()
 	{
-		Name name1=new Name("winter");
+		Name name1=Name.instanceOf("winter");
 		assertNull(name1.getPrefix());
 		assertFalse(name1.hasPrefix());
-		assertEquals("winter", name1.getBase());
-		assertEquals("winter", name1.toString());
-		Name name2=new Name("winter");
+		assertEquals("winter", name1.getBase().asString());
+		assertEquals("winter", name1.asString());
+		Name name2=Name.instanceOf("winter");
 		assertEquals(name1, name2);
-		Name name3=new Name("spring");
+		Name name3=Name.instanceOf("spring");
 		assertNotEquals(name3, name1);
 		Map<Name, Integer> map=new HashMap<>();
 		map.put(name1, 120);
@@ -33,12 +33,10 @@ public class NameTest
 	@Test
 	public void prefixAndBase()
 	{
-		Name parent1=new Name("winter");
-		Name parent2=new Name("winter");
-		Name child1=new Name(parent1, "january");
+		Name child1=Name.instanceOf("winter", "january");
 		assertTrue(child1.hasPrefix());
-		Name child2=new Name(parent2, "january");
-		assertEquals("winter.january", child1.toString());
+		Name child2=Name.instanceOf("winter", "january");
+		assertEquals("winter.january", child1.asString());
 		Map<Name, Integer> map=new HashMap<>();
 		map.put(child1, 120);
 		assertEquals(120, map.get(child2).intValue());

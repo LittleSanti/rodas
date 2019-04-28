@@ -28,12 +28,14 @@ import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class ArithmeticExpressionParserTest
 {
+	private final ParserContext parserContext=new ParserContext();
+
 	private Expression parseTerminal(String src)
 		throws ParserException,
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ArithmeticExpressionParser.getInstance().parseTerminal(tokenizer);
+		return ArithmeticExpressionParser.getInstance().parseTerminal(tokenizer, this.parserContext);
 	}
 
 	@Test(expected=ParserException.class)
@@ -43,7 +45,7 @@ public class ArithmeticExpressionParserTest
 	{
 		String src="";
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		ArithmeticExpressionParser.getInstance().parseTerminal(tokenizer);
+		ArithmeticExpressionParser.getInstance().parseTerminal(tokenizer, this.parserContext);
 	}
 
 	@Test
@@ -131,7 +133,7 @@ public class ArithmeticExpressionParserTest
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ArithmeticExpressionParser.getInstance().parseSignExpression(tokenizer);
+		return ArithmeticExpressionParser.getInstance().parseSignExpression(tokenizer, this.parserContext);
 	}
 
 	@Test
@@ -197,7 +199,7 @@ public class ArithmeticExpressionParserTest
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ArithmeticExpressionParser.getInstance().parseMultiplyingExpression(tokenizer);
+		return ArithmeticExpressionParser.getInstance().parseMultiplyingExpression(tokenizer, this.parserContext);
 	}
 
 	@Test
@@ -300,7 +302,7 @@ public class ArithmeticExpressionParserTest
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ArithmeticExpressionParser.getInstance().parseAddingExpression(tokenizer);
+		return ArithmeticExpressionParser.getInstance().parseAddingExpression(tokenizer, this.parserContext);
 	}
 
 	@Test

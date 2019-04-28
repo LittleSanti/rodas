@@ -18,13 +18,16 @@ import com.samajackun.rodas.core.eval.ColumnNotFoundException;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.MapList;
-import com.samajackun.rodas.core.eval.MyCursor;
+import com.samajackun.rodas.core.eval.MyOpenContext;
 import com.samajackun.rodas.core.eval.PrefixNotFoundException;
+import com.samajackun.rodas.core.eval.StrictVariablesContext;
+import com.samajackun.rodas.core.eval.StrictVariablesManager;
+import com.samajackun.rodas.core.eval.VariablesContext;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.BooleanExpression;
 import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.EqualsExpression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
@@ -156,19 +159,23 @@ public class JoinedCursorTest
 		ColumnNotFoundException,
 		PrefixNotFoundException
 	{
-		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("month_id"), new IdentifierExpression("day_id"));
+		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("c1", "month_id"), new IdentifierExpression("c2", "day_id"));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
-		Map<String, Cursor> cursors=new HashMap<>();
-		cursors.put("x1", createCursor1());
-		cursors.put("x2", createCursor2());
-		DefaultBuildingContext context=new DefaultBuildingContext(cursors);
-		context.bindPrivateColumn(null, "month_id");
-		context.bindPrivateColumn(null, "day_id");
-		JoinedCursor joinedCursor=new JoinedCursor(cursors.get("x1"), cursors.get("x2"), condition, evaluatorFactory, context);
+		Cursor cursor1=createCursor1();
+		Cursor cursor2=createCursor2();
+		MyOpenContext context=new MyOpenContext();
+		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
+		Map<String, Cursor> cursorMap=new HashMap<>();
+		cursorMap.put("c1", cursor1);
+		cursorMap.put("c2", cursor2);
+		VariablesContext newVariablesContext=new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap);
+		context.getVariablesManager().pushLocalContext(newVariablesContext);
+		context.setProvider(new MyProvider());
+		JoinedCursor joinedCursor=new JoinedCursor(cursor1, cursor2, condition, evaluatorFactory, context);
 		return joinedCursor;
 	}
 
-	private MyCursor createCursor1()
+	private DefaultCursor createCursor1()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();
@@ -186,11 +193,11 @@ public class JoinedCursorTest
 			// @formatter:on
 		});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
-	private MyCursor createCursor2()
+	private DefaultCursor createCursor2()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();
@@ -204,11 +211,11 @@ public class JoinedCursorTest
 			// @formatter:on
 		});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
-	private MyCursor createCursor0()
+	private DefaultCursor createCursor0()
 		throws ProviderException
 	{
 		List<ColumnMetadata> metadata=new ArrayList<>();
@@ -218,7 +225,7 @@ public class JoinedCursorTest
 		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
 		List<Object[]> data=Arrays.asList(new Object[][] {});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
-		MyCursor cursor=new MyCursor(metadata, iterableTableData);
+		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
 		return cursor;
 	}
 
@@ -229,15 +236,19 @@ public class JoinedCursorTest
 		ColumnNotFoundException,
 		PrefixNotFoundException
 	{
-		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("month_id"), new IdentifierExpression("day_id"));
+		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("c1", "month_id"), new IdentifierExpression("c2", "day_id"));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
-		Map<String, Cursor> cursors=new HashMap<>();
-		cursors.put("x1", createCursor0());
-		cursors.put("x2", createCursor2());
-		DefaultBuildingContext context=new DefaultBuildingContext(cursors);
-		context.bindPrivateColumn(null, "month_id");
-		context.bindPrivateColumn(null, "day_id");
-		JoinedCursor joinedCursor=new JoinedCursor(cursors.get("x1"), cursors.get("x2"), condition, evaluatorFactory, context);
+		Cursor cursor1=createCursor0();
+		Cursor cursor2=createCursor2();
+		MyOpenContext context=new MyOpenContext();
+		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
+		Map<String, Cursor> cursorMap=new HashMap<>();
+		cursorMap.put("c1", cursor1);
+		cursorMap.put("c2", cursor2);
+		VariablesContext newVariablesContext=new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap);
+		context.getVariablesManager().pushLocalContext(newVariablesContext);
+		context.setProvider(new MyProvider());
+		JoinedCursor joinedCursor=new JoinedCursor(cursor1, cursor2, condition, evaluatorFactory, context);
 
 		// getNumberOfColumns:
 		assertEquals(6, joinedCursor.getNumberOfColumns());
@@ -287,17 +298,42 @@ public class JoinedCursorTest
 		assertEquals(Datatype.TEXT, columnMetadata.getDatatype());
 		assertFalse(columnMetadata.isNullable());
 
-		RowData rowData=joinedCursor.getRowData();
-		while (joinedCursor.hasNext())
-		{
-			joinedCursor.next();
-			for (int j=0; j < joinedCursor.getNumberOfColumns(); i++)
-			{
-				System.out.print(rowData.get(j) + "\t");
-			}
-			System.out.println();
-		}
-		// hasNext:
+		assertFalse(joinedCursor.hasNext());
+	}
+
+	@Test
+	public void joinBetweenFullAndFull()
+		throws ProviderException,
+		CursorException,
+		ColumnNotFoundException,
+		PrefixNotFoundException
+	{
+		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("c1", "month_id"), new IdentifierExpression("c2", "day_id"));
+		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
+		Cursor cursor1=createCursor1();
+		Cursor cursor2=createCursor2();
+		MyOpenContext context=new MyOpenContext();
+		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
+		Map<String, Cursor> cursorMap=new HashMap<>();
+		cursorMap.put("c1", cursor1);
+		cursorMap.put("c2", cursor2);
+		VariablesContext newVariablesContext=new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap);
+		context.getVariablesManager().pushLocalContext(newVariablesContext);
+		context.setProvider(new MyProvider());
+		JoinedCursor joinedCursor=new JoinedCursor(cursor1, cursor2, condition, evaluatorFactory, context);
+		RowData row=joinedCursor.getRowData();
+		assertTrue(joinedCursor.hasNext());
+		joinedCursor.next();
+		assertEquals("enero", row.get(1));
+		assertEquals("lunes", row.get(5));
+		assertTrue(joinedCursor.hasNext());
+		joinedCursor.next();
+		assertEquals("febrero", row.get(1));
+		assertEquals("martes", row.get(5));
+		assertTrue(joinedCursor.hasNext());
+		joinedCursor.next();
+		assertEquals("marzo", row.get(1));
+		assertEquals("miércoles", row.get(5));
 		assertFalse(joinedCursor.hasNext());
 	}
 

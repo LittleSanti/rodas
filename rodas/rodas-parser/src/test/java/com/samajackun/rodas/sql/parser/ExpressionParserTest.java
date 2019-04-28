@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.samajackun.rodas.core.model.ConstantExpression;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.ExpressionCollection;
-import com.samajackun.rodas.core.model.FunctionExpression;
+import com.samajackun.rodas.core.model.FunctionCallExpression;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.ParehentesizedExpression;
 import com.samajackun.rodas.parsing.parser.ParserException;
@@ -19,12 +19,14 @@ import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class ExpressionParserTest
 {
+	private final ParserContext parserContext=new ParserContext();
+
 	private ExpressionCollection parseExpressionList(String src)
 		throws ParserException,
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ExpressionCollectionParser.getInstance().parse(tokenizer);
+		return ExpressionCollectionParser.getInstance().parse(tokenizer, this.parserContext);
 	}
 
 	@Test
@@ -69,7 +71,7 @@ public class ExpressionParserTest
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return ExpressionParser.getInstance().parse(tokenizer);
+		return ExpressionParser.getInstance().parse(tokenizer, this.parserContext);
 	}
 
 	@Test
@@ -79,9 +81,9 @@ public class ExpressionParserTest
 	{
 		String src="enero()";
 		Expression expression=parseExpression(src);
-		Assert.assertTrue(expression instanceof FunctionExpression);
-		FunctionExpression functionExpression=(FunctionExpression)expression;
-		Assert.assertEquals("enero", functionExpression.getFunction());
+		Assert.assertTrue(expression instanceof FunctionCallExpression);
+		FunctionCallExpression functionExpression=(FunctionCallExpression)expression;
+		Assert.assertEquals("enero", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
 		Assert.assertEquals(0, functionExpression.getArguments().size());
 	}
 
@@ -92,9 +94,9 @@ public class ExpressionParserTest
 	{
 		String src="enero(a)";
 		Expression expression=parseExpression(src);
-		Assert.assertTrue(expression instanceof FunctionExpression);
-		FunctionExpression functionExpression=(FunctionExpression)expression;
-		Assert.assertEquals("enero", functionExpression.getFunction());
+		Assert.assertTrue(expression instanceof FunctionCallExpression);
+		FunctionCallExpression functionExpression=(FunctionCallExpression)expression;
+		Assert.assertEquals("enero", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
 		Assert.assertEquals(1, functionExpression.getArguments().size());
 		Assert.assertTrue(functionExpression.getArguments().get(0) instanceof IdentifierExpression);
 		Assert.assertEquals("a", ((IdentifierExpression)functionExpression.getArguments().get(0)).getIdentifier());
@@ -107,9 +109,9 @@ public class ExpressionParserTest
 	{
 		String src="enero(a,b)";
 		Expression expression=parseExpression(src);
-		Assert.assertTrue(expression instanceof FunctionExpression);
-		FunctionExpression functionExpression=(FunctionExpression)expression;
-		Assert.assertEquals("enero", functionExpression.getFunction());
+		Assert.assertTrue(expression instanceof FunctionCallExpression);
+		FunctionCallExpression functionExpression=(FunctionCallExpression)expression;
+		Assert.assertEquals("enero", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
 		Assert.assertEquals(2, functionExpression.getArguments().size());
 		Assert.assertTrue(functionExpression.getArguments().get(0) instanceof IdentifierExpression);
 		Assert.assertEquals("a", ((IdentifierExpression)functionExpression.getArguments().get(0)).getIdentifier());

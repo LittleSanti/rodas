@@ -16,12 +16,14 @@ import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class RelationalExpressionParserTest
 {
+	private final ParserContext parserContext=new ParserContext();
+
 	private Expression parse(String src)
 		throws ParserException,
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		return RelationalExpressionParser.getInstance().parse(tokenizer);
+		return RelationalExpressionParser.getInstance().parse(tokenizer, this.parserContext);
 	}
 
 	@Test

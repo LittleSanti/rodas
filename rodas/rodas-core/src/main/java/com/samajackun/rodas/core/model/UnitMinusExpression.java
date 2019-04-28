@@ -19,9 +19,9 @@ public class UnitMinusExpression extends ArithmeticUnitExpression
 	}
 
 	@Override
-	protected Number compute(EvaluatorFactory evaluatorFactory, Expression expression1)
+	protected Number compute(Context context, EvaluatorFactory evaluatorFactory, Expression expression1)
 		throws EvaluationException
 	{
-		return evaluatorFactory.getArithmeticEvaluator().evaluateUnitMinus(null, expression1);
+		return evaluatorFactory.getArithmeticEvaluator().evaluateUnitMinus(context, expression1);
 	}
 }

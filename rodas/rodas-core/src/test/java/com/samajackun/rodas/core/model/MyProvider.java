@@ -1,19 +1,13 @@
 package com.samajackun.rodas.core.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.model.ColumnMetadata;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.Datatype;
-import com.samajackun.rodas.core.model.DefaultCursor;
-import com.samajackun.rodas.core.model.IterableTableData;
-import com.samajackun.rodas.core.model.Provider;
-import com.samajackun.rodas.core.model.ProviderException;
-import com.samajackun.rodas.core.model.TableData;
-import com.samajackun.rodas.core.model.TableMetadata;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.DefaultCursor;
 
 public class MyProvider implements Provider
 {
@@ -118,6 +112,25 @@ public class MyProvider implements Provider
 		throws ProviderException
 	{
 		TableMetadata tableMetadata=new MyTableMetadata(table);
+		List<ColumnMetadata> metadata=tableMetadata.getListOfColumnMetadata();
+		switch (table)
+		{
+			case "country":
+				metadata.add(new ColumnMetadata("idCountry", Datatype.INTEGER_NUMBER, false));
+				metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
+				metadata.add(new ColumnMetadata("area", Datatype.DECIMAL_NUMBER, true));
+				break;
+			case "city":
+				metadata.add(new ColumnMetadata("idCity", Datatype.INTEGER_NUMBER, false));
+				metadata.add(new ColumnMetadata("idCountry", Datatype.INTEGER_NUMBER, false));
+				metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
+				break;
+			case "month":
+				metadata.add(new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false));
+				metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
+				metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
+				break;
+		}
 		return tableMetadata;
 	}
 
@@ -125,7 +138,7 @@ public class MyProvider implements Provider
 	{
 		private final String name;
 
-		private final List<ColumnMetadata> columns=createColumns();
+		private final List<ColumnMetadata> columns=new ArrayList<>();
 
 		public MyTableMetadata(String name)
 		{
@@ -137,18 +150,6 @@ public class MyProvider implements Provider
 		public ColumnMetadata getColumnMetadata(int column)
 		{
 			return this.columns.get(column);
-		}
-
-		private List<ColumnMetadata> createColumns()
-		{
-			// @formatter:off
-			ColumnMetadata[] columns= {
-				new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false),
-				new ColumnMetadata("name", Datatype.TEXT, true),
-				new ColumnMetadata("area", Datatype.DECIMAL_NUMBER, true),
-			};
-			// @formatter:oh
-			return Arrays.asList(columns);
 		}
 
 		@Override

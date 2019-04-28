@@ -2,12 +2,9 @@ package com.samajackun.rodas.core.context;
 
 import java.util.ServiceConfigurationError;
 
-import com.samajackun.rodas.core.context.DefaultExecutionContext;
-import com.samajackun.rodas.core.context.IdentifierCoordinates;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.MapList;
-import com.samajackun.rodas.core.eval.MyCursor;
-import com.samajackun.rodas.core.model.Cursor;
+import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.MyProvider;
 import com.samajackun.rodas.core.model.ProviderException;
 

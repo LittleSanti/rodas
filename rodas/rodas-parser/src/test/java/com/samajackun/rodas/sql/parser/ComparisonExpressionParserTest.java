@@ -18,17 +18,19 @@ import com.samajackun.rodas.parsing.parser.UnexpectedTokenException;
 import com.samajackun.rodas.parsing.source.CharSequenceSource;
 import com.samajackun.rodas.parsing.source.PushBackSource;
 import com.samajackun.rodas.sql.tokenizer.SqlMatchingTokenizer;
-import com.samajackun.rodas.sql.tokenizer.SqlToken;
+import com.samajackun.rodas.sql.tokenizer.SqlTokenTypes;
 import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class ComparisonExpressionParserTest
 {
+	private final ParserContext parserContext=new ParserContext();
+
 	private Expression parse(String src)
 		throws ParserException,
 		IOException
 	{
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
-		Expression expression=ComparisonExpressionParser.getInstance().parse(tokenizer);
+		Expression expression=ComparisonExpressionParser.getInstance().parse(tokenizer, this.parserContext);
 		return expression;
 	}
 
@@ -76,7 +78,7 @@ public class ComparisonExpressionParserTest
 		}
 		catch (UnexpectedTokenException e)
 		{
-			Assert.assertEquals(SqlToken.Type.INTEGER_NUMBER_LITERAL, e.getToken().getType());
+			Assert.assertEquals(SqlTokenTypes.INTEGER_NUMBER_LITERAL, e.getToken().getType());
 		}
 	}
 

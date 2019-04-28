@@ -4,4 +4,5 @@ public interface RowData
 {
 	public Object get(int column);
 
+	public long position();
 }

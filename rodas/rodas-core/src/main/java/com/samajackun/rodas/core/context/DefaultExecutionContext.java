@@ -2,21 +2,27 @@ package com.samajackun.rodas.core.context;
 
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.DefaultRuntime;
+import com.samajackun.rodas.core.eval.EvaluationException;
+import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.IndexNotBoundException;
 import com.samajackun.rodas.core.eval.MapList;
 import com.samajackun.rodas.core.eval.NameNotBoundException;
 import com.samajackun.rodas.core.eval.Runtime;
+import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.eval.VariablesManager;
-import com.samajackun.rodas.core.model.Cursor;
-import com.samajackun.rodas.core.model.CursorException;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
+import com.samajackun.rodas.core.model.Expression;
+import com.samajackun.rodas.core.model.Provider;
 import com.samajackun.rodas.core.model.RowData;
 
+// TODO Clase en ensayo que no se ha llegado a completar. Seguramente para desechar por completo.
 public class DefaultExecutionContext implements Context
 {
 	private final MapList<String, IdentifierCoordinates> identifierCoordinatesMap;
 
-	private final VariablesManager variablesManager=new StrictVariablesManager();
+	private final VariablesManager variablesManager=new StrictVariablesManager(new StrictVariablesContext());
 
 	private final Runtime runtime=new DefaultRuntime();
 
@@ -156,5 +162,19 @@ public class DefaultExecutionContext implements Context
 	public Runtime getRuntime()
 	{
 		return this.runtime;
+	}
+
+	@Override
+	public Provider getProvider()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object evaluate(Expression expression, EvaluatorFactory evaluatorFactory)
+		throws EvaluationException
+	{
+		return expression.evaluate(this, evaluatorFactory);
 	}
 }

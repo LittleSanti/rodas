@@ -3,9 +3,6 @@ package com.samajackun.rodas.core.model;
 import java.util.Iterator;
 import java.util.List;
 
-import com.samajackun.rodas.core.model.IterableTableData;
-import com.samajackun.rodas.core.model.RowData;
-
 public class MyIterableTableData implements IterableTableData
 {
 	private final List<Object[]> data;
@@ -35,7 +32,8 @@ public class MyIterableTableData implements IterableTableData
 		@Override
 		public RowData next()
 		{
-			return new MyRowData(MyIterableTableData.this.data.get(this.index++));
+			long n=this.index;
+			return new MyRowData(MyIterableTableData.this.data.get(this.index++), n);
 		}
 	}
 
@@ -43,10 +41,19 @@ public class MyIterableTableData implements IterableTableData
 	{
 		private final Object[] data;
 
-		public MyRowData(Object[] data)
+		private final long myPosition;
+
+		public MyRowData(Object[] data, long myPosition)
 		{
 			super();
 			this.data=data;
+			this.myPosition=myPosition;
+		}
+
+		@Override
+		public long position()
+		{
+			return this.myPosition;
 		}
 
 		@Override
