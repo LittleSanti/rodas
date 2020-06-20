@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 public abstract class AbstractVariablesContext implements VariablesContext
 {
-	private final Map<String, Object> map=new HashMap<>();
+	private final Map<Name, Supplier<Object>> map=new HashMap<>();
 
 	public AbstractVariablesContext()
 	{
@@ -16,36 +16,40 @@ public abstract class AbstractVariablesContext implements VariablesContext
 	@Override
 	public void set(Name name, Object value)
 	{
-		map.put(name.asString(), value);
+		// throw new UnsupportedOperationException();
+		this.map.put(name, () -> value);
 	}
 
 	@Override
 	public Object setIfAbsent(Name name, Supplier<Object> supplier)
 	{
 		// Sin cacheo:
-		return supplier.get();
+		Supplier<Object> supplier2=this.map.computeIfAbsent(name, x -> supplier);
+		return supplier2 == null
+			? null
+			: supplier2.get();
 	}
 
 	@Override
 	public void remove(Name name)
 	{
-		map.remove(name.asString());
+		this.map.remove(name);
 	}
 
-	protected Map<String, Object> getMap()
+	protected Map<Name, Supplier<Object>> getMap()
 	{
-		return map;
+		return this.map;
 	}
 
 	@Override
 	public boolean contains(Name name)
 	{
-		return getMap().containsKey(name.asString());
+		return getMap().containsKey(name);
 	}
 
 	@Override
 	public void clear()
 	{
-		map.clear();
+		this.map.clear();
 	}
 }

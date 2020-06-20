@@ -1,9 +1,12 @@
 package com.samajackun.rodas.sql.engine;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.RodasException;
@@ -11,15 +14,16 @@ import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.MyOpenContext;
 import com.samajackun.rodas.core.eval.Name;
-import com.samajackun.rodas.core.eval.ParameterNotFoundException;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
+import com.samajackun.rodas.core.eval.VariableNotFoundException;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.Engine;
 import com.samajackun.rodas.core.model.EngineException;
 import com.samajackun.rodas.core.model.MyProvider;
 import com.samajackun.rodas.core.model.Provider;
 import com.samajackun.rodas.core.model.ProviderException;
+import com.samajackun.rodas.core.model.RodasRuntimeException;
 import com.samajackun.rodas.core.model.RowData;
 import com.samajackun.rodas.core.model.SelectSentence;
 import com.samajackun.rodas.core.model.TableSource;
@@ -61,6 +65,7 @@ public class EngineAndProviderTest
 			cursor.getColumnMap().entrySet().stream().forEach(e -> System.out.printf("%s\t", rowData.get(e.getValue())));
 			System.out.printf("\r\n");
 		}
+		cursor.close();
 	}
 
 	private void executeQuery(String sql)
@@ -92,12 +97,43 @@ public class EngineAndProviderTest
 	}
 
 	@Test
-	public void executeQuery()
+	public void executeSimpleQuery()
 		throws RodasException,
 		IOException
 	{
-		String sql="SELECT idCountry, name, 120 FROM country";
-		executeQuery(sql);
+		String sql="SELECT idCountry, name, area FROM country";
+		Object[][] expected= {
+			// @formatter:off
+			{ 1, "spain", 121.1d },
+			{ 2, "portugal", 122.2d },
+			{ 3, "italy", 123.3d },
+			// @formatter:on
+		};
+		executeQuery(sql, createContext(), expected);
+	}
+
+	private void executeQuery(String sql, Context context, Object[][] expected)
+		throws RodasException,
+		IOException
+	{
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(sql))));
+		ParserContext parserContext=new ParserContext();
+		SelectSentence source=SelectSentenceParser.getInstance().parse(tokenizer, parserContext);
+		Cursor cursor=this.engine.execute(source, context);
+		cursor.getColumnMap().keySet().stream().forEach(s -> System.out.printf("%s\t", s));
+		int i=0;
+		while (cursor.hasNext())
+		{
+			assertTrue(i < expected.length);
+			cursor.next();
+			RowData rowData=cursor.getRowData();
+			assertEquals(expected[i].length, cursor.getNumberOfColumns());
+			for (int j=0; j < cursor.getNumberOfColumns(); j++)
+			{
+				assertEquals(expected[i][j], rowData.get(j));
+			}
+			i++;
+		}
 	}
 
 	@Test
@@ -164,6 +200,16 @@ public class EngineAndProviderTest
 	}
 
 	@Test
+	public void executeQueryFromNoTable()
+		throws RodasException,
+		IOException
+	{
+		String sql="SELECT 120";
+		executeQuery(sql);
+	}
+
+	@Test
+	@Ignore
 	public void executeQueryWithAsterisk()
 		throws RodasException,
 		IOException
@@ -182,9 +228,37 @@ public class EngineAndProviderTest
 			String sql="SELECT idCountry, name, area FROM country WHERE idCountry=:ID";
 			executeQuery(sql);
 		}
-		catch (ParameterNotFoundException e)
+		catch (RodasRuntimeException e)
 		{
-			assertEquals("ID", e.getParameter());
+			try
+			{
+				throw e.getCause();
+			}
+			catch (EvaluationException e3)
+			{
+				try
+				{
+					throw e3.getCause();
+				}
+				catch (VariableNotFoundException e2)
+				{
+					assertEquals("ID", e2.getName().asString());
+				}
+				catch (Throwable e2)
+				{
+					e2.printStackTrace();
+					fail(e2.toString());
+				}
+			}
+			catch (Throwable e2)
+			{
+				e2.printStackTrace();
+				fail(e2.toString());
+			}
+		}
+		catch (Exception e)
+		{
+			fail("Expected RodasRuntimeException/ParameterNotFoundException");
 		}
 	}
 

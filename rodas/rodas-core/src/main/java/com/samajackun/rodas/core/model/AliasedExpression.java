@@ -1,12 +1,16 @@
 package com.samajackun.rodas.core.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.Name;
 
 public class AliasedExpression implements Codeable
 {
+	private static final long serialVersionUID=-212472329399875852L;
+
 	private final Expression expression;
 
 	private final String alias;
@@ -25,25 +29,7 @@ public class AliasedExpression implements Codeable
 
 	public String getAlias()
 	{
-		String alias;
-		if (this.alias == null)
-		{
-			Name name=this.expression.getName();
-			if (name == null)
-			{
-				alias=null;
-			}
-			else
-			{
-				Name base=name.getBase();
-				alias=base.asString();
-			}
-		}
-		else
-		{
-			alias=this.alias;
-		}
-		return alias;
+		return this.alias;
 	}
 
 	@Override
@@ -62,5 +48,14 @@ public class AliasedExpression implements Codeable
 		throws EvaluationException
 	{
 		return this.getExpression().evaluate(context, evaluatorFactory);
+	}
+
+	public List<AliasedExpression> toPhysicalExpressions(Provider provider)
+		throws ProviderException
+	{
+		List<Expression> expressions=this.expression.toPhysicalExpressions(provider);
+		List<AliasedExpression> aliasedExpressions=new ArrayList<>(expressions.size());
+		expressions.forEach(k -> aliasedExpressions.add(new AliasedExpression(k, this.alias)));
+		return aliasedExpressions;
 	}
 }

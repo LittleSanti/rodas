@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class NumericConstantExpression extends ConstantExpression
 {
+	private static final long serialVersionUID=-1435205172218413065L;
+
 	private final Number numericValue;
 
 	public NumericConstantExpression(String value, Number numericValue)

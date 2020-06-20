@@ -24,11 +24,12 @@ public class GroupedCursor implements Cursor
 {
 	private final Cursor src;
 
-	public GroupedCursor(Cursor cursor, Context context, EvaluatorFactory evaluatorFactory, List<Expression> groupExpressions, Map<String, AliasedExpression> selectExpressionMap) throws CursorException
+	public GroupedCursor(Cursor cursor, Context context, EvaluatorFactory evaluatorFactory, List<Expression> groupExpressions, Map<String, AliasedExpression> selectExpressionMap)
+		throws CursorException
 	{
 		try
 		{
-			src=group(cursor, context, evaluatorFactory, groupExpressions, selectExpressionMap);
+			this.src=group(cursor, context, evaluatorFactory, groupExpressions, selectExpressionMap);
 		}
 		catch (MetadataException e)
 		{
@@ -50,13 +51,13 @@ public class GroupedCursor implements Cursor
 		{
 			cursor.next();
 			RowData row=cursor.getCachedRowData();
-			// FIXME Este add(row) es sólo para pruebas: lo que hay que hacer aquí es alimentar la FunctionContext correspondiente en cada columna:
+			// FIXME Este add(row) es sólo para pruebas: lo que hay que hacer aquí es alimentar el FunctionAggregator correspondiente en cada columna:
 			System.out.printf("Row=%s\n", row);
 			map.computeIfAbsent(row, r -> new ArrayList<>()).add(row);
 		}
 		context.getVariablesManager().popLocalContext();
 		map.keySet().forEach(row -> groupedCursor.addRow(row));
-		map.keySet().forEach(row -> System.out.printf("grouped row=%s\n", row));
+		// map.keySet().forEach(row -> System.out.printf("grouped row=%s\n", row));
 		return new MemoryCursor(groupedCursor);
 	}
 
@@ -107,67 +108,67 @@ public class GroupedCursor implements Cursor
 	public void close()
 		throws CursorException
 	{
-		src.close();
+		this.src.close();
 	}
 
 	@Override
 	public void next()
 		throws CursorException
 	{
-		src.next();
+		this.src.next();
 	}
 
 	@Override
 	public boolean hasNext()
 		throws CursorException
 	{
-		return src.hasNext();
+		return this.src.hasNext();
 	}
 
 	@Override
 	public RowData getRowData()
 		throws CursorException
 	{
-		return src.getRowData();
+		return this.src.getRowData();
 	}
 
 	@Override
 	public Map<String, Integer> getColumnMap()
 		throws CursorException
 	{
-		return src.getColumnMap();
+		return this.src.getColumnMap();
 	}
 
 	@Override
 	public List<ColumnMetadata> getMetadata()
 		throws CursorException
 	{
-		return src.getMetadata();
+		return this.src.getMetadata();
 	}
 
 	@Override
 	public void reset()
 		throws CursorException
 	{
-		src.reset();
+		this.src.reset();
 	}
 
 	@Override
 	public int getNumberOfColumns()
 	{
-		return src.getNumberOfColumns();
+		return this.src.getNumberOfColumns();
 	}
 
 	@Override
 	public boolean isCached()
 	{
-		return src.isCached();
+		return this.src.isCached();
 	}
 
 	@Override
 	public CachedCursor toCachedCursor()
 		throws CursorException
 	{
-		return src.toCachedCursor();
+		return this.src.toCachedCursor();
 	}
 }

@@ -1,21 +1,22 @@
 package com.samajackun.rodas.sql.engine;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.VariablesContext;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.DefaultCursor;
+import com.samajackun.rodas.core.model.AliasedSource;
 import com.samajackun.rodas.core.model.ColumnMetadata;
 import com.samajackun.rodas.core.model.CrossSource;
 import com.samajackun.rodas.core.model.Engine;
 import com.samajackun.rodas.core.model.EngineException;
 import com.samajackun.rodas.core.model.OnJoinedSource;
+import com.samajackun.rodas.core.model.ParehentesizedSource;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.SelectSentence;
 import com.samajackun.rodas.core.model.Source;
@@ -96,10 +97,13 @@ public class MyEngine implements Engine
 		// Y lo vamos a resolver mediante el paradigma de las COMPOSICIONES SUCESIVAS:
 
 		// 1-Cursor inicial:
+		// Hay que crear aquí un nuevo VariablesContext y pasárselo a createCursor.
 		Cursor cursor=createCursor(selectSource.getSource(), context);
-		Map<String, Cursor> cursorMap=new HashMap<>();
-		cursorMap.put("x", cursor);
-		context.getVariablesManager().pushLocalContext(new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap));
+
+		// Map<String, Cursor> cursorMap=new HashMap<>();
+		// cursorMap.put("x", cursor); // FIXME
+		// context.getVariablesManager().pushLocalContext(new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap));
+		// context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 
 		// 2-Filtrar:
 		if (selectSource.getWhereExpression() != null)
@@ -127,9 +131,9 @@ public class MyEngine implements Engine
 		// 6-Seleccionar columnas:
 		cursor=new SelectingCursor(cursor, context, this.evaluatorFactory, selectSource.getSelectExpressions());
 
-		// FIXME Hay que determinar dónde meter el popLocalContext: ¿En Cursor.close()? ¿En OrderedCursor.close()? ¿En FilteredCursor.close()?
-		// Aquí, en principio, no debería ir, pues entonces perdemos el CursorMapVariablesContext que hemos "pushado" al comienzo deste método.
-		// context.getVariablesManager().popLocalContext();
+		// PoppingVariablesContextCursor sirve para hacer el popLocalContext en Cursor.close().
+		// No se debe hacer antes, pues entonces perdemos el CursorMapVariablesContext que hemos "pushado" al comienzo deste método.
+		cursor=new PoppingVariablesContextCursor(cursor, context);
 
 		return cursor;
 	}
@@ -141,7 +145,11 @@ public class MyEngine implements Engine
 	{
 		// FIXME No estoy seguro de que este sea un buen patrón de diseño.
 		Cursor cursor;
-		if (source instanceof TableSource)
+		if (source == null)
+		{
+			cursor=new SingleRowCursor();
+		}
+		else if (source instanceof TableSource)
 		{
 			cursor=execute((TableSource)source, context);
 		}
@@ -157,10 +165,20 @@ public class MyEngine implements Engine
 		{
 			cursor=execute((OnJoinedSource)source, context);
 		}
+		else if (source instanceof ParehentesizedSource)
+		{
+			cursor=createCursor(((ParehentesizedSource)source).getSource(), context);
+		}
+		else if (source instanceof AliasedSource)
+		{
+			cursor=createCursor(((AliasedSource)source).getSource(), context);
+		}
 		else
 		{
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(source.getClass().getName());
 		}
+		VariablesContext newVariablesContext=new RowDataVariablesContext(context.getVariablesManager().peekLocalContext(), cursor.getColumnMap());
+		context.getVariablesManager().pushLocalContext(newVariablesContext);
 		return cursor;
 	}
 

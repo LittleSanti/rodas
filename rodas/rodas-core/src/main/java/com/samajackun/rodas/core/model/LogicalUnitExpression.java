@@ -7,6 +7,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public abstract class LogicalUnitExpression extends UnitExpression
 {
+	private static final long serialVersionUID=7636910312222994528L;
+
 	public LogicalUnitExpression(String operator, Expression expression1)
 	{
 		super(operator, expression1);

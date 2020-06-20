@@ -8,6 +8,8 @@ import com.samajackun.rodas.core.execution.Cursor;
 
 public class CrossSource implements Source
 {
+	private static final long serialVersionUID=-1464538091012466631L;
+
 	private final List<Source> sources;
 
 	public CrossSource(List<Source> sources)

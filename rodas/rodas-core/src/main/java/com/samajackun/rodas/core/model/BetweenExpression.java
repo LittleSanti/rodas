@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class BetweenExpression extends RelationalBinaryExpression
 {
+	private static final long serialVersionUID=836546164286583932L;
+
 	private final Expression lower;
 
 	private final Expression upper;

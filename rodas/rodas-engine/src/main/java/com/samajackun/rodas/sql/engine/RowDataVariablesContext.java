@@ -29,10 +29,14 @@ class RowDataVariablesContext implements VariablesContext
 	@Override
 	public boolean contains(Name name)
 	{
-		boolean x=columnMap.get(name.asString()) != null;
-		if (!x && parent != null)
+		boolean x=this.calculatedValues.containsKey(name);
+		if (!x)
 		{
-			x=parent.contains(name);
+			x=this.columnMap.get(name.asString()) != null;
+		}
+		if (!x && this.parent != null)
+		{
+			x=this.parent.contains(name);
 		}
 		return x;
 	}
@@ -41,22 +45,27 @@ class RowDataVariablesContext implements VariablesContext
 	public Object get(Name name)
 		throws VariableNotFoundException
 	{
-		Object value;
-		Integer index=columnMap.get(name.asString());
-		if (index == null)
+		Object value=this.calculatedValues.get(name);
+		if (value == null && !this.calculatedValues.containsKey(name))
 		{
-			if (parent == null)
+			Integer index=this.columnMap.get(name.asString());
+			if (index == null)
 			{
-				throw new VariableNotFoundException(name);
+				// Esta búsqueda jerárquica quizá no la podamos evitar, pues si al evaluar la fila de un rowser hubiera asignaciones condicionales,
+				// sería impossible determinar en tiempo de compilación cuál es el verdadero scope en que está definida una variable.
+				if (this.parent == null)
+				{
+					throw new VariableNotFoundException(name);
+				}
+				else
+				{
+					value=this.parent.get(name);
+				}
 			}
 			else
 			{
-				value=parent.get(name);
+				value=this.rowData.get(index);
 			}
-		}
-		else
-		{
-			value=rowData.get(index);
 		}
 		return value;
 	}
@@ -64,26 +73,26 @@ class RowDataVariablesContext implements VariablesContext
 	@Override
 	public void set(Name name, Object value)
 	{
-		calculatedValues.put(name, value);
+		this.calculatedValues.put(name, value);
 	}
 
 	@Override
 	public Object setIfAbsent(Name name, Supplier<Object> supplier)
 	{
 		// Con cacheo:
-		return calculatedValues.computeIfAbsent(name, (k) -> supplier);
+		return this.calculatedValues.computeIfAbsent(name, (k) -> supplier.get());
 	}
 
 	@Override
 	public void remove(Name name)
 	{
-		calculatedValues.remove(name);
+		this.calculatedValues.remove(name);
 	}
 
 	@Override
 	public void clear()
 	{
-		calculatedValues.clear();
+		this.calculatedValues.clear();
 	}
 
 	public void setRowData(RowData rowData)

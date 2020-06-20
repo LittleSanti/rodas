@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public abstract class CollectionsBinaryExpression extends BinaryExpression
 {
+	private static final long serialVersionUID=790551456218178233L;
+
 	public CollectionsBinaryExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

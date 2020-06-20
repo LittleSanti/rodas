@@ -8,6 +8,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class DatetimeConstantExpression extends ConstantExpression
 {
+	private static final long serialVersionUID=-7128805434579909759L;
+
 	private final Calendar numericValue;
 
 	public DatetimeConstantExpression(String value, Calendar numericValue)

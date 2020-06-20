@@ -9,6 +9,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class ListConstantExpression extends ConstantExpression
 {
+	private static final long serialVersionUID=-2169880621482900692L;
+
 	private final List<ConstantExpression> list=new ArrayList<>();
 
 	public ListConstantExpression()

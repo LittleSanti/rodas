@@ -13,9 +13,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.core.context.DefaultBuildingContext;
 import com.samajackun.rodas.core.eval.ColumnNotFoundException;
-import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.MapList;
 import com.samajackun.rodas.core.eval.MyOpenContext;
@@ -346,7 +344,7 @@ public class JoinedCursorTest
 	{
 		BooleanExpression condition=new EqualsExpression("=", new IdentifierExpression("month_id"), new IdentifierExpression("day_id"));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
-		MapList<String, Cursor> cursorMap=new MapList<>();
+		Map<String, Cursor> cursorMap=new HashMap<>();
 		Cursor cursor1=createCursor2();
 		Cursor cursor2=createCursor0();
 		cursorMap.put("x1", cursor1);
@@ -358,11 +356,15 @@ public class JoinedCursorTest
 		sources.put("country", source1);
 		TableSource source2=new TableSource("month");
 		sources.put("month", source2);
-		DefaultBuildingContext context=new DefaultBuildingContext(provider, sources);
-		context.bindPrivateColumn(null, "id");
-		context.bindPrivateColumn(null, "day_id");
-		Context executionContext=context.toExecutionContext(cursorMap);
-		JoinedCursor joinedCursor=new JoinedCursor(cursor1, cursor2, condition, evaluatorFactory, executionContext);
+		MyOpenContext context=new MyOpenContext();
+		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
+		context.setProvider(provider);
+		VariablesContext varContext=new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap);
+		context.getVariablesManager().pushLocalContext(varContext);
+		// context.bindPrivateColumn(null, "id");
+		// context.bindPrivateColumn(null, "day_id");
+		// Context executionContext=context.toExecutionContext(cursorMap);
+		JoinedCursor joinedCursor=new JoinedCursor(cursor1, cursor2, condition, evaluatorFactory, context);
 
 		// getNumberOfColumns:
 		assertEquals(6, joinedCursor.getNumberOfColumns());

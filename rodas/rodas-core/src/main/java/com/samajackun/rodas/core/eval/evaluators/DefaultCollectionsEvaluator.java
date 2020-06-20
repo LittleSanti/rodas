@@ -34,7 +34,6 @@ public class DefaultCollectionsEvaluator extends AbstractEvaluator implements Co
 				x=(value1 == null)
 					? item == null
 					: (value1.equals(item));
-				System.out.println("x=" + x + ", value1=" + value1 + ", item=" + item);
 			}
 		}
 		else

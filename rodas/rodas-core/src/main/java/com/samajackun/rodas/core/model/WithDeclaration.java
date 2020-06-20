@@ -2,6 +2,8 @@ package com.samajackun.rodas.core.model;
 
 public class WithDeclaration implements Codeable
 {
+	private static final long serialVersionUID=-3789343636099225876L;
+
 	private final String alias;
 
 	private final SelectSentence selectSentence;

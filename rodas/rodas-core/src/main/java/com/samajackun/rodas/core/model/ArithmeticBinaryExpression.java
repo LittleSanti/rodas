@@ -7,6 +7,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public abstract class ArithmeticBinaryExpression extends BinaryExpression
 {
+	private static final long serialVersionUID=-2052346717266097710L;
+
 	public ArithmeticBinaryExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

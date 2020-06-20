@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.model.AliasedExpression;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.parsing.parser.AbstractParser;
@@ -57,7 +58,10 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 					switch (token.getType())
 					{
 						case SqlTokenTypes.COMMA:
-							String alias=expression.getName().asString();
+							Name nameAlias=expression.getName();
+							String alias=nameAlias == null
+								? null
+								: nameAlias.asString();
 							expressions.add(new AliasedExpression(expression, alias));
 							state=State.INITIAL;
 							break;
@@ -93,13 +97,6 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 					switch (token.getType())
 					{
 						case SqlTokenTypes.COMMA:
-							if (expression == null)
-							{
-								throw new RuntimeException("expression no debería ser null");
-							}
-							AliasedExpression aliasedExpression=new AliasedExpression(expression, null);
-							expressions.add(aliasedExpression);
-							expression=null;
 							state=State.INITIAL;
 							break;
 						default:
@@ -111,12 +108,34 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 					// Ignorar.
 			}
 		}
-		if (expression != null)
+		if (expression != null && !(expression instanceof AliasedExpression))
 		{
-			AliasedExpression aliasedExpression=new AliasedExpression(expression, null);
+			String alias=buildAutoAlias(expression, expressions.size());
+			AliasedExpression aliasedExpression=new AliasedExpression(expression, alias);
 			expressions.add(aliasedExpression);
 		}
 		return expressions;
+	}
+
+	private String buildAutoAlias(Expression expression, int n)
+	{
+		// Hay que construir un alias "al vuelo":
+		String alias;
+		Name name=expression.getName();
+		if (name == null)
+		{
+			alias=null;
+		}
+		else
+		{
+			Name base=name.getBase();
+			alias=base.asString();
+		}
+		if (alias == null)
+		{
+			alias="COL_" + n;
+		}
+		return alias;
 	}
 
 }

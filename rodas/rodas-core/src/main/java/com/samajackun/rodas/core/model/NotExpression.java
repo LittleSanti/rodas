@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class NotExpression extends LogicalUnitExpression implements BooleanExpression
 {
+	private static final long serialVersionUID=-3644300650478141158L;
+
 	public NotExpression(String operator, Expression expression)
 	{
 		super(operator, expression);

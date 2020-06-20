@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public abstract class CollectionsUnitExpression extends UnitExpression
 {
+	private static final long serialVersionUID=2368982869036179697L;
+
 	public CollectionsUnitExpression(String operator, Expression expression)
 	{
 		super(operator, expression);

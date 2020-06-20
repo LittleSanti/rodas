@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class InExpression extends CollectionsBinaryExpression implements BooleanExpression
 {
+	private static final long serialVersionUID=7049224469666985572L;
+
 	public InExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.execution.Cursor;
 
 public class ParehentesizedSource implements Source
 {
+	private static final long serialVersionUID=-4777536811994962855L;
+
 	private final Source source;
 
 	public ParehentesizedSource(Source source)

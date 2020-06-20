@@ -2,6 +2,8 @@ package com.samajackun.rodas.core.model;
 
 public class UsingJoinedSource extends OnJoinedSource
 {
+	private static final long serialVersionUID=-8763733749543080956L;
+
 	private final Expression using;
 
 	public UsingJoinedSource(Source sourceLeft, Source sourceRight, Type type, IdentifierExpression using)

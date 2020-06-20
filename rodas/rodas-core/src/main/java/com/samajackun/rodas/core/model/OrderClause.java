@@ -2,6 +2,8 @@ package com.samajackun.rodas.core.model;
 
 public class OrderClause implements Codeable
 {
+	private static final long serialVersionUID=-1359852623125066497L;
+
 	private final Expression expression;
 
 	private final boolean ascending;

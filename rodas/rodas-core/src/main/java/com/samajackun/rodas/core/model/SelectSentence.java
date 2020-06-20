@@ -14,6 +14,8 @@ import com.samajackun.rodas.core.execution.Cursor;
 
 public class SelectSentence implements Source, Sentence, Expression
 {
+	private static final long serialVersionUID=5862006849796771401L;
+
 	private final List<WithDeclaration> withDeclarations=new ArrayList<>();
 
 	private final List<AliasedExpression> selectExpressions=new ArrayList<>();
@@ -47,7 +49,6 @@ public class SelectSentence implements Source, Sentence, Expression
 	public Map<String, AliasedExpression> getSelectExpressionsMap()
 	{
 		return this.selectExpressionsMap;
-
 	}
 
 	public void addSelectExpressions(Collection<AliasedExpression> expressions)
@@ -216,6 +217,7 @@ public class SelectSentence implements Source, Sentence, Expression
 		}
 		throw new ExpressionWithTooManyColumnsException(this);
 	}
+
 	// @Override
 	// public boolean hasColumn(String column)
 	// throws ProviderException
@@ -242,5 +244,178 @@ public class SelectSentence implements Source, Sentence, Expression
 	// ColumnMetadata columnMetadata=new ColumnMetadata(aliasedExpression.getAlias(), datatype, true);
 	// return columnMetadata;
 	// }
+
+	@Override
+	public List<Expression> getSubExpressions()
+	{
+		throw new IllegalArgumentException("Sunselects not allowed here");
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime=31;
+		int result=1;
+		result=prime * result + ((this.columnNames == null)
+			? 0
+			: this.columnNames.hashCode());
+		result=prime * result + ((this.groupExpressions == null)
+			? 0
+			: this.groupExpressions.hashCode());
+		result=prime * result + ((this.havingExpression == null)
+			? 0
+			: this.havingExpression.hashCode());
+		result=prime * result + ((this.options == null)
+			? 0
+			: this.options.hashCode());
+		result=prime * result + ((this.orderClauses == null)
+			? 0
+			: this.orderClauses.hashCode());
+		result=prime * result + ((this.selectExpressions == null)
+			? 0
+			: this.selectExpressions.hashCode());
+		result=prime * result + ((this.selectExpressionsMap == null)
+			? 0
+			: this.selectExpressionsMap.hashCode());
+		result=prime * result + ((this.source == null)
+			? 0
+			: this.source.hashCode());
+		result=prime * result + ((this.whereExpression == null)
+			? 0
+			: this.whereExpression.hashCode());
+		result=prime * result + ((this.withDeclarations == null)
+			? 0
+			: this.withDeclarations.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (getClass() != obj.getClass())
+		{
+			return false;
+		}
+		SelectSentence other=(SelectSentence)obj;
+		if (this.columnNames == null)
+		{
+			if (other.columnNames != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.columnNames.equals(other.columnNames))
+		{
+			return false;
+		}
+		if (this.groupExpressions == null)
+		{
+			if (other.groupExpressions != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.groupExpressions.equals(other.groupExpressions))
+		{
+			return false;
+		}
+		if (this.havingExpression == null)
+		{
+			if (other.havingExpression != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.havingExpression.equals(other.havingExpression))
+		{
+			return false;
+		}
+		if (this.options == null)
+		{
+			if (other.options != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.options.equals(other.options))
+		{
+			return false;
+		}
+		if (this.orderClauses == null)
+		{
+			if (other.orderClauses != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.orderClauses.equals(other.orderClauses))
+		{
+			return false;
+		}
+		if (this.selectExpressions == null)
+		{
+			if (other.selectExpressions != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.selectExpressions.equals(other.selectExpressions))
+		{
+			return false;
+		}
+		if (this.selectExpressionsMap == null)
+		{
+			if (other.selectExpressionsMap != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.selectExpressionsMap.equals(other.selectExpressionsMap))
+		{
+			return false;
+		}
+		if (this.source == null)
+		{
+			if (other.source != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.source.equals(other.source))
+		{
+			return false;
+		}
+		if (this.whereExpression == null)
+		{
+			if (other.whereExpression != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.whereExpression.equals(other.whereExpression))
+		{
+			return false;
+		}
+		if (this.withDeclarations == null)
+		{
+			if (other.withDeclarations != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.withDeclarations.equals(other.withDeclarations))
+		{
+			return false;
+		}
+		return true;
+	}
 
 }

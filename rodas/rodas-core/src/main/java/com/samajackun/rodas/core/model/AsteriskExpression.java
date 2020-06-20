@@ -9,6 +9,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class AsteriskExpression implements Prefixed, Expression
 {
+	private static final long serialVersionUID=1633937011078663420L;
+
 	private final String prefix;
 
 	private final String asterisk;
@@ -71,5 +73,66 @@ public class AsteriskExpression implements Prefixed, Expression
 		throws MetadataException
 	{
 		throw new MetadataException("Unable to perform on AsteriskExpression");
+	}
+
+	@Override
+	public List<Expression> getSubExpressions()
+	{
+		return Collections.emptyList();
+	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime=31;
+		int result=1;
+		result=prime * result + ((this.asterisk == null)
+			? 0
+			: this.asterisk.hashCode());
+		result=prime * result + ((this.prefix == null)
+			? 0
+			: this.prefix.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+		{
+			return true;
+		}
+		if (obj == null)
+		{
+			return false;
+		}
+		if (getClass() != obj.getClass())
+		{
+			return false;
+		}
+		AsteriskExpression other=(AsteriskExpression)obj;
+		if (this.asterisk == null)
+		{
+			if (other.asterisk != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.asterisk.equals(other.asterisk))
+		{
+			return false;
+		}
+		if (this.prefix == null)
+		{
+			if (other.prefix != null)
+			{
+				return false;
+			}
+		}
+		else if (!this.prefix.equals(other.prefix))
+		{
+			return false;
+		}
+		return true;
 	}
 }

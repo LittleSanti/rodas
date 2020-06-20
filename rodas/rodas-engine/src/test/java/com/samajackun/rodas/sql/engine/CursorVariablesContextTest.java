@@ -98,8 +98,8 @@ public class CursorVariablesContextTest
 		globalVariablesContext.set(Name.instanceOf("year"), 2019);
 		VariablesManager variablesManager=new StrictVariablesManager(globalVariablesContext);
 		context.setVariablesManager(variablesManager);
-		variablesManager.pushLocalContext(new CursorVariablesContext(variablesManager.getLocalVariablesContext(), cursorUpper));
-		variablesManager.pushLocalContext(new CursorVariablesContext(variablesManager.getLocalVariablesContext(), cursor));
+		variablesManager.pushLocalContext(new CursorVariablesContext(variablesManager.peekLocalContext(), cursorUpper));
+		variablesManager.pushLocalContext(new CursorVariablesContext(variablesManager.peekLocalContext(), cursor));
 		try
 		{
 			IdentifierExpression identifierYear=new IdentifierExpression("year");

@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class BooleanConstantExpression extends ConstantExpression implements BooleanExpression
 {
+	private static final long serialVersionUID=2140808409185492665L;
+
 	private final boolean booleanValue;
 
 	public BooleanConstantExpression(String value, boolean booleanValue)

@@ -7,6 +7,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class ConcatExpression extends BinaryExpression
 {
+	private static final long serialVersionUID=-1645828688548374371L;
+
 	public ConcatExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

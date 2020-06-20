@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class DivideExpression extends ArithmeticBinaryExpression
 {
+	private static final long serialVersionUID=2734758515715376732L;
+
 	public DivideExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

@@ -7,6 +7,8 @@ import com.samajackun.rodas.core.execution.Cursor;
 // TODO Falta procesar el alias.
 public class AliasedSource implements Source
 {
+	private static final long serialVersionUID=250852036138699181L;
+
 	private final Source source;
 
 	private final String alias;

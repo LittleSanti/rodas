@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class UnitPlusExpression extends ArithmeticUnitExpression
 {
+	private static final long serialVersionUID=-1548759775527092749L;
+
 	public UnitPlusExpression(String operator, Expression expression)
 	{
 		super(operator, expression);

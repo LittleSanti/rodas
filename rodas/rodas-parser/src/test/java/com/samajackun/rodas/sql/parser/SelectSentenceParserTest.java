@@ -1,10 +1,13 @@
 package com.samajackun.rodas.sql.parser;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.model.AliasedExpression;
@@ -45,17 +48,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("a", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertEquals("a", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -69,25 +72,25 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(2, sentence.getSelectExpressions().size());
+			assertEquals(2, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("a", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertEquals("a", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
 			aliasedExpression=sentence.getSelectExpressions().get(1);
-			Assert.assertEquals("b", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("b", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertEquals("b", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("b", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
 
 			Source source=sentence.getSource();
-			Assert.assertTrue(source instanceof TableSource);
-			Assert.assertEquals("t", ((TableSource)source).getTable());
+			assertTrue(source instanceof TableSource);
+			assertEquals("t", ((TableSource)source).getTable());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -105,16 +108,16 @@ public class SelectSentenceParserTest
 			Source globalSource=sentence.getSource();
 			assertTrue(globalSource instanceof CrossSource);
 			Source source0=((CrossSource)globalSource).getSources().get(0);
-			Assert.assertTrue(source0 instanceof TableSource);
-			Assert.assertEquals("t", ((TableSource)source0).getTable());
+			assertTrue(source0 instanceof TableSource);
+			assertEquals("t", ((TableSource)source0).getTable());
 			Source source1=((CrossSource)globalSource).getSources().get(1);
-			Assert.assertTrue(source1 instanceof TableSource);
-			Assert.assertEquals("s", ((TableSource)source1).getTable());
+			assertTrue(source1 instanceof TableSource);
+			assertEquals("s", ((TableSource)source1).getTable());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -130,16 +133,16 @@ public class SelectSentenceParserTest
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
 
 			Source source=sentence.getSource();
-			Assert.assertTrue(source instanceof ParehentesizedSource);
-			Assert.assertTrue(((ParehentesizedSource)source).getSource() instanceof SelectSentence);
+			assertTrue(source instanceof ParehentesizedSource);
+			assertTrue(((ParehentesizedSource)source).getSource() instanceof SelectSentence);
 			SelectSentence selectSentence=(SelectSentence)((ParehentesizedSource)source).getSource();
-			Assert.assertEquals(1, selectSentence.getSelectExpressions().size());
-			Assert.assertEquals("120", ((ConstantExpression)selectSentence.getSelectExpressions().get(0).getExpression()).getValue());
+			assertEquals(1, selectSentence.getSelectExpressions().size());
+			assertEquals("120", ((ConstantExpression)selectSentence.getSelectExpressions().get(0).getExpression()).getValue());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -153,17 +156,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("x1", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertEquals("x1", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -177,17 +180,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("x1", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertEquals("x1", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -202,13 +205,33 @@ public class SelectSentenceParserTest
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
 			Source source=sentence.getSource();
-			Assert.assertTrue(source instanceof TableSource);
-			Assert.assertEquals("b", ((TableSource)source).getTable());
+			assertTrue(source instanceof TableSource);
+			assertEquals("b", ((TableSource)source).getTable());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
+		}
+	}
+
+	@Test
+	public void selectFromNoTable()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT 120";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			Source source=sentence.getSource();
+			assertNull(source);
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -222,18 +245,18 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertNull(aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof AsteriskExpression);
-			Assert.assertNull(((AsteriskExpression)aliasedExpression.getExpression()).getPrefix());
-			Assert.assertEquals("*", ((AsteriskExpression)aliasedExpression.getExpression()).getAsterisk());
+			assertNull(aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof AsteriskExpression);
+			assertNull(((AsteriskExpression)aliasedExpression.getExpression()).getPrefix());
+			assertEquals("*", ((AsteriskExpression)aliasedExpression.getExpression()).getAsterisk());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -247,18 +270,18 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertNull(aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof AsteriskExpression);
-			Assert.assertEquals("b", ((AsteriskExpression)aliasedExpression.getExpression()).getPrefix());
-			Assert.assertEquals("*", ((AsteriskExpression)aliasedExpression.getExpression()).getAsterisk());
+			assertNull(aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof AsteriskExpression);
+			assertEquals("b", ((AsteriskExpression)aliasedExpression.getExpression()).getPrefix());
+			assertEquals("*", ((AsteriskExpression)aliasedExpression.getExpression()).getAsterisk());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -273,13 +296,13 @@ public class SelectSentenceParserTest
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
 			Source source=sentence.getSource();
-			Assert.assertTrue(source instanceof ParehentesizedSource);
-			Assert.assertEquals("(SELECT x FROM y)", ((ParehentesizedSource)source).toCode());
+			assertTrue(source instanceof ParehentesizedSource);
+			assertEquals("(SELECT x FROM y)", ((ParehentesizedSource)source).toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -294,13 +317,13 @@ public class SelectSentenceParserTest
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
 			Source source=sentence.getSource();
-			Assert.assertTrue(source instanceof ParehentesizedSource);
-			Assert.assertEquals("(SELECT x FROM y WHERE ((z1)=(z2)))", source.toCode());
+			assertTrue(source instanceof ParehentesizedSource);
+			assertEquals("(SELECT x FROM y WHERE ((z1)=(z2)))", source.toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -314,17 +337,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("a", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertEquals("a", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -338,21 +361,21 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertNull(aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof BinaryExpression);
-			Assert.assertEquals("+", ((BinaryExpression)aliasedExpression.getExpression()).getOperator());
-			Assert.assertTrue(((BinaryExpression)aliasedExpression.getExpression()).getExpression1() instanceof ConstantExpression);
-			Assert.assertEquals("1", ((ConstantExpression)((BinaryExpression)aliasedExpression.getExpression()).getExpression1()).toCode());
-			Assert.assertTrue(((BinaryExpression)aliasedExpression.getExpression()).getExpression2() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)((BinaryExpression)aliasedExpression.getExpression()).getExpression2()).toCode());
+			assertNull(aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof BinaryExpression);
+			assertEquals("+", ((BinaryExpression)aliasedExpression.getExpression()).getOperator());
+			assertTrue(((BinaryExpression)aliasedExpression.getExpression()).getExpression1() instanceof ConstantExpression);
+			assertEquals("1", ((ConstantExpression)((BinaryExpression)aliasedExpression.getExpression()).getExpression1()).toCode());
+			assertTrue(((BinaryExpression)aliasedExpression.getExpression()).getExpression2() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)((BinaryExpression)aliasedExpression.getExpression()).getExpression2()).toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -366,18 +389,18 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertNull(aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof ParehentesizedExpression);
-			Assert.assertTrue(((ParehentesizedExpression)aliasedExpression.getExpression()).getExpression() instanceof ConstantExpression);
-			Assert.assertEquals("1", ((ParehentesizedExpression)aliasedExpression.getExpression()).getExpression().toCode());
+			assertNull(aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof ParehentesizedExpression);
+			assertTrue(((ParehentesizedExpression)aliasedExpression.getExpression()).getExpression() instanceof ConstantExpression);
+			assertEquals("1", ((ParehentesizedExpression)aliasedExpression.getExpression()).getExpression().toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -391,12 +414,12 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals("c", sentence.getWhereExpression().toCode());
+			assertEquals("c", sentence.getWhereExpression().toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -410,20 +433,20 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertNull(aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof FunctionCallExpression);
+			assertEquals("COL_0", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof FunctionCallExpression);
 			FunctionCallExpression functionExpression=(FunctionCallExpression)aliasedExpression.getExpression();
-			Assert.assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
-			Assert.assertEquals(1, functionExpression.getArguments().size());
-			Assert.assertTrue(functionExpression.getArguments().get(0) instanceof ConstantExpression);
-			Assert.assertEquals("1", ((ConstantExpression)functionExpression.getArguments().get(0)).getValue());
+			assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
+			assertEquals(1, functionExpression.getArguments().size());
+			assertTrue(functionExpression.getArguments().get(0) instanceof ConstantExpression);
+			assertEquals("1", ((ConstantExpression)functionExpression.getArguments().get(0)).getValue());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -437,19 +460,19 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertNull(aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof FunctionCallExpression);
+			assertNull(aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof FunctionCallExpression);
 			FunctionCallExpression functionExpression=(FunctionCallExpression)aliasedExpression.getExpression();
-			Assert.assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
-			Assert.assertEquals(1, functionExpression.getArguments().size());
-			Assert.assertTrue(functionExpression.getArguments().get(0) instanceof AsteriskExpression);
+			assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
+			assertEquals(1, functionExpression.getArguments().size());
+			assertTrue(functionExpression.getArguments().get(0) instanceof AsteriskExpression);
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -463,15 +486,15 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(2, sentence.getSelectExpressions().size());
+			assertEquals(2, sentence.getSelectExpressions().size());
 			AliasedExpression exp=sentence.getSelectExpressions().get(1);
-			Assert.assertEquals("z", exp.getAlias());
-			Assert.assertTrue("z", exp.getExpression() instanceof FunctionCallExpression);
+			assertEquals("z", exp.getAlias());
+			assertTrue("z", exp.getExpression() instanceof FunctionCallExpression);
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -485,15 +508,83 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getGroupExpressions().size());
-			Assert.assertTrue(sentence.getGroupExpressions().get(0) instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)sentence.getGroupExpressions().get(0)).getIdentifier());
-			Assert.assertNull(sentence.getHavingExpression());
+			assertEquals(1, sentence.getGroupExpressions().size());
+			assertTrue(sentence.getGroupExpressions().get(0) instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)sentence.getGroupExpressions().get(0)).getIdentifier());
+			assertNull(sentence.getHavingExpression());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
+		}
+	}
+
+	@Test
+	public void groupAndOneAggregationExpression()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT a, count(1) FROM b GROUP BY a";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new TokenizerSettings(TokenizerSettings.WhitespaceBehaviour.IGNORE, TokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, TokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertEquals(1, sentence.getGroupExpressions().size());
+			assertTrue(sentence.getGroupExpressions().get(0) instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)sentence.getGroupExpressions().get(0)).getIdentifier());
+			assertNull(sentence.getHavingExpression());
+
+			assertEquals(2, sentence.getSelectExpressions().size());
+			AliasedExpression aliasedExpression;
+
+			aliasedExpression=sentence.getSelectExpressions().get(0);
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+
+			aliasedExpression=sentence.getSelectExpressions().get(1);
+			assertTrue(aliasedExpression.getExpression() instanceof FunctionCallExpression);
+			assertEquals("count", ((FunctionCallExpression)aliasedExpression.getExpression()).getFunctionObject().getName().asString());
+			assertEquals(1, ((FunctionCallExpression)aliasedExpression.getExpression()).getArguments().size());
+			assertEquals("1", ((FunctionCallExpression)aliasedExpression.getExpression()).getArguments().get(0).toCode());
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
+		}
+	}
+
+	@Test
+	public void groupAndOneIllegalExpression()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT a, b FROM z GROUP BY a";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src)), new TokenizerSettings(TokenizerSettings.WhitespaceBehaviour.IGNORE, TokenizerSettings.CommentsBehaviour.INCLUDE_IN_FOLLOWING_TOKEN, TokenizerSettings.UnexpectedSymbolBehaviour.THROW_EXCEPTION)));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertEquals(1, sentence.getGroupExpressions().size());
+			assertTrue(sentence.getGroupExpressions().get(0) instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)sentence.getGroupExpressions().get(0)).getIdentifier());
+			assertNull(sentence.getHavingExpression());
+
+			assertEquals(2, sentence.getSelectExpressions().size());
+			AliasedExpression aliasedExpression;
+
+			aliasedExpression=sentence.getSelectExpressions().get(0);
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+
+			aliasedExpression=sentence.getSelectExpressions().get(1);
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("b", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
 		}
 	}
 
@@ -507,17 +598,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
-			Assert.assertTrue(sentence.getSelectExpressions().get(0).getExpression() instanceof FunctionCallExpression);
+			assertEquals(1, sentence.getSelectExpressions().size());
+			assertTrue(sentence.getSelectExpressions().get(0).getExpression() instanceof FunctionCallExpression);
 			FunctionCallExpression functionExpression=(FunctionCallExpression)sentence.getSelectExpressions().get(0).getExpression();
-			Assert.assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
-			Assert.assertEquals(1, functionExpression.getArguments().size());
-			Assert.assertEquals("*", functionExpression.getArguments().get(0).toCode());
+			assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());
+			assertEquals(1, functionExpression.getArguments().size());
+			assertEquals("*", functionExpression.getArguments().get(0).toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -531,19 +622,19 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertNotNull(sentence.getHavingExpression());
-			Assert.assertTrue(sentence.getHavingExpression() instanceof BinaryExpression);
+			assertNotNull(sentence.getHavingExpression());
+			assertTrue(sentence.getHavingExpression() instanceof BinaryExpression);
 			BinaryExpression binaryExpression=(BinaryExpression)sentence.getHavingExpression();
-			Assert.assertEquals(">", binaryExpression.getOperator());
-			Assert.assertEquals("count", ((IdentifierExpression)(((FunctionCallExpression)binaryExpression.getExpression1())).getFunctionObject()).getIdentifier());
-			Assert.assertEquals(1, ((FunctionCallExpression)binaryExpression.getExpression1()).getArguments().size());
-			Assert.assertEquals("1", ((ConstantExpression)((FunctionCallExpression)binaryExpression.getExpression1()).getArguments().get(0)).getValue());
-			Assert.assertEquals("0", ((ConstantExpression)binaryExpression.getExpression2()).getValue());
+			assertEquals(">", binaryExpression.getOperator());
+			assertEquals("count", ((IdentifierExpression)(((FunctionCallExpression)binaryExpression.getExpression1())).getFunctionObject()).getIdentifier());
+			assertEquals(1, ((FunctionCallExpression)binaryExpression.getExpression1()).getArguments().size());
+			assertEquals("1", ((ConstantExpression)((FunctionCallExpression)binaryExpression.getExpression1()).getArguments().get(0)).getValue());
+			assertEquals("0", ((ConstantExpression)binaryExpression.getExpression2()).getValue());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -557,17 +648,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getOrderClauses().size());
+			assertEquals(1, sentence.getOrderClauses().size());
 			OrderClause clause;
 			clause=sentence.getOrderClauses().get(0);
-			Assert.assertTrue(clause.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
+			assertTrue(clause.getExpression() instanceof IdentifierExpression);
+			assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
 			assertTrue(clause.isAscending());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -581,22 +672,22 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(2, sentence.getOrderClauses().size());
+			assertEquals(2, sentence.getOrderClauses().size());
 			OrderClause clause;
 			clause=sentence.getOrderClauses().get(0);
-			Assert.assertTrue(clause.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
+			assertTrue(clause.getExpression() instanceof IdentifierExpression);
+			assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
 			assertTrue(clause.isAscending());
 
 			clause=sentence.getOrderClauses().get(1);
-			Assert.assertTrue(clause.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("d", ((IdentifierExpression)clause.getExpression()).getIdentifier());
+			assertTrue(clause.getExpression() instanceof IdentifierExpression);
+			assertEquals("d", ((IdentifierExpression)clause.getExpression()).getIdentifier());
 			assertTrue(clause.isAscending());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -610,17 +701,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getOrderClauses().size());
+			assertEquals(1, sentence.getOrderClauses().size());
 			OrderClause clause;
 			clause=sentence.getOrderClauses().get(0);
-			Assert.assertTrue(clause.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
+			assertTrue(clause.getExpression() instanceof IdentifierExpression);
+			assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
 			assertTrue(clause.isAscending());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -634,17 +725,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getOrderClauses().size());
+			assertEquals(1, sentence.getOrderClauses().size());
 			OrderClause clause;
 			clause=sentence.getOrderClauses().get(0);
-			Assert.assertTrue(clause.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
+			assertTrue(clause.getExpression() instanceof IdentifierExpression);
+			assertEquals("c", ((IdentifierExpression)clause.getExpression()).getIdentifier());
 			assertTrue(clause.isAscending());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -658,17 +749,17 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getWithDeclarations().size());
+			assertEquals(1, sentence.getWithDeclarations().size());
 			WithDeclaration withDeclaration=sentence.getWithDeclarations().get(0);
-			Assert.assertEquals("t", withDeclaration.getAlias());
+			assertEquals("t", withDeclaration.getAlias());
 			SelectSentence sentence2=withDeclaration.getSelectSentence();
-			Assert.assertEquals("SELECT a FROM b", sentence2.toCode());
-			Assert.assertEquals("WITH t AS (SELECT a FROM b) SELECT * FROM t", sentence.toCode());
+			assertEquals("SELECT a FROM b", sentence2.toCode());
+			assertEquals("WITH t AS (SELECT a FROM b) SELECT * FROM t", sentence.toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -682,23 +773,23 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(2, sentence.getWithDeclarations().size());
+			assertEquals(2, sentence.getWithDeclarations().size());
 			WithDeclaration withDeclaration=sentence.getWithDeclarations().get(0);
-			Assert.assertEquals("t", withDeclaration.getAlias());
+			assertEquals("t", withDeclaration.getAlias());
 			SelectSentence sentence2=withDeclaration.getSelectSentence();
-			Assert.assertEquals("SELECT a FROM b", sentence2.toCode());
+			assertEquals("SELECT a FROM b", sentence2.toCode());
 
 			withDeclaration=sentence.getWithDeclarations().get(1);
-			Assert.assertEquals("s", withDeclaration.getAlias());
+			assertEquals("s", withDeclaration.getAlias());
 			sentence2=withDeclaration.getSelectSentence();
-			Assert.assertEquals("SELECT c FROM d", sentence2.toCode());
+			assertEquals("SELECT c FROM d", sentence2.toCode());
 
-			Assert.assertEquals("WITH t AS (SELECT a FROM b),s AS (SELECT c FROM d) SELECT * FROM t,s", sentence.toCode());
+			assertEquals("WITH t AS (SELECT a FROM b),s AS (SELECT c FROM d) SELECT * FROM t,s", sentence.toCode());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -710,10 +801,10 @@ public class SelectSentenceParserTest
 		String src="SELECT a FROM b WHERE c=:P1";
 		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
 		SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-		Assert.assertTrue(sentence.getWhereExpression() instanceof EqualsExpression);
+		assertTrue(sentence.getWhereExpression() instanceof EqualsExpression);
 		EqualsExpression equalsExpression=(EqualsExpression)sentence.getWhereExpression();
-		Assert.assertEquals("c", ((IdentifierExpression)equalsExpression.getExpression1()).getIdentifier());
-		Assert.assertEquals("P1", ((NamedParameterExpression)equalsExpression.getExpression2()).getName().asString());
+		assertEquals("c", ((IdentifierExpression)equalsExpression.getExpression1()).getIdentifier());
+		assertEquals("P1", ((NamedParameterExpression)equalsExpression.getExpression2()).getName().asString());
 	}
 
 	@Test
@@ -727,19 +818,19 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("a", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
-			Assert.assertTrue(sentence.getSource() instanceof TableSource);
-			Assert.assertEquals("b", ((TableSource)sentence.getSource()).getTable());
+			assertEquals("a", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertTrue(sentence.getSource() instanceof TableSource);
+			assertEquals("b", ((TableSource)sentence.getSource()).getTable());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 
@@ -754,19 +845,19 @@ public class SelectSentenceParserTest
 		try
 		{
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
-			Assert.assertEquals(1, sentence.getSelectExpressions().size());
+			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			Assert.assertEquals("a", aliasedExpression.getAlias());
-			Assert.assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
-			Assert.assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
-			Assert.assertTrue(sentence.getSource() instanceof TableSource);
-			Assert.assertEquals("c:\\enero\\febrero\\marzo y abril.mayo", ((TableSource)sentence.getSource()).getTable());
+			assertEquals("a", aliasedExpression.getAlias());
+			assertTrue(aliasedExpression.getExpression() instanceof IdentifierExpression);
+			assertEquals("a", ((IdentifierExpression)aliasedExpression.getExpression()).getIdentifier());
+			assertTrue(sentence.getSource() instanceof TableSource);
+			assertEquals("c:\\enero\\febrero\\marzo y abril.mayo", ((TableSource)sentence.getSource()).getTable());
 		}
 		catch (ParserException e)
 		{
 			e.printStackTrace();
-			Assert.fail(e.toString());
+			fail(e.toString());
 		}
 	}
 }

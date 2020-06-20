@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class NotEqualsExpression extends RelationalBinaryExpression
 {
+	private static final long serialVersionUID=-5675967674914761481L;
+
 	public NotEqualsExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

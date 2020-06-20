@@ -1,8 +1,9 @@
-package com.samajackun.rodas.core.eval.functions;
+package com.samajackun.rodas.core.model;
 
 import com.samajackun.rodas.core.eval.Context;
+import com.samajackun.rodas.core.eval.functions.FunctionEvaluationException;
 
-public interface FunctionContext
+public interface FunctionAggregator
 {
 	public Object getResult();
 

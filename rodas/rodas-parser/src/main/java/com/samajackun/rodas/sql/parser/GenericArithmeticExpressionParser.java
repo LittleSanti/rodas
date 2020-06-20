@@ -46,7 +46,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return parseAddingExpression(tokenizer, parserContext);
 	};
 
-	Expression parseTerminal(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
+	protected Expression parseTerminal(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -108,8 +108,12 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 								}
 								else
 								{
-									expression=new IdentifierExpression(token.getValue());
-									tokenizer.pushBack(token2);
+									expression=unexpectedTokenAfterIdentifier(tokenizer, parserContext, token, token2);
+									if (expression == null)
+									{
+										expression=new IdentifierExpression(token.getValue());
+										tokenizer.pushBack(token2);
+									}
 								}
 							}
 							else
@@ -191,6 +195,15 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		throw new UnexpectedTokenException(token);
 	}
 
+	protected Expression unexpectedTokenAfterIdentifier(AbstractMatchingTokenizer tokenizer, ParserContext parserContext, Token identifierToken, Token unexpectedToken)
+		throws ParserException,
+		IOException
+	{
+		Expression expression=new IdentifierExpression(identifierToken.getValue());
+		tokenizer.pushBack(unexpectedToken);
+		return expression;
+	}
+
 	private Expression parseSelectOrExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
@@ -213,7 +226,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parseSignExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
+	protected Expression parseSignExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -243,7 +256,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parseMultiplyingExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
+	protected Expression parseMultiplyingExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -311,7 +324,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parseAddingExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
+	protected Expression parseAddingExpression(AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
 		throws ParserException,
 		IOException
 	{
@@ -396,7 +409,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		return expression;
 	}
 
-	Expression parsePrefixedExpression(AbstractMatchingTokenizer tokenizer, String prefix)
+	protected Expression parsePrefixedExpression(AbstractMatchingTokenizer tokenizer, String prefix)
 		throws ParserException,
 		IOException
 	{

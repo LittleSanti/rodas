@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class SubstractExpression extends ArithmeticBinaryExpression
 {
+	private static final long serialVersionUID=2081604089592485862L;
+
 	public SubstractExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

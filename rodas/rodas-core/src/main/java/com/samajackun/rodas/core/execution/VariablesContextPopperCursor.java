@@ -1,76 +1,75 @@
-package com.samajackun.rodas.sql.engine;
+package com.samajackun.rodas.core.execution;
 
 import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.execution.Cursor;
-import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.ColumnMetadata;
 import com.samajackun.rodas.core.model.RowData;
 
-public abstract class AbstractComposedCursor implements Cursor
+public class VariablesContextPopperCursor implements Cursor
 {
-	private final Cursor src;
-
-	public AbstractComposedCursor(Cursor src)
-	{
-		super();
-		this.src=src;
-	}
 
 	@Override
 	public void close()
 		throws CursorException
 	{
-		this.src.close();
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public void next()
 		throws CursorException
 	{
-		this.src.next();
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public boolean hasNext()
 		throws CursorException
 	{
-		return this.src.hasNext();
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
 	public RowData getRowData()
 		throws CursorException
 	{
-		return this.src.getRowData();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public Map<String, Integer> getColumnMap()
 		throws CursorException
 	{
-		return this.src.getColumnMap();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public List<ColumnMetadata> getMetadata()
 		throws CursorException
 	{
-		return this.src.getMetadata();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
 	public void reset()
 		throws CursorException
 	{
-		this.src.reset();
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
 	public int getNumberOfColumns()
 	{
-		return this.src.getNumberOfColumns();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

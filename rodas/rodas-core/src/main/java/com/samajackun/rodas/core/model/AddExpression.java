@@ -7,6 +7,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class AddExpression extends BinaryExpression
 {
+	private static final long serialVersionUID=-2848765988247286350L;
+
 	public AddExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

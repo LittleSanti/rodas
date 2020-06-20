@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class LowerThanExpression extends RelationalBinaryExpression
 {
+	private static final long serialVersionUID=-2225845369398918610L;
+
 	public LowerThanExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

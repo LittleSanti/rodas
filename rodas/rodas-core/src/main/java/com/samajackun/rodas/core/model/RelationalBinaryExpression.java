@@ -7,6 +7,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public abstract class RelationalBinaryExpression extends BinaryExpression implements BooleanExpression
 {
+	private static final long serialVersionUID=5832978806302648865L;
+
 	public RelationalBinaryExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

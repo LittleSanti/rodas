@@ -12,14 +12,14 @@ public interface VariablesManager
 	public Object getLocalVariable(Name name)
 		throws VariableNotFoundException;
 
+	public void setLocalVariable(Name name, Object value);
+
+	public void removeLocalVariable(Name name);
+
 	public Object getNearestVariable(Name name)
 		throws VariableNotFoundException;
 
 	public void setNearestVariable(Name name, Object value);
-
-	public void setLocalVariable(Name name, Object value);
-
-	public void removeLocalVariable(Name name);
 
 	public void pushLocalContext(VariablesContext newContext);
 
@@ -27,8 +27,8 @@ public interface VariablesManager
 
 	public VariablesContext popLocalContext();
 
-	public VariablesContext getVariablesContext(Name name)
-		throws VariableNotFoundException;
-
-	public VariablesContext getLocalVariablesContext();
+	// public VariablesContext getVariablesContext(Name name)
+	// throws VariableNotFoundException;
+	//
+	// public VariablesContext getLocalVariablesContext();
 }

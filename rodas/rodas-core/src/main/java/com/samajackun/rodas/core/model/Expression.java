@@ -68,4 +68,12 @@ public interface Expression extends Codeable
 	{
 		return Collections.singletonList(this);
 	}
+
+	public default Object feedAndEvaluate(Context context, EvaluatorFactory evaluatorFactory)
+		throws EvaluationException
+	{
+		return evaluate(context, evaluatorFactory);
+	}
+
+	public List<Expression> getSubExpressions();
 }

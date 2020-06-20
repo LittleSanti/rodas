@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.execution.Cursor;
 
 public class TableSource implements Source
 {
+	private static final long serialVersionUID=3785987493745142450L;
+
 	private final String table;
 
 	public TableSource(String table)

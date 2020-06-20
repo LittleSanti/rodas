@@ -1,9 +1,9 @@
 package com.samajackun.rodas.core.context;
 
-import java.util.ServiceConfigurationError;
-
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.MapList;
+import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.StrictVariablesContext;
+import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.MyProvider;
 import com.samajackun.rodas.core.model.ProviderException;
@@ -48,23 +48,24 @@ public class TestUtils
 
 	public static Context createContext()
 	{
-		try
-		{
-			Cursor cursor1=createCursor("month");
-			MapList<String, Cursor> cursors=new MapList<>();
-			cursors.put("mes", cursor1);
-			MapList<String, IdentifierCoordinates> identifierCoordinatesMap=new MapList<>();
-			identifierCoordinatesMap.put("id", new IdentifierCoordinates(0, 0));
-			identifierCoordinatesMap.put("name", new IdentifierCoordinates(0, 1));
-			identifierCoordinatesMap.put("days", new IdentifierCoordinates(0, 2));
-			Context context=new DefaultExecutionContext(cursors, identifierCoordinatesMap);
+		// try
+		// {
+		// Cursor cursor1=createCursor("month");
+		// MapList<String, Cursor> cursors=new MapList<>();
+		// cursors.put("mes", cursor1);
+		// MapList<String, IdentifierCoordinates> identifierCoordinatesMap=new MapList<>();
+		// identifierCoordinatesMap.put("id", new IdentifierCoordinates(0, 0));
+		// identifierCoordinatesMap.put("name", new IdentifierCoordinates(0, 1));
+		// identifierCoordinatesMap.put("days", new IdentifierCoordinates(0, 2));
+		MyOpenContext context=new MyOpenContext();
+		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 
-			// cursor1.next();
-			return context;
-		}
-		catch (ProviderException e)
-		{
-			throw new ServiceConfigurationError(e.toString(), e);
-		}
+		// cursor1.next();
+		return context;
+		// }
+		// catch (ProviderException e)
+		// {
+		// throw new ServiceConfigurationError(e.toString(), e);
+		// }
 	}
 }

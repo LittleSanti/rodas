@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class EqualsExpression extends RelationalBinaryExpression
 {
+	private static final long serialVersionUID=-1692875716081469798L;
+
 	public EqualsExpression(String operator, Expression expression1, Expression expression2)
 	{
 		super(operator, expression1, expression2);

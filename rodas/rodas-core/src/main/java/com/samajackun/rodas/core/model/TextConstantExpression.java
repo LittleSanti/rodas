@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class TextConstantExpression extends ConstantExpression
 {
+	private static final long serialVersionUID=8553911440861992794L;
+
 	public TextConstantExpression(String value)
 	{
 		super(value);

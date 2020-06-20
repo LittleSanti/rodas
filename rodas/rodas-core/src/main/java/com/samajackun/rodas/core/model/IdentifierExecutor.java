@@ -5,16 +5,18 @@ import java.util.Set;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
+import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.NameNotBoundException;
-import com.samajackun.rodas.core.execution.CursorException;
+import com.samajackun.rodas.core.eval.VariableNotFoundException;
 
 public class IdentifierExecutor extends AbstractExecutor
 {
-	private final int index;
+	// TODO private final int index;
 
 	// private final String alias;
 	//
 	// private final String identifier;
+	private final Name name;
 
 	public IdentifierExecutor(Context context, EvaluatorFactory evaluatorFactory, String alias, String identifier)
 		throws NameNotBoundException,
@@ -23,9 +25,10 @@ public class IdentifierExecutor extends AbstractExecutor
 		super(context, evaluatorFactory);
 		// this.alias=alias;
 		// this.identifier=identifier;
-		this.index=getContext().getColumnIndexByName(identifier, (alias != null)
-			? alias
-			: identifier);
+		// TODO this.index=getContext().getColumnIndexByName(identifier, (alias != null)
+		// ? alias
+		// : identifier);
+		this.name=Name.instanceOf(alias, identifier);
 	}
 
 	@Override
@@ -34,9 +37,10 @@ public class IdentifierExecutor extends AbstractExecutor
 	{
 		try
 		{
-			return getContext().getColumnByIndex(this.index);
+			return getContext().getVariablesManager().getNearestVariable(this.name);
+			// return getContext().getColumnByIndex(this.index);
 		}
-		catch (CursorException e)
+		catch (VariableNotFoundException e)
 		{
 			throw new EvaluationException(e);
 		}

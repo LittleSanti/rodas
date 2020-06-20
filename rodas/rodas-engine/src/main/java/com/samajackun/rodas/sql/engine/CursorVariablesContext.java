@@ -30,10 +30,10 @@ public class CursorVariablesContext implements VariablesContext
 	{
 		try
 		{
-			boolean x=cursor.getColumnMap().get(name.asString()) != null;
-			if (!x && parent != null)
+			boolean x=this.cursor.getColumnMap().get(name.asString()) != null;
+			if (!x && this.parent != null)
 			{
-				x=parent.contains(name);
+				x=this.parent.contains(name);
 			}
 			return x;
 		}
@@ -51,21 +51,21 @@ public class CursorVariablesContext implements VariablesContext
 		try
 		{
 			Object value;
-			Integer index=cursor.getColumnMap().get(name.asString());
+			Integer index=this.cursor.getColumnMap().get(name.asString());
 			if (index == null)
 			{
-				if (parent == null)
+				if (this.parent == null)
 				{
 					throw new VariableNotFoundException(name);
 				}
 				else
 				{
-					value=parent.get(name);
+					value=this.parent.get(name);
 				}
 			}
 			else
 			{
-				value=cursor.getRowData().get(index);
+				value=this.cursor.getRowData().get(index);
 			}
 			return value;
 		}
@@ -79,7 +79,7 @@ public class CursorVariablesContext implements VariablesContext
 	@Override
 	public void set(Name name, Object value)
 	{
-		calculatedValues.put(name, value);
+		this.calculatedValues.put(name, value);
 	}
 
 	@Override
@@ -92,13 +92,13 @@ public class CursorVariablesContext implements VariablesContext
 	@Override
 	public void remove(Name name)
 	{
-		calculatedValues.remove(name);
+		this.calculatedValues.remove(name);
 	}
 
 	@Override
 	public void clear()
 	{
-		calculatedValues.clear();
+		this.calculatedValues.clear();
 	}
 
 	// @Override

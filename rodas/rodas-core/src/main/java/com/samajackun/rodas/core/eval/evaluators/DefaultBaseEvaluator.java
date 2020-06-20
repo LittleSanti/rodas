@@ -7,9 +7,7 @@ import com.samajackun.rodas.core.eval.BaseEvaluator;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.NameNotBoundException;
 import com.samajackun.rodas.core.eval.VariableNotFoundException;
-import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.AliasedExpression;
 import com.samajackun.rodas.core.model.BooleanConstantExpression;
 import com.samajackun.rodas.core.model.Datatype;
@@ -125,10 +123,10 @@ public class DefaultBaseEvaluator extends AbstractEvaluator implements BaseEvalu
 		try
 		{
 			// TODO La determinación de tipos habrá que hacerla a priori.
-			Object value=context.getColumnByName(expression.getIdentifier(), expression.getPrefix());
+			Object value=context.getVariablesManager().getNearestVariable(expression.getName());
 			return guessDatatype(value);
 		}
-		catch (NameNotBoundException | CursorException e)
+		catch (VariableNotFoundException e)
 		{
 			throw new MetadataException(e);
 		}

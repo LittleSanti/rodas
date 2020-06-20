@@ -1,19 +1,29 @@
 package com.samajackun.rodas.core.eval;
 
+import java.util.function.Supplier;
+
 public class StrictVariablesContext extends AbstractVariablesContext
 {
 	@Override
 	public Object get(Name name)
 		throws VariableNotFoundException
 	{
-		String nameAsString=name.asString();
-		Object value=getMap().get(nameAsString);
-		if (value == null)
+		Object value;
+		Supplier<Object> supplier=getMap().get(name);
+		if (supplier != null)
 		{
-			if (!getMap().containsKey(nameAsString))
+			value=supplier.get();
+			if (value == null)
 			{
-				throw new VariableNotFoundException(name);
+				if (!getMap().containsKey(name))
+				{
+					throw new VariableNotFoundException(name);
+				}
 			}
+		}
+		else
+		{
+			throw new VariableNotFoundException(name);
 		}
 		return value;
 	}

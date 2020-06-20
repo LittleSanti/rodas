@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.execution.Cursor;
 
 public class OnJoinedSource implements Source
 {
+	private static final long serialVersionUID=5706849727964840994L;
+
 	public enum Type {
 		INNER, OUTER, LEFT, RIGHT
 	};

@@ -24,9 +24,7 @@ public class FilteredCursor extends AbstractComposedCursor
 
 	private long myPosition;
 
-	public FilteredCursor(Cursor src, Context context, EvaluatorFactory evaluatorFactory, Expression filterExpression)
-		throws CursorException,
-		EvaluationException
+	public FilteredCursor(Cursor src, Context context, EvaluatorFactory evaluatorFactory, Expression filterExpression) throws CursorException, EvaluationException
 	{
 		super(src);
 		this.context=context;
@@ -46,27 +44,25 @@ public class FilteredCursor extends AbstractComposedCursor
 				if (super.hasNext())
 				{
 					super.next();
-					System.out.println(this.filterExpression);
-					Object value=this.filterExpression.evaluate(this.context, this.evaluatorFactory);
-					System.out.println(this.filterExpression + "=" + value);
+					Object value=filterExpression.evaluate(context, evaluatorFactory);
 					boolean match=LogicalUtils.toBoolean(value);
 					if (match)
 					{
-						this.fetched=new CachedRowData(super.getRowData(), getNumberOfColumns(), this.myPosition);
+						fetched=new CachedRowData(super.getRowData(), getNumberOfColumns(), myPosition);
 						looping=false;
 					}
 					else
 					{
-						this.fetched=null;
+						fetched=null;
 					}
 				}
 				else
 				{
-					this.fetched=null;
+					fetched=null;
 					looping=false;
 				}
 			}
-			this.myPosition++;
+			myPosition++;
 		}
 		catch (EvaluationException e)
 		{
@@ -78,11 +74,11 @@ public class FilteredCursor extends AbstractComposedCursor
 	public void next()
 		throws CursorException
 	{
-		if (this.fetched == null)
+		if (fetched == null)
 		{
 			throw new CursorException("Exhausted cursor");
 		}
-		this.current=this.fetched;
+		current=fetched;
 		fetch();
 	}
 
@@ -90,14 +86,14 @@ public class FilteredCursor extends AbstractComposedCursor
 	public boolean hasNext()
 		throws CursorException
 	{
-		return this.fetched != null;
+		return fetched != null;
 	}
 
 	@Override
 	public RowData getRowData()
 		throws CursorException
 	{
-		return this.current;
+		return current;
 	}
 
 	@Override

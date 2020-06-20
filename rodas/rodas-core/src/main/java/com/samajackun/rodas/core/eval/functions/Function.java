@@ -13,9 +13,4 @@ public interface Function
 	{
 		return false;
 	}
-
-	public default FunctionContext toFunctionContext()
-	{
-		return new DefaultFunctionContext(this);
-	}
 }

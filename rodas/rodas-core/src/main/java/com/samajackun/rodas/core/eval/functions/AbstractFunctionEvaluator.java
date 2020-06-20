@@ -35,7 +35,7 @@ public abstract class AbstractFunctionEvaluator extends AbstractEvaluator implem
 		}
 		else
 		{
-			throw new NotAFunctionException(functionExpression);
+			return obj;
 		}
 	}
 

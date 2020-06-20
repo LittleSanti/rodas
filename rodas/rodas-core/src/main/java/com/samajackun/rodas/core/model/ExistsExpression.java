@@ -6,6 +6,8 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 
 public class ExistsExpression extends CollectionsUnitExpression implements BooleanExpression
 {
+	private static final long serialVersionUID=363013587318120719L;
+
 	public ExistsExpression(String operator, Expression expression)
 	{
 		super(operator, expression);

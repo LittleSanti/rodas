@@ -132,6 +132,9 @@ public class GenericSelectSentenceParser extends AbstractParser<SelectSentence> 
 						case SqlTokenTypes.KEYWORD_ORDER:
 							state=State.READING_ORDER_CLAUSE;
 							break;
+						case SqlTokenTypes.SEMICOLON:
+							state=State.COMPLETE;
+							break;
 						default:
 							throw new UnexpectedTokenException(token);
 					}
