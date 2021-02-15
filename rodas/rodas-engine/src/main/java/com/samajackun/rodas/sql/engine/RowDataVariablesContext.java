@@ -7,13 +7,14 @@ import java.util.function.Supplier;
 import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.VariableNotFoundException;
 import com.samajackun.rodas.core.eval.VariablesContext;
-import com.samajackun.rodas.core.model.RowData;
+import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.CursorException;
 
 class RowDataVariablesContext implements VariablesContext
 {
 	private final VariablesContext parent;
 
-	private RowData rowData;
+	private Cursor currentCursor;
 
 	private final Map<String, Integer> columnMap;
 
@@ -64,7 +65,16 @@ class RowDataVariablesContext implements VariablesContext
 			}
 			else
 			{
-				value=this.rowData.get(index);
+				try
+				{
+					value=this.currentCursor.getRowData().get(index);
+				}
+				catch (CursorException e)
+				{
+					// FIXME
+					e.printStackTrace();
+					throw new VariableNotFoundException(name);
+				}
 			}
 		}
 		return value;
@@ -95,8 +105,14 @@ class RowDataVariablesContext implements VariablesContext
 		this.calculatedValues.clear();
 	}
 
-	public void setRowData(RowData rowData)
+	public void setCurrentCursor(Cursor currentCursor)
 	{
-		this.rowData=rowData;
+		this.currentCursor=currentCursor;
 	}
+
+	// public void setRowData(RowData rowData)
+	// {
+	// this.rowData=rowData;
+	// }
+
 }

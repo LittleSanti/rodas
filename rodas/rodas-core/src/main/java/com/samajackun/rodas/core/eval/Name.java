@@ -17,9 +17,13 @@ public interface Name
 
 	public static Name instanceOf(String prefix, String base)
 	{
-		return prefix == null
-			? new SimpleName(base)
-			: new PrefixedName(prefix, new SimpleName(base));
+		return instanceOf(prefix, new SimpleName(base));
 	}
 
+	public static Name instanceOf(String prefix, Name base)
+	{
+		return prefix == null
+			? base
+			: new PrefixedName(prefix, base);
+	}
 }

@@ -171,6 +171,90 @@ public class SelectSentenceParserTest
 	}
 
 	@Test
+	public void selectTwoUnaliasedFields()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT a, b FROM b";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertEquals(2, sentence.getSelectExpressions().size());
+			assertEquals("a", sentence.getSelectExpressions().get(0).getAlias());
+			assertEquals("b", sentence.getSelectExpressions().get(1).getAlias());
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
+		}
+	}
+
+	@Test
+	public void selectTwoUnaliasedExpressions()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT a+b, c+d FROM b";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertEquals(2, sentence.getSelectExpressions().size());
+			assertEquals("COL_0", sentence.getSelectExpressions().get(0).getAlias());
+			assertEquals("COL_1", sentence.getSelectExpressions().get(1).getAlias());
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
+		}
+	}
+
+	@Test
+	public void selectOneAliasedExpressionAndOneUnaliased()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT a AS x1, c+d FROM b";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertEquals(2, sentence.getSelectExpressions().size());
+			assertEquals("x1", sentence.getSelectExpressions().get(0).getAlias());
+			assertEquals("COL_0", sentence.getSelectExpressions().get(1).getAlias());
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
+		}
+	}
+
+	@Test
+	public void selectOneAliasedExpressionWithTrickyAlias()
+		throws TokenizerException,
+		IOException
+	{
+		String src="SELECT a+b, c+d AS COL_0 FROM b";
+		SqlMatchingTokenizer tokenizer=new SqlMatchingTokenizer(new SqlTokenizer(new PushBackSource(new CharSequenceSource(src))));
+		try
+		{
+			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
+			assertEquals(2, sentence.getSelectExpressions().size());
+			assertEquals("COL_1", sentence.getSelectExpressions().get(0).getAlias());
+			assertEquals("COL_0", sentence.getSelectExpressions().get(1).getAlias());
+		}
+		catch (ParserException e)
+		{
+			e.printStackTrace();
+			fail(e.toString());
+		}
+	}
+
+	@Test
 	public void selectOneAliasedWithQuotesField()
 		throws TokenizerException,
 		IOException
@@ -364,7 +448,7 @@ public class SelectSentenceParserTest
 			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			assertNull(aliasedExpression.getAlias());
+			assertEquals("COL_0", aliasedExpression.getAlias());
 			assertTrue(aliasedExpression.getExpression() instanceof BinaryExpression);
 			assertEquals("+", ((BinaryExpression)aliasedExpression.getExpression()).getOperator());
 			assertTrue(((BinaryExpression)aliasedExpression.getExpression()).getExpression1() instanceof ConstantExpression);
@@ -392,7 +476,7 @@ public class SelectSentenceParserTest
 			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression;
 			aliasedExpression=sentence.getSelectExpressions().get(0);
-			assertNull(aliasedExpression.getAlias());
+			assertEquals("COL_0", aliasedExpression.getAlias());
 			assertTrue(aliasedExpression.getExpression() instanceof ParehentesizedExpression);
 			assertTrue(((ParehentesizedExpression)aliasedExpression.getExpression()).getExpression() instanceof ConstantExpression);
 			assertEquals("1", ((ParehentesizedExpression)aliasedExpression.getExpression()).getExpression().toCode());
@@ -462,7 +546,7 @@ public class SelectSentenceParserTest
 			SelectSentence sentence=SelectSentenceParser.getInstance().parse(tokenizer, this.parserContext);
 			assertEquals(1, sentence.getSelectExpressions().size());
 			AliasedExpression aliasedExpression=sentence.getSelectExpressions().get(0);
-			assertNull(aliasedExpression.getAlias());
+			assertEquals("COL_0", aliasedExpression.getAlias());
 			assertTrue(aliasedExpression.getExpression() instanceof FunctionCallExpression);
 			FunctionCallExpression functionExpression=(FunctionCallExpression)aliasedExpression.getExpression();
 			assertEquals("count", ((IdentifierExpression)functionExpression.getFunctionObject()).getIdentifier());

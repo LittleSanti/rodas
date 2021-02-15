@@ -1,7 +1,6 @@
 package com.samajackun.rodas.sql.parser;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.samajackun.rodas.core.eval.Name;
@@ -36,7 +35,7 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 		throws ParserException,
 		IOException
 	{
-		List<AliasedExpression> expressions=new ArrayList<>();
+		AliasedExpressionMap expressions=new AliasedExpressionMap();
 		Expression expression=null;
 		State state=State.INITIAL;
 		while (state != State.COMPLETE)
@@ -110,32 +109,32 @@ public class AliasedExpressionListParser extends AbstractParser<List<AliasedExpr
 		}
 		if (expression != null && !(expression instanceof AliasedExpression))
 		{
-			String alias=buildAutoAlias(expression, expressions.size());
-			AliasedExpression aliasedExpression=new AliasedExpression(expression, alias);
+			AliasedExpression aliasedExpression=new AliasedExpression(expression, null);
 			expressions.add(aliasedExpression);
 		}
-		return expressions;
+		expressions.completeAlias(x -> "COL_" + x);
+		return expressions.getList();
 	}
 
-	private String buildAutoAlias(Expression expression, int n)
-	{
-		// Hay que construir un alias "al vuelo":
-		String alias;
-		Name name=expression.getName();
-		if (name == null)
-		{
-			alias=null;
-		}
-		else
-		{
-			Name base=name.getBase();
-			alias=base.asString();
-		}
-		if (alias == null)
-		{
-			alias="COL_" + n;
-		}
-		return alias;
-	}
+	// private String buildAutoAlias(Expression expression, int n)
+	// {
+	// // Hay que construir un alias "al vuelo":
+	// String alias;
+	// Name name=expression.getName();
+	// if (name == null)
+	// {
+	// alias=null;
+	// }
+	// else
+	// {
+	// Name base=name.getBase();
+	// alias=base.asString();
+	// }
+	// if (alias == null)
+	// {
+	// alias="COL_" + n;
+	// }
+	// return alias;
+	// }
 
 }

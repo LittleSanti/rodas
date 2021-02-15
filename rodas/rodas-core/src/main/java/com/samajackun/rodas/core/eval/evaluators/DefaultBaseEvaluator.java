@@ -120,16 +120,18 @@ public class DefaultBaseEvaluator extends AbstractEvaluator implements BaseEvalu
 	public Datatype getDatatype(Context context, IdentifierExpression expression)
 		throws MetadataException
 	{
-		try
-		{
-			// TODO La determinación de tipos habrá que hacerla a priori.
-			Object value=context.getVariablesManager().getNearestVariable(expression.getName());
-			return guessDatatype(value);
-		}
-		catch (VariableNotFoundException e)
-		{
-			throw new MetadataException(e);
-		}
+		// try
+		// {
+		// // TODO La determinación de tipos habrá que hacerla a priori.
+		// Object value=context.getVariablesManager().getNearestVariable(expression.getName());
+		// return guessDatatype(value);
+		// }
+		// catch (VariableNotFoundException e)
+		// {
+		// throw new MetadataException(e);
+		// }
+		// FIXME La determinación de tipos habrá que hacerla a priori; Esto es sólo para ir probando.
+		return Datatype.TEXT;
 	}
 
 	private Datatype guessDatatype(Object value)

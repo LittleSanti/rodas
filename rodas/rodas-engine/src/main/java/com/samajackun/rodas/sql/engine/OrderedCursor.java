@@ -51,7 +51,7 @@ public class OrderedCursor implements Cursor
 				Object value;
 				try
 				{
-					rowDataVariablesContext.setRowData(r);
+					// rowDataVariablesContext.setRowData(r);
 					value=exp.evaluate(context, evaluatorFactory);
 				}
 				catch (EvaluationException e)

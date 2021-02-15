@@ -13,13 +13,16 @@ public class AliasedExpression implements Codeable
 
 	private final Expression expression;
 
-	private final String alias;
+	private String alias;
 
-	public AliasedExpression(Expression expression, String alias)
+	private final String rawAlias;
+
+	public AliasedExpression(Expression expression, String rawAlias)
 	{
 		super();
 		this.expression=expression;
-		this.alias=alias;
+		this.rawAlias=rawAlias;
+		this.alias=rawAlias;
 	}
 
 	public Expression getExpression()
@@ -32,13 +35,22 @@ public class AliasedExpression implements Codeable
 		return this.alias;
 	}
 
+	public void setAlias(String alias)
+	{
+		if (this.alias != null)
+		{
+			throw new IllegalStateException();
+		}
+		this.alias=alias;
+	}
+
 	@Override
 	public String toCode()
 	{
 		String code=this.expression.toCode();
-		if (this.alias != null)
+		if (this.rawAlias != null)
 		{
-			code+=" AS " + this.alias;
+			code+=" AS " + this.rawAlias;
 		}
 
 		return code;

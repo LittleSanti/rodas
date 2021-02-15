@@ -75,5 +75,8 @@ public interface Expression extends Codeable
 		return evaluate(context, evaluatorFactory);
 	}
 
-	public List<Expression> getSubExpressions();
+	public default List<Expression> getSubExpressions()
+	{
+		return Collections.emptyList();
+	}
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.VariablesContext;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.DefaultCursor;
@@ -177,7 +176,8 @@ public class MyEngine implements Engine
 		{
 			throw new IllegalArgumentException(source.getClass().getName());
 		}
-		VariablesContext newVariablesContext=new RowDataVariablesContext(context.getVariablesManager().peekLocalContext(), cursor.getColumnMap());
+		RowDataVariablesContext newVariablesContext=new RowDataVariablesContext(context.getVariablesManager().peekLocalContext(), cursor.getColumnMap());
+		newVariablesContext.setCurrentCursor(cursor);
 		context.getVariablesManager().pushLocalContext(newVariablesContext);
 		return cursor;
 	}
