@@ -2,6 +2,8 @@ package com.samajackun.rodas.core.eval;
 
 import java.util.Date;
 
+import com.samajackun.rodas.core.model.TextUtils;
+
 public final class ArithmeticUtils
 {
 	private ArithmeticUtils()
@@ -155,20 +157,24 @@ public final class ArithmeticUtils
 		{
 			throw new NotMatchingTypesException(value1.getClass(), Number.class);
 		}
-		// else if (value1 instanceof String)
-		// {
-		// if (value2 instanceof String)
-		// {
-		// x=TextUtils.computeConcat((String)value1, (String)value2);
-		// }
-		// else
-		// {
-		// throw new NotMatchingTypesException(value1.getClass(), value2.getClass());
-		// }
-		// }
 		else
 		{
 			throw new UnsuportedDatatypeException(value1.getClass());
+		}
+		return x;
+	}
+
+	public static Object computeAddNumberOrString(Object value1, Object value2)
+		throws EvaluationException
+	{
+		Object x;
+		if (value1 instanceof String)
+		{
+			x=TextUtils.computeConcat((String)value1, TextUtils.toString(value2));
+		}
+		else
+		{
+			x=computeAdd(value1, value2);
 		}
 		return x;
 	}

@@ -27,6 +27,15 @@ public class DefaultArithmeticEvaluator extends AbstractEvaluator implements Ari
 	}
 
 	@Override
+	public Object evaluateAddNumberOrString(Context context, Expression expression1, Expression expression2)
+		throws EvaluationException
+	{
+		Object value1=context.evaluate(expression1, getEvaluatorFactory());
+		Object value2=context.evaluate(expression2, getEvaluatorFactory());
+		return ArithmeticUtils.computeAddNumberOrString(value1, value2);
+	}
+
+	@Override
 	public Number evaluateSubstract(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException
 	{

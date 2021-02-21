@@ -14,6 +14,7 @@ public class MyOpenContext implements Context
 
 	private Provider provider;
 
+	private EvaluatorFactory evaluatorFactory;
 	// @Override
 	// public Object getColumnByName(String column, String prefix)
 	// throws NameNotBoundException,
@@ -122,7 +123,18 @@ public class MyOpenContext implements Context
 
 	public Context createSubcontext(VariablesContext newVariablesContext)
 	{
-		return new ProxyContext(this, newVariablesContext);
+		return new ProxyContext(this, newVariablesContext, this.evaluatorFactory);
+	}
+
+	@Override
+	public EvaluatorFactory getEvaluatorFactory()
+	{
+		return this.evaluatorFactory;
+	}
+
+	public void setEvaluatorFactory(EvaluatorFactory evaluatorFactory)
+	{
+		this.evaluatorFactory=evaluatorFactory;
 	}
 
 }

@@ -18,7 +18,7 @@ public class AddExpression extends BinaryExpression
 	public Object evaluate(Context context, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
-		return evaluatorFactory.getArithmeticEvaluator().evaluateAdd(context, getExpression1(), getExpression2());
+		return evaluatorFactory.getArithmeticEvaluator().evaluateAddNumberOrString(context, getExpression1(), getExpression2());
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class AddExpression extends BinaryExpression
 		}
 		else if (reduced1 instanceof TextConstantExpression || reduced2 instanceof TextConstantExpression)
 		{
-			String result=evaluatorFactory.getTextEvaluator().evaluateConcat(null, reduced1, reduced2);
+			String result=evaluatorFactory.getTextEvaluator().evaluateConcat(DummyContext.getInstance(), reduced1, reduced2);
 			reduced=new TextConstantExpression(result);
 		}
 		else

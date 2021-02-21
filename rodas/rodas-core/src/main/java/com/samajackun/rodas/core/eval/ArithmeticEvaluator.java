@@ -9,6 +9,9 @@ public interface ArithmeticEvaluator
 	public Number evaluateAdd(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException;
 
+	public Object evaluateAddNumberOrString(Context context, Expression expression1, Expression expression2)
+		throws EvaluationException;
+
 	public Number evaluateSubstract(Context context, Expression expression1, Expression expression2)
 		throws EvaluationException;
 

@@ -1,5 +1,6 @@
 package com.samajackun.rodas.core.eval;
 
+import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.Provider;
 
@@ -78,4 +79,9 @@ public final class DummyContext implements Context
 		return expression.evaluate(this, evaluatorFactory);
 	}
 
+	@Override
+	public EvaluatorFactory getEvaluatorFactory()
+	{
+		return new DefaultEvaluatorFactory();
+	}
 }

@@ -30,4 +30,6 @@ public interface Context
 
 	public Object evaluate(Expression expression, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException;
+
+	public EvaluatorFactory getEvaluatorFactory();
 }

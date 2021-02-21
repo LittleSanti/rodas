@@ -15,7 +15,7 @@ public abstract class AbstractMappedFunctionEvaluator extends AbstractFunctionEv
 	public AbstractMappedFunctionEvaluator(EvaluatorFactory evaluatorFactory)
 	{
 		super(evaluatorFactory);
-		map=createMap(evaluatorFactory);
+		this.map=createMap(evaluatorFactory);
 	}
 
 	protected abstract Map<String, Function> createMap(EvaluatorFactory evaluatorFactory);
@@ -25,11 +25,10 @@ public abstract class AbstractMappedFunctionEvaluator extends AbstractFunctionEv
 		throws EvaluationException
 	{
 		Object resolved;
-		// FIXME Quizá no sea IdentifierExpression, sino VariableExpression, o algo así.
 		if (functionExpression instanceof IdentifierExpression)
 		{
 			String functionName=((IdentifierExpression)functionExpression).getIdentifier();
-			resolved=map.get(functionName);
+			resolved=this.map.get(functionName);
 		}
 		else
 		{

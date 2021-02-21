@@ -369,6 +369,8 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 					t=parseMultiplyingExpression(tokenizer, parserContext);
 					if (t != null)
 					{
+						// FIXME Aquí es donde estamos decidiendo que el resultado de la suma será del dominio numérico, cuando en realidad, en SumaParser podría ser también String.
+						// Entonces, quizá merecería la pena ESPECIALIZAR esta línea en SumaParser.
 						expression=new AddExpression(operator, expression, t);
 						state=State.EXPECTING_OPERATOR;
 					}
