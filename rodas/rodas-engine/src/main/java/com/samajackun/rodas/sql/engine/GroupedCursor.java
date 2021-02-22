@@ -15,7 +15,7 @@ import com.samajackun.rodas.core.execution.CachedCursor;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.AliasedExpression;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.MetadataException;
 import com.samajackun.rodas.core.model.RowData;
@@ -41,7 +41,7 @@ public class GroupedCursor implements Cursor
 		throws CursorException,
 		MetadataException
 	{
-		List<ColumnMetadata> metadata=createMetadata(context, evaluatorFactory, selectExpressionMap);
+		List<ColumnMetaData> metadata=createMetadata(context, evaluatorFactory, selectExpressionMap);
 		MemoryCachedCursor groupedCursor=new MemoryCachedCursor(metadata);
 		RowDataVariablesContext rowDataVariablesContext=new RowDataVariablesContext(context.getVariablesManager().peekLocalContext(), cursor.getColumnMap());
 		Comparator<RowData> comparator=createComparator(context, evaluatorFactory, groupExpressions, rowDataVariablesContext);
@@ -92,13 +92,13 @@ public class GroupedCursor implements Cursor
 		return comparator;
 	}
 
-	private List<ColumnMetadata> createMetadata(Context context, EvaluatorFactory evaluatorFactory, Map<String, AliasedExpression> selectExpressionMap)
+	private List<ColumnMetaData> createMetadata(Context context, EvaluatorFactory evaluatorFactory, Map<String, AliasedExpression> selectExpressionMap)
 		throws MetadataException
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
+		List<ColumnMetaData> metadata=new ArrayList<>();
 		for (Map.Entry<String, AliasedExpression> entry : selectExpressionMap.entrySet())
 		{
-			ColumnMetadata columnMetadata=new ColumnMetadata(entry.getKey(), entry.getValue().getExpression().getDatatype(context, evaluatorFactory), false);
+			ColumnMetaData columnMetadata=new ColumnMetaData(entry.getKey(), entry.getValue().getExpression().getDatatype(context, evaluatorFactory), false);
 			metadata.add(columnMetadata);
 		}
 		return metadata;
@@ -140,7 +140,7 @@ public class GroupedCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.src.getMetadata();

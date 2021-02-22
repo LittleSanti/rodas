@@ -31,7 +31,7 @@ public class CrossSourceTest
 		Source source=new TableSource("country");
 		MyOpenContext context=new MyOpenContext();
 		context.setProvider(new MyProvider());
-		Cursor cursor=source.execute(new MyEngine(), context);
+		Cursor cursor=source.execute(new SqlEngine(), context);
 		RowData row=cursor.getRowData();
 		assertTrue(cursor.hasNext());
 		cursor.next();
@@ -57,7 +57,7 @@ public class CrossSourceTest
 		CrossSource crossSource=new CrossSource(sources);
 		MyOpenContext context=new MyOpenContext();
 		context.setProvider(new MyProvider());
-		Cursor cursor=crossSource.execute(new MyEngine(), context);
+		Cursor cursor=crossSource.execute(new SqlEngine(), context);
 		// while (cursor.hasNext())
 		// {
 		// cursor.next();

@@ -19,7 +19,7 @@ import com.samajackun.rodas.core.eval.VariablesContext;
 import com.samajackun.rodas.core.eval.VariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.IdentifierExpression;
 import com.samajackun.rodas.core.model.IterableTableData;
@@ -29,20 +29,20 @@ import com.samajackun.rodas.core.model.ProviderException;
 public class CursorVariablesContextTest
 {
 
-	private List<ColumnMetadata> createMetadata1()
+	private List<ColumnMetaData> createMetadata1()
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
-		metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
-		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
+		List<ColumnMetaData> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetaData("id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetaData("name", Datatype.TEXT, false));
+		metadata.add(new ColumnMetaData("days", Datatype.INTEGER_NUMBER, true));
+		metadata.add(new ColumnMetaData("amount", Datatype.DECIMAL_NUMBER, true));
 		return metadata;
 	}
 
 	private DefaultCursor createCursor1()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=createMetadata1();
+		List<ColumnMetaData> metadata=createMetadata1();
 		List<Object[]> data=Arrays.asList(new Object[][] {
 				// @formatter:off
 				new Object[] {1, "enero", 31, 0.1d},
@@ -57,18 +57,18 @@ public class CursorVariablesContextTest
 		return cursor;
 	}
 
-	private List<ColumnMetadata> createMetadata2()
+	private List<ColumnMetaData> createMetadata2()
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("day_id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("day_name", Datatype.TEXT, false));
+		List<ColumnMetaData> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetaData("day_id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetaData("day_name", Datatype.TEXT, false));
 		return metadata;
 	}
 
 	private DefaultCursor createCursor2()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=createMetadata2();
+		List<ColumnMetaData> metadata=createMetadata2();
 		List<Object[]> data=Arrays.asList(new Object[][] {
 						// @formatter:off
 							new Object[] {1, "lunes"},

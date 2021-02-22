@@ -36,7 +36,7 @@ import com.samajackun.rodas.sql.tokenizer.SqlTokenizer;
 
 public class EngineAndProviderTest
 {
-	private final Engine engine=new MyEngine();
+	private final Engine engine=new SqlEngine();
 
 	private final Provider provider=new MyProvider();
 

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 public abstract class AbstractComposedCursor implements Cursor
@@ -57,7 +57,7 @@ public abstract class AbstractComposedCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.src.getMetadata();

@@ -22,7 +22,7 @@ public class MyEngineTest
 	@Test
 	public void executeTable()
 	{
-		MyEngine engine=new MyEngine();
+		SqlEngine engine=new SqlEngine();
 		TableSource source=new TableSource("country");
 		Provider provider=new MyProvider();
 		MyOpenContext context=new MyOpenContext();

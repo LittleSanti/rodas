@@ -11,7 +11,7 @@ import java.util.Map;
 
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 public class CrossCursor implements Cursor
@@ -20,7 +20,7 @@ public class CrossCursor implements Cursor
 
 	private final Deque<Cursor> cursorsInReverse;
 
-	private final List<ColumnMetadata> metadata;
+	private final List<ColumnMetaData> metadata;
 
 	private final Map<String, Integer> columnMap;
 
@@ -220,7 +220,7 @@ public class CrossCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.metadata;

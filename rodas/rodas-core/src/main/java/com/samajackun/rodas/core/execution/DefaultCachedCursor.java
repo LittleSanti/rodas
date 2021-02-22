@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 public class DefaultCachedCursor implements CachedCursor
@@ -13,7 +13,7 @@ public class DefaultCachedCursor implements CachedCursor
 
 	private final Map<String, Integer> columnMap;
 
-	private final List<ColumnMetadata> metadata;
+	private final List<ColumnMetaData> metadata;
 
 	private boolean closed;
 
@@ -71,7 +71,7 @@ public class DefaultCachedCursor implements CachedCursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return metadata;

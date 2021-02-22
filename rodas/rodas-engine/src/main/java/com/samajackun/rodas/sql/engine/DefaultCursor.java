@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.RowData;
@@ -28,7 +28,7 @@ public class DefaultCursor implements Cursor
 		}
 	}
 
-	private final List<ColumnMetadata> metadata;
+	private final List<ColumnMetaData> metadata;
 
 	private final Map<String, Integer> columnMap;
 
@@ -51,7 +51,7 @@ public class DefaultCursor implements Cursor
 		return this.srcRowData;
 	}
 
-	public DefaultCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
+	public DefaultCursor(List<ColumnMetaData> metadata, IterableTableData iterable)
 		throws ProviderException
 	{
 		super();
@@ -100,7 +100,7 @@ public class DefaultCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.metadata;

@@ -1,6 +1,6 @@
 package com.samajackun.rodas.core.model;
 
-public class ColumnMetadata
+public class ColumnMetaData
 {
 	private final String name;
 
@@ -8,7 +8,7 @@ public class ColumnMetadata
 
 	private final boolean nullable;
 
-	public ColumnMetadata(String name, Datatype datatype, boolean nullable)
+	public ColumnMetaData(String name, Datatype datatype, boolean nullable)
 	{
 		super();
 		this.name=name;

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.RowData;
@@ -17,7 +17,7 @@ class SingleRowCursor extends DefaultCursor
 		super(createMetadata(), createIterableTableData());
 	}
 
-	private static List<ColumnMetadata> createMetadata()
+	private static List<ColumnMetaData> createMetadata()
 	{
 		return Collections.emptyList();
 	}

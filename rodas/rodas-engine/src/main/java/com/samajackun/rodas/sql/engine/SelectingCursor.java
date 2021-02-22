@@ -11,14 +11,14 @@ import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.AliasedExpression;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.MetadataException;
 import com.samajackun.rodas.core.model.RowData;
 
 public class SelectingCursor extends AbstractComposedCursor
 {
-	private final List<ColumnMetadata> metadata;
+	private final List<ColumnMetaData> metadata;
 
 	private final Map<String, Integer> columnMap;
 
@@ -34,7 +34,7 @@ public class SelectingCursor extends AbstractComposedCursor
 		throws MetadataException
 	{
 		super(src);
-		List<ColumnMetadata> metadata=new ArrayList<>(selectExpressions.size());
+		List<ColumnMetaData> metadata=new ArrayList<>(selectExpressions.size());
 		Map<String, Integer> columnMap=new HashMap<>((int)(1.7d * selectExpressions.size()));
 		int p=0;
 		for (AliasedExpression expression : selectExpressions)
@@ -42,7 +42,7 @@ public class SelectingCursor extends AbstractComposedCursor
 			String alias=expression.getAlias();
 			Datatype datatype=expression.getExpression().getDatatype(context, evaluatorFactory);
 			boolean nullable=true;
-			ColumnMetadata columnMetadata=new ColumnMetadata(alias, datatype, nullable);
+			ColumnMetaData columnMetadata=new ColumnMetaData(alias, datatype, nullable);
 			metadata.add(columnMetadata);
 			columnMap.put(alias, p++);
 		}
@@ -62,7 +62,7 @@ public class SelectingCursor extends AbstractComposedCursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.metadata;

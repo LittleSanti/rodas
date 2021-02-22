@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 
 final class CursorsUtils
 {
@@ -15,7 +15,7 @@ final class CursorsUtils
 	{
 	}
 
-	public static List<ColumnMetadata> concatMetadata(List<Cursor> cursors)
+	public static List<ColumnMetaData> concatMetadata(List<Cursor> cursors)
 		throws CursorException
 	{
 		int numberOfColumns=0;
@@ -23,7 +23,7 @@ final class CursorsUtils
 		{
 			numberOfColumns+=cursor.getNumberOfColumns();
 		}
-		List<ColumnMetadata> metadata=new ArrayList<>(numberOfColumns);
+		List<ColumnMetaData> metadata=new ArrayList<>(numberOfColumns);
 		for (Cursor cursor : cursors)
 		{
 			metadata.addAll(cursor.getMetadata());
@@ -31,11 +31,11 @@ final class CursorsUtils
 		return metadata;
 	}
 
-	public static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
+	public static Map<String, Integer> toColumnMap(List<ColumnMetaData> metadata)
 	{
 		Map<String, Integer> columnMap=new HashMap<>((int)(1.7d * metadata.size()));
 		int i=0;
-		for (ColumnMetadata column : metadata)
+		for (ColumnMetaData column : metadata)
 		{
 			// FIXME Machaca columnas con nombre repetido:
 			columnMap.put(column.getName(), i++);

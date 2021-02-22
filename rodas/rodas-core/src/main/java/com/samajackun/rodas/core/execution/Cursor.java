@@ -3,7 +3,7 @@ package com.samajackun.rodas.core.execution;
 import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 /**
@@ -35,7 +35,7 @@ public interface Cursor
 	public Map<String, Integer> getColumnMap()
 		throws CursorException;
 
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException;
 
 	public void reset()

@@ -7,7 +7,7 @@ import com.samajackun.rodas.core.execution.CachedCursor;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.execution.ExhaustedCursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 public class MemoryCursor implements Cursor
@@ -86,7 +86,7 @@ public class MemoryCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.src.getMetadata();

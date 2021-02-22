@@ -3,7 +3,7 @@ package com.samajackun.rodas.core.execution;
 import java.util.List;
 import java.util.Map;
 
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 public class VariablesContextPopperCursor implements Cursor
@@ -50,7 +50,7 @@ public class VariablesContextPopperCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		// TODO Auto-generated method stub

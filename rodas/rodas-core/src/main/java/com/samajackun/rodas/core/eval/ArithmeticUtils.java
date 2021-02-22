@@ -168,9 +168,9 @@ public final class ArithmeticUtils
 		throws EvaluationException
 	{
 		Object x;
-		if (value1 instanceof String)
+		if (value1 instanceof String || value2 instanceof String)
 		{
-			x=TextUtils.computeConcat((String)value1, TextUtils.toString(value2));
+			x=TextUtils.computeConcat(TextUtils.toString(value1), TextUtils.toString(value2));
 		}
 		else
 		{

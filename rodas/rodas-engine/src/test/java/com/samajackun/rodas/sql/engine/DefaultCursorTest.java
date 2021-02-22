@@ -21,7 +21,7 @@ import com.samajackun.rodas.core.eval.VariableNotFoundException;
 import com.samajackun.rodas.core.eval.VariablesContext;
 import com.samajackun.rodas.core.eval.VariablesManager;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.MyIterableTableData;
@@ -45,9 +45,9 @@ public class DefaultCursorTest
 		CursorException
 	{
 		DefaultCursor cursor=createCursor1();
-		List<ColumnMetadata> metadata=cursor.getMetadata();
+		List<ColumnMetaData> metadata=cursor.getMetadata();
 		assertEquals(4, metadata.size());
-		ColumnMetadata columnMetadata;
+		ColumnMetaData columnMetadata;
 
 		columnMetadata=metadata.get(0);
 		assertEquals("id", columnMetadata.getName());
@@ -157,20 +157,20 @@ public class DefaultCursorTest
 		}
 	}
 
-	private List<ColumnMetadata> createMetadata()
+	private List<ColumnMetaData> createMetadata()
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("name", Datatype.TEXT, false));
-		metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
-		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
+		List<ColumnMetaData> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetaData("id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetaData("name", Datatype.TEXT, false));
+		metadata.add(new ColumnMetaData("days", Datatype.INTEGER_NUMBER, true));
+		metadata.add(new ColumnMetaData("amount", Datatype.DECIMAL_NUMBER, true));
 		return metadata;
 	}
 
 	private DefaultCursor createCursor1()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=createMetadata();
+		List<ColumnMetaData> metadata=createMetadata();
 		List<Object[]> data=Arrays.asList(new Object[][] {
 			// @formatter:off
 			new Object[] {1, "enero", 31, 0.1d},
@@ -188,7 +188,7 @@ public class DefaultCursorTest
 	private DefaultCursor createCursor0()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=createMetadata();
+		List<ColumnMetaData> metadata=createMetadata();
 		List<Object[]> data=new ArrayList<>();
 		IterableTableData iterableTableData=new MyIterableTableData(data);
 		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
@@ -268,9 +268,9 @@ public class DefaultCursorTest
 		CursorException
 	{
 		DefaultCursor cursor=createCursor0();
-		List<ColumnMetadata> metadata=cursor.getMetadata();
+		List<ColumnMetaData> metadata=cursor.getMetadata();
 		assertEquals(4, metadata.size());
-		ColumnMetadata columnMetadata;
+		ColumnMetaData columnMetadata;
 
 		columnMetadata=metadata.get(0);
 		assertEquals("id", columnMetadata.getName());

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.RowData;
@@ -41,7 +41,7 @@ public class MyCursor implements Cursor
 		}
 	}
 
-	private final List<ColumnMetadata> metadata;
+	private final List<ColumnMetaData> metadata;
 
 	private final Map<String, Integer> columnMap;
 
@@ -64,7 +64,7 @@ public class MyCursor implements Cursor
 		return this.srcRowData;
 	}
 
-	public MyCursor(List<ColumnMetadata> metadata, IterableTableData iterable)
+	public MyCursor(List<ColumnMetaData> metadata, IterableTableData iterable)
 		throws ProviderException
 	{
 		super();
@@ -74,11 +74,11 @@ public class MyCursor implements Cursor
 		reset();
 	}
 
-	private static Map<String, Integer> toColumnMap(List<ColumnMetadata> metadata)
+	private static Map<String, Integer> toColumnMap(List<ColumnMetaData> metadata)
 	{
 		Map<String, Integer> map=new HashMap<>((int)(1.7 * metadata.size()));
 		int i=0;
-		for (ColumnMetadata column : metadata)
+		for (ColumnMetaData column : metadata)
 		{
 			map.put(column.getName(), i++);
 		}
@@ -124,7 +124,7 @@ public class MyCursor implements Cursor
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
 		return this.metadata;

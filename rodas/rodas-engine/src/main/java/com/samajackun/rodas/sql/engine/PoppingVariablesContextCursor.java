@@ -6,7 +6,7 @@ import java.util.Map;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.RowData;
 
 public class PoppingVariablesContextCursor implements Cursor
@@ -26,55 +26,55 @@ public class PoppingVariablesContextCursor implements Cursor
 	public void close()
 		throws CursorException
 	{
-		context.getVariablesManager().popLocalContext();
-		src.close();
+		this.context.getVariablesManager().popLocalContext();
+		this.src.close();
 	}
 
 	@Override
 	public void next()
 		throws CursorException
 	{
-		src.next();
+		this.src.next();
 	}
 
 	@Override
 	public boolean hasNext()
 		throws CursorException
 	{
-		return src.hasNext();
+		return this.src.hasNext();
 	}
 
 	@Override
 	public RowData getRowData()
 		throws CursorException
 	{
-		return src.getRowData();
+		return this.src.getRowData();
 	}
 
 	@Override
 	public Map<String, Integer> getColumnMap()
 		throws CursorException
 	{
-		return src.getColumnMap();
+		return this.src.getColumnMap();
 	}
 
 	@Override
-	public List<ColumnMetadata> getMetadata()
+	public List<ColumnMetaData> getMetadata()
 		throws CursorException
 	{
-		return src.getMetadata();
+		return this.src.getMetadata();
 	}
 
 	@Override
 	public void reset()
 		throws CursorException
 	{
-		src.reset();
+		this.src.reset();
 	}
 
 	@Override
 	public int getNumberOfColumns()
 	{
-		return src.getNumberOfColumns();
+		return this.src.getNumberOfColumns();
 	}
 }

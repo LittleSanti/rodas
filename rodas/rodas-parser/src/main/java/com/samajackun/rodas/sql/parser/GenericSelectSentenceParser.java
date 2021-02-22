@@ -153,12 +153,10 @@ public class GenericSelectSentenceParser extends AbstractParser<SelectSentence> 
 						case SqlTokenTypes.KEYWORD_ORDER:
 							state=State.READING_ORDER_CLAUSE;
 							break;
-						case SqlTokenTypes.PARENTHESIS_END:
+						default:
 							tokenizer.pushBack(token);
 							state=State.COMPLETE;
 							break;
-						default:
-							throw new UnexpectedTokenException(token);
 					}
 					break;
 				case READ_WHERE_CLAUSE:
@@ -184,7 +182,7 @@ public class GenericSelectSentenceParser extends AbstractParser<SelectSentence> 
 							state=State.READ_GROUP_CLAUSE;
 							break;
 						default:
-							throw new UnexpectedTokenException(token);
+							throw new UnexpectedTokenException(token, SqlTokenTypes.KEYWORD_BY);
 					}
 					break;
 				case READ_GROUP_CLAUSE:
@@ -199,7 +197,8 @@ public class GenericSelectSentenceParser extends AbstractParser<SelectSentence> 
 							state=State.READING_ORDER_CLAUSE;
 							break;
 						default:
-							throw new UnexpectedTokenException(token);
+							tokenizer.pushBack(token);
+							state=State.COMPLETE;
 					}
 					break;
 				case READ_HAVING_CLAUSE:
@@ -209,7 +208,8 @@ public class GenericSelectSentenceParser extends AbstractParser<SelectSentence> 
 							state=State.READING_ORDER_CLAUSE;
 							break;
 						default:
-							throw new UnexpectedTokenException(token);
+							tokenizer.pushBack(token);
+							state=State.COMPLETE;
 					}
 					break;
 				case READING_ORDER_CLAUSE:

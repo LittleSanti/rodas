@@ -20,7 +20,7 @@ public class MyEngine implements Engine
 		EvaluationException,
 		ProviderException
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>(source.getSelectExpressions().size());
+		List<ColumnMetaData> metadata=new ArrayList<>(source.getSelectExpressions().size());
 		for (AliasedExpression expression : source.getSelectExpressions())
 		{
 			String name=expression.getAlias() != null
@@ -28,7 +28,7 @@ public class MyEngine implements Engine
 				: expression.getExpression().getName().asString();
 			Datatype datatype=expression.getExpression().getDatatype(context, this.evaluatorFactory);
 			boolean nullable=true;
-			ColumnMetadata columnMetadata=new ColumnMetadata(name, datatype, nullable);
+			ColumnMetaData columnMetadata=new ColumnMetaData(name, datatype, nullable);
 			metadata.add(columnMetadata);
 		}
 		IterableTableData tableData=null;
@@ -51,8 +51,8 @@ public class MyEngine implements Engine
 		EvaluationException,
 		ProviderException
 	{
-		TableData tableData=context.getProvider().getTableData(source.getTable());
-		List<ColumnMetadata> metadata=context.getProvider().getColumnsMetadataFromTable(source.getTable()).getListOfColumnMetadata();
+		TableData tableData=context.getProvider().getTableMetaData(source.getTable()).getTableData();
+		List<ColumnMetaData> metadata=context.getProvider().getTableMetaData(source.getTable()).getListOfColumnMetadata();
 		Cursor cursor=new DefaultCursor(metadata, tableData);
 		return cursor;
 	}

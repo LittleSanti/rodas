@@ -10,7 +10,7 @@ import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.DefaultCursor;
 import com.samajackun.rodas.core.model.AliasedSource;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.CrossSource;
 import com.samajackun.rodas.core.model.Engine;
 import com.samajackun.rodas.core.model.EngineException;
@@ -22,68 +22,9 @@ import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.TableData;
 import com.samajackun.rodas.core.model.TableSource;
 
-public class MyEngine implements Engine
+public class SqlEngine implements Engine
 {
 	private final EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
-
-	// @Override
-	// public Cursor execute(SelectSentence source, Provider provider, Context context)
-	// throws EngineException,
-	// EvaluationException,
-	// ProviderException
-	// {
-	// if (source.getSourceDeclarations().size() == 1)
-	// {
-	// if (source.getWhereExpression() == null || source.getWhereExpression() instanceof BooleanExpression)
-	// {
-	// BooleanExpression booleanExpression=(BooleanExpression)source.getWhereExpression();
-	// List<Object[]> output=new ArrayList<>(100);
-	// Cursor sourceCursor1=source.getSourceDeclarations().get(0).execute(this, provider, context);
-	// Context context1=null;// TODO context.getSubcontext(source.getAlias());
-	// while (sourceCursor1.hasNext())
-	// {
-	// sourceCursor1.next();
-	// for (Map.Entry<String, Integer> entry : sourceCursor1.getColumnMap().entrySet())
-	// {
-	// // Object value=sourceCursor1.getRowData().get(entry.getValue());
-	// // context.putSubcontext(entry.getKey(), context1);
-	// }
-	// if (booleanExpression == null || booleanExpression.evaluate(context1, this.evaluatorFactory))
-	// {
-	// Object[] row=new Object[sourceCursor1.getColumnMap().size()];
-	// int i=0;
-	// for (String c : source.getColumnNames(provider))
-	// {
-	// // Object value=sourceCursor1.getRowData().get(c);
-	// AliasedExpression aliasedExpression=source.getSelectExpressionsMap().get(c);
-	// Object value=aliasedExpression.evaluate(context1, this.evaluatorFactory);
-	// // System.out.printf("*row.put(%s, %s)\r\n", c, value);
-	// row[i++]=value;
-	// }
-	// output.add(row);
-	// }
-	// }
-	// Map<String, Integer> columnMap=new HashMap<>((int)(1.7d * source.getColumnNames(provider).size()));
-	// int i=0;
-	// for (String c : source.getColumnNames(provider))
-	// {
-	// columnMap.put(c, i++);
-	// }
-	// TableData tableData=new MyTableData(output);
-	// // List<ColumnMetadata> metadata=provider.getColumnsMetadataFromTable(source.getTable()).getListOfColumnMetadata();
-	// Cursor cursor=new DefaultCursor(metadata, tableData);
-	// return cursor;
-	// }
-	// else
-	// {
-	// throw new EngineException("El WHERE debería devolver una condición boolean");
-	// }
-	// }
-	// else
-	// {
-	// throw new EngineException("Lo siento; de momento, sólo tolero un FROM");
-	// }
-	// }
 
 	@Override
 	public Cursor execute(SelectSentence selectSource, Context context)
@@ -142,7 +83,7 @@ public class MyEngine implements Engine
 		EvaluationException,
 		ProviderException
 	{
-		// FIXME No estoy seguro de que este sea un buen patrón de diseño.
+		// FIXME Hay que reemplazar esta implementación por una simple return source.execute(this, context)
 		Cursor cursor;
 		if (source == null)
 		{
@@ -199,8 +140,8 @@ public class MyEngine implements Engine
 		EvaluationException,
 		ProviderException
 	{
-		TableData tableData=context.getProvider().getTableData(source.getTable());
-		List<ColumnMetadata> metadata=context.getProvider().getColumnsMetadataFromTable(source.getTable()).getListOfColumnMetadata();
+		TableData tableData=context.getProvider().getTableMetaData(source.getTable()).getTableData();
+		List<ColumnMetaData> metadata=context.getProvider().getTableMetaData(source.getTable()).getListOfColumnMetadata();
 		Cursor cursor=new DefaultCursor(metadata, tableData);
 		return cursor;
 	}

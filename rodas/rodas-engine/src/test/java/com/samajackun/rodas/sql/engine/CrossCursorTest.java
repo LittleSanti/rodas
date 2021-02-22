@@ -13,7 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.execution.CursorException;
-import com.samajackun.rodas.core.model.ColumnMetadata;
+import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.MyIterableTableData;
@@ -37,9 +37,9 @@ public class CrossCursorTest
 		CursorException
 	{
 		CrossCursor cursor=createCrossCursor();
-		List<ColumnMetadata> metadata=cursor.getMetadata();
+		List<ColumnMetaData> metadata=cursor.getMetadata();
 		assertEquals(6, metadata.size());
-		ColumnMetadata columnMetadata;
+		ColumnMetaData columnMetadata;
 		int i=0;
 
 		columnMetadata=metadata.get(i++);
@@ -195,11 +195,11 @@ public class CrossCursorTest
 	private DefaultCursor createCursor0()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("month_id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("month_name", Datatype.TEXT, false));
-		metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
-		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
+		List<ColumnMetaData> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetaData("month_id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetaData("month_name", Datatype.TEXT, false));
+		metadata.add(new ColumnMetaData("days", Datatype.INTEGER_NUMBER, true));
+		metadata.add(new ColumnMetaData("amount", Datatype.DECIMAL_NUMBER, true));
 		List<Object[]> data=Arrays.asList(new Object[][] {});
 		IterableTableData iterableTableData=new MyIterableTableData(data);
 		DefaultCursor cursor=new DefaultCursor(metadata, iterableTableData);
@@ -209,11 +209,11 @@ public class CrossCursorTest
 	private DefaultCursor createCursor1()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("month_id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("month_name", Datatype.TEXT, false));
-		metadata.add(new ColumnMetadata("days", Datatype.INTEGER_NUMBER, true));
-		metadata.add(new ColumnMetadata("amount", Datatype.DECIMAL_NUMBER, true));
+		List<ColumnMetaData> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetaData("month_id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetaData("month_name", Datatype.TEXT, false));
+		metadata.add(new ColumnMetaData("days", Datatype.INTEGER_NUMBER, true));
+		metadata.add(new ColumnMetaData("amount", Datatype.DECIMAL_NUMBER, true));
 		List<Object[]> data=Arrays.asList(new Object[][] {
 			// @formatter:off
 			new Object[] {1, "enero", 31, 0.1d},
@@ -231,9 +231,9 @@ public class CrossCursorTest
 	private DefaultCursor createCursor2()
 		throws ProviderException
 	{
-		List<ColumnMetadata> metadata=new ArrayList<>();
-		metadata.add(new ColumnMetadata("day_id", Datatype.INTEGER_NUMBER, false));
-		metadata.add(new ColumnMetadata("day_name", Datatype.TEXT, false));
+		List<ColumnMetaData> metadata=new ArrayList<>();
+		metadata.add(new ColumnMetaData("day_id", Datatype.INTEGER_NUMBER, false));
+		metadata.add(new ColumnMetaData("day_name", Datatype.TEXT, false));
 		List<Object[]> data=Arrays.asList(new Object[][] {
 			// @formatter:off
 			new Object[] {1, "lunes"},
@@ -265,9 +265,9 @@ public class CrossCursorTest
 		assertEquals(5, columnMap.get("day_name").intValue());
 		assertNull(columnMap.get("wrongColumn"));
 		// Metadata:
-		List<ColumnMetadata> metadata=cursor.getMetadata();
+		List<ColumnMetaData> metadata=cursor.getMetadata();
 		assertEquals(6, metadata.size());
-		ColumnMetadata columnMetadata;
+		ColumnMetaData columnMetadata;
 		int i=0;
 
 		columnMetadata=metadata.get(i++);
@@ -332,9 +332,9 @@ public class CrossCursorTest
 		assertEquals(5, columnMap.get("amount").intValue());
 		assertNull(columnMap.get("wrongColumn"));
 		// Metadata:
-		List<ColumnMetadata> metadata=cursor.getMetadata();
+		List<ColumnMetaData> metadata=cursor.getMetadata();
 		assertEquals(6, metadata.size());
-		ColumnMetadata columnMetadata;
+		ColumnMetaData columnMetadata;
 		int i=0;
 
 		columnMetadata=metadata.get(i++);

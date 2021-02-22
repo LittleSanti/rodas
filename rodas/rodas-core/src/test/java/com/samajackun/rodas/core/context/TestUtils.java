@@ -42,7 +42,7 @@ public class TestUtils
 		throws ProviderException
 	{
 		MyProvider provider=new MyProvider();
-		MyCursor cursor=new MyCursor(provider.getColumnsMetadataFromTable(table).getListOfColumnMetadata(), provider.getTableData(table));
+		MyCursor cursor=new MyCursor(provider.getTableMetaData(table).getListOfColumnMetadata(), provider.getTableMetaData(table).getTableData());
 		return cursor;
 	}
 
