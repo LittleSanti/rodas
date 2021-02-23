@@ -18,9 +18,9 @@ public class MyOpenContextTest
 
 	private final EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 
-	private MyOpenContext createContext()
+	private DefaultContext createContext()
 	{
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setProvider(this.provider);
 		return context;
 	}
@@ -28,7 +28,7 @@ public class MyOpenContextTest
 	@Test
 	public void evaluateIdentifier()
 	{
-		MyOpenContext context=createContext();
+		DefaultContext context=createContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().peekLocalContext().set(Name.instanceOf("mes"), "enero");
 		Expression expression=new IdentifierExpression("mes");
@@ -47,7 +47,7 @@ public class MyOpenContextTest
 	@Test
 	public void evaluateAdd()
 	{
-		MyOpenContext context=createContext();
+		DefaultContext context=createContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().peekLocalContext().set(Name.instanceOf("a"), 1);
 		context.getVariablesManager().peekLocalContext().set(Name.instanceOf("b"), 2);

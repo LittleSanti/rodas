@@ -16,7 +16,7 @@ import org.junit.Test;
 import com.samajackun.rodas.core.eval.ColumnNotFoundException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.MapList;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.PrefixNotFoundException;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
@@ -161,7 +161,7 @@ public class JoinedCursorTest
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		Cursor cursor1=createCursor1();
 		Cursor cursor2=createCursor2();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		Map<String, Cursor> cursorMap=new HashMap<>();
 		cursorMap.put("c1", cursor1);
@@ -238,7 +238,7 @@ public class JoinedCursorTest
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		Cursor cursor1=createCursor0();
 		Cursor cursor2=createCursor2();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		Map<String, Cursor> cursorMap=new HashMap<>();
 		cursorMap.put("c1", cursor1);
@@ -310,7 +310,7 @@ public class JoinedCursorTest
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		Cursor cursor1=createCursor1();
 		Cursor cursor2=createCursor2();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		Map<String, Cursor> cursorMap=new HashMap<>();
 		cursorMap.put("c1", cursor1);
@@ -356,7 +356,7 @@ public class JoinedCursorTest
 		sources.put("country", source1);
 		TableSource source2=new TableSource("month");
 		sources.put("month", source2);
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.setProvider(provider);
 		VariablesContext varContext=new CursorMapVariablesContext(context.getVariablesManager().peekLocalContext(), cursorMap);

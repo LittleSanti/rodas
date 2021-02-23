@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.CrossSource;
 import com.samajackun.rodas.core.model.EngineException;
@@ -29,7 +29,7 @@ public class CrossSourceTest
 		ProviderException
 	{
 		Source source=new TableSource("country");
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setProvider(new MyProvider());
 		Cursor cursor=source.execute(new SqlEngine(), context);
 		RowData row=cursor.getRowData();
@@ -55,7 +55,7 @@ public class CrossSourceTest
 		Source source2=new TableSource("city");
 		List<Source> sources=Arrays.asList(source1, source2);
 		CrossSource crossSource=new CrossSource(sources);
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setProvider(new MyProvider());
 		Cursor cursor=crossSource.execute(new SqlEngine(), context);
 		// while (cursor.hasNext())

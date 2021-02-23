@@ -13,7 +13,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
@@ -90,7 +90,7 @@ public class DefaultCursorTest
 		throws ProviderException,
 		CursorException
 	{
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		DefaultCursor cursor=createCursor1();
 		VariablesContext globalVariablesContext=new StrictVariablesContext();
 		globalVariablesContext.set(Name.instanceOf("year"), 2019);

@@ -9,7 +9,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.model.EngineException;
 import com.samajackun.rodas.core.model.MyProvider;
@@ -25,7 +25,7 @@ public class MyEngineTest
 		SqlEngine engine=new SqlEngine();
 		TableSource source=new TableSource("country");
 		Provider provider=new MyProvider();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setProvider(provider);
 		try
 		{

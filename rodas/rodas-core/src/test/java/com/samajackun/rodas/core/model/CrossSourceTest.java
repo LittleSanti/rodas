@@ -3,7 +3,7 @@ package com.samajackun.rodas.core.model;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.execution.Cursor;
 
 public class CrossSourceTest
@@ -15,7 +15,7 @@ public class CrossSourceTest
 		ProviderException
 	{
 		Source source1=new TableSource("country");
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setProvider(new MyProvider());
 		Cursor cursor1=source1.execute(new MyEngine(), context);
 		while (cursor1.hasNext())

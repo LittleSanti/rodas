@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.samajackun.rodas.core.RodasException;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
@@ -43,7 +43,7 @@ public class EngineAndProviderTest
 	private Context createContext()
 	{
 		// MapList<String, Source> sources=new MapList<>();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setProvider(this.provider);
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		return context;

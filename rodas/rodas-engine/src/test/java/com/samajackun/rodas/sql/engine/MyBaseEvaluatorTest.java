@@ -14,7 +14,7 @@ import com.samajackun.rodas.core.context.TestUtils;
 import com.samajackun.rodas.core.eval.ColumnNotFoundException;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
@@ -105,7 +105,7 @@ public class MyBaseEvaluatorTest
 		throws ProviderException
 	{
 		// Context context=TestUtils.createContext();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		Cursor cursor=TestUtils.createCursor("month");
 		VariablesContext globalVariablesContext=new StrictVariablesContext();
 		globalVariablesContext.set(Name.instanceOf("year"), 2019);
@@ -173,7 +173,7 @@ public class MyBaseEvaluatorTest
 		try
 		{
 			Cursor cursor1=TestUtils.createCursor("month");
-			MyOpenContext context=new MyOpenContext();
+			DefaultContext context=new DefaultContext();
 			context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 			Map<String, Cursor> cursorMap=new HashMap<>();
 			cursorMap.put("mes", cursor1);
@@ -201,7 +201,7 @@ public class MyBaseEvaluatorTest
 		try
 		{
 			Cursor cursor1=TestUtils.createCursor("month");
-			MyOpenContext context=new MyOpenContext();
+			DefaultContext context=new DefaultContext();
 			VariablesManager variablesManager=new StrictVariablesManager(new CursorVariablesContext(null, cursor1));
 			context.setVariablesManager(variablesManager);
 

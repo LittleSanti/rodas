@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.samajackun.rodas.core.context.TestUtils;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
@@ -32,7 +32,7 @@ public class GroupedCursorTest
 		ProviderException
 	{
 		Cursor cursor=TestUtils.createCursor("month");
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();

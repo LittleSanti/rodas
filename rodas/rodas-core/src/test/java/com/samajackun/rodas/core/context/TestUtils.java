@@ -1,7 +1,7 @@
 package com.samajackun.rodas.core.context;
 
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.execution.Cursor;
@@ -57,7 +57,7 @@ public class TestUtils
 		// identifierCoordinatesMap.put("id", new IdentifierCoordinates(0, 0));
 		// identifierCoordinatesMap.put("name", new IdentifierCoordinates(0, 1));
 		// identifierCoordinatesMap.put("days", new IdentifierCoordinates(0, 2));
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 
 		// cursor1.next();

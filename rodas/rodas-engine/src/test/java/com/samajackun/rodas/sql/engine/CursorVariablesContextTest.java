@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
@@ -90,7 +90,7 @@ public class CursorVariablesContextTest
 		throws ProviderException,
 		CursorException
 	{
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		DefaultCursor cursorUpper=createCursor2();
 		DefaultCursor cursor=createCursor1();
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();

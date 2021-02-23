@@ -24,7 +24,9 @@ public class FilteredCursor extends AbstractComposedCursor
 
 	private long myPosition;
 
-	public FilteredCursor(Cursor src, Context context, EvaluatorFactory evaluatorFactory, Expression filterExpression) throws CursorException, EvaluationException
+	public FilteredCursor(Cursor src, Context context, EvaluatorFactory evaluatorFactory, Expression filterExpression)
+		throws CursorException,
+		EvaluationException
 	{
 		super(src);
 		this.context=context;
@@ -44,25 +46,25 @@ public class FilteredCursor extends AbstractComposedCursor
 				if (super.hasNext())
 				{
 					super.next();
-					Object value=filterExpression.evaluate(context, evaluatorFactory);
+					Object value=this.filterExpression.evaluate(this.context, this.evaluatorFactory);
 					boolean match=LogicalUtils.toBoolean(value);
 					if (match)
 					{
-						fetched=new CachedRowData(super.getRowData(), getNumberOfColumns(), myPosition);
+						this.fetched=new CachedRowData(super.getRowData(), getNumberOfColumns(), this.myPosition);
 						looping=false;
 					}
 					else
 					{
-						fetched=null;
+						this.fetched=null;
 					}
 				}
 				else
 				{
-					fetched=null;
+					this.fetched=null;
 					looping=false;
 				}
 			}
-			myPosition++;
+			this.myPosition++;
 		}
 		catch (EvaluationException e)
 		{
@@ -74,11 +76,11 @@ public class FilteredCursor extends AbstractComposedCursor
 	public void next()
 		throws CursorException
 	{
-		if (fetched == null)
+		if (this.fetched == null)
 		{
 			throw new CursorException("Exhausted cursor");
 		}
-		current=fetched;
+		this.current=this.fetched;
 		fetch();
 	}
 
@@ -86,14 +88,14 @@ public class FilteredCursor extends AbstractComposedCursor
 	public boolean hasNext()
 		throws CursorException
 	{
-		return fetched != null;
+		return this.fetched != null;
 	}
 
 	@Override
 	public RowData getRowData()
 		throws CursorException
 	{
-		return current;
+		return this.current;
 	}
 
 	@Override

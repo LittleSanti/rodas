@@ -7,7 +7,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.eval.EvaluationException;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.execution.Cursor;
 
 public class TableSourceTest
@@ -32,7 +32,7 @@ public class TableSourceTest
 	{
 		TableSource source=new TableSource("country");
 		MyEngine engine=new MyEngine();
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		Provider provider=new MyProvider();
 		context.setProvider(provider);
 		try

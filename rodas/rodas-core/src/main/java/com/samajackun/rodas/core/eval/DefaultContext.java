@@ -4,10 +4,8 @@ import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.Provider;
 import com.samajackun.rodas.core.model.RodasRuntimeException;
 
-public class MyOpenContext implements Context
+public class DefaultContext implements Context
 {
-	// private MapList<String, Cursor> cursors;
-
 	private VariablesManager variablesManager;
 
 	private Runtime runtime;
@@ -15,58 +13,6 @@ public class MyOpenContext implements Context
 	private Provider provider;
 
 	private EvaluatorFactory evaluatorFactory;
-	// @Override
-	// public Object getColumnByName(String column, String prefix)
-	// throws NameNotBoundException,
-	// CursorException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Object getColumnByName(String column)
-	// throws NameNotBoundException,
-	// CursorException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public int getColumnIndexByName(String column, String prefix)
-	// throws NameNotBoundException
-	// {
-	// // TODO Auto-generated method stub
-	// return 0;
-	// }
-	//
-	// @Override
-	// public Context fork(Context subContext)
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-	//
-	// @Override
-	// public Object getColumnByIndex(int index)
-	// throws IndexNotBoundException,
-	// CursorException
-	// {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-
-	// @Override
-	// public MapList<String, Cursor> getCursors()
-	// {
-	// return this.cursors;
-	// }
-	//
-	// public void setCursors(MapList<String, Cursor> cursors)
-	// {
-	// this.cursors=cursors;
-	// }
 
 	@Override
 	public VariablesManager getVariablesManager()
@@ -74,9 +20,10 @@ public class MyOpenContext implements Context
 		return this.variablesManager;
 	}
 
-	public void setVariablesManager(VariablesManager variablesManager)
+	public DefaultContext setVariablesManager(VariablesManager variablesManager)
 	{
 		this.variablesManager=variablesManager;
+		return this;
 	}
 
 	@Override
@@ -85,9 +32,10 @@ public class MyOpenContext implements Context
 		return this.runtime;
 	}
 
-	public void setRuntime(Runtime runtime)
+	public DefaultContext setRuntime(Runtime runtime)
 	{
 		this.runtime=runtime;
+		return this;
 	}
 
 	@Override
@@ -96,19 +44,22 @@ public class MyOpenContext implements Context
 		return this.provider;
 	}
 
-	public void setProvider(Provider provider)
+	public DefaultContext setProvider(Provider provider)
 	{
 		this.provider=provider;
+		return this;
 	}
 
 	@Override
 	public Object evaluate(Expression expression, EvaluatorFactory evaluatorFactory)
 		throws EvaluationException
 	{
+		// return expression.evaluate(this, evaluatorFactory);
 		VariablesContext variablesContext=this.variablesManager.peekLocalContext();
 		// System.out.println("variablesContext.get(" + expression.getName() +
 		// ")=" + variablesContext.get(expression.getName()));
-		Object value=variablesContext.setIfAbsent(expression.getCodeAsName(), () -> {
+		Name name=expression.getCodeAsName();
+		Object value=variablesContext.setIfAbsent(name, () -> {
 			try
 			{
 				return expression.evaluate(this, evaluatorFactory);
@@ -132,9 +83,10 @@ public class MyOpenContext implements Context
 		return this.evaluatorFactory;
 	}
 
-	public void setEvaluatorFactory(EvaluatorFactory evaluatorFactory)
+	public DefaultContext setEvaluatorFactory(EvaluatorFactory evaluatorFactory)
 	{
 		this.evaluatorFactory=evaluatorFactory;
+		return this;
 	}
 
 }

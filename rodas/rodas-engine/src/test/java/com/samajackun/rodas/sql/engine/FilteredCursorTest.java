@@ -9,7 +9,7 @@ import org.junit.Test;
 import com.samajackun.rodas.core.context.TestUtils;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.MyOpenContext;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
@@ -33,7 +33,7 @@ public class FilteredCursorTest
 	{
 		Cursor cursor=TestUtils.createCursor("month");
 		Expression expression=new BooleanConstantExpression("true", true);
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
@@ -90,7 +90,7 @@ public class FilteredCursorTest
 	{
 		Cursor cursor=TestUtils.createCursor("month");
 		Expression expression=new BooleanConstantExpression("false", false);
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
@@ -107,7 +107,7 @@ public class FilteredCursorTest
 	{
 		Cursor cursor=TestUtils.createCursor("month");
 		Expression expression=new EqualsExpression("=", new IdentifierExpression("name"), new TextConstantExpression("marzo"));
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
@@ -129,7 +129,7 @@ public class FilteredCursorTest
 	{
 		Cursor cursor=TestUtils.createCursor("month");
 		Expression expression=new EqualsExpression("=", new IdentifierExpression("days"), new NumericConstantExpression("31", 31));
-		MyOpenContext context=new MyOpenContext();
+		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
