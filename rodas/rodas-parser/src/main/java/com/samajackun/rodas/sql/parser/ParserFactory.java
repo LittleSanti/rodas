@@ -17,4 +17,6 @@ public interface ParserFactory
 	public PartialParser getRelationalExpressionParser();
 
 	public PartialParser getSelectSentenceParser();
+
+	public SourceParser getSourceParser();
 }

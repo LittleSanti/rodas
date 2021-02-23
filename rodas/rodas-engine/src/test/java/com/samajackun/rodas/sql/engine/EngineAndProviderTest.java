@@ -5,14 +5,16 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.RodasException;
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.DefaultContext;
+import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.Name;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
@@ -68,15 +70,15 @@ public class EngineAndProviderTest
 		cursor.close();
 	}
 
-	private void executeQuery(String sql)
+	private List<Object[]> executeQuery(String sql)
 		throws RodasException,
 		IOException,
 		IOException
 	{
-		executeQuery(sql, createContext());
+		return executeQuery(sql, createContext());
 	}
 
-	private void executeQuery(String sql, Context context)
+	private List<Object[]> executeQuery(String sql, Context context)
 		throws RodasException,
 		IOException,
 		IOException
@@ -87,13 +89,26 @@ public class EngineAndProviderTest
 		Cursor cursor=this.engine.execute(source, context);
 		cursor.getColumnMap().keySet().stream().forEach(s -> System.out.printf("%s\t", s));
 		System.out.printf("\r\n");
+		List<Object[]> resultRows=new ArrayList<>();
 		while (cursor.hasNext())
 		{
 			cursor.next();
 			RowData rowData=cursor.getRowData();
 			cursor.getColumnMap().entrySet().stream().forEach(e -> System.out.printf("%s\t", rowData.get(e.getValue())));
+			resultRows.add(toArray(rowData, cursor.getColumnMap().size()));
 			System.out.printf("\r\n");
 		}
+		return resultRows;
+	}
+
+	private Object[] toArray(RowData rowData, int columns)
+	{
+		Object[] row=new Object[columns];
+		for (int i=0; i < columns; i++)
+		{
+			row[i]=rowData.get(i);
+		}
+		return row;
 	}
 
 	@Test
@@ -107,6 +122,8 @@ public class EngineAndProviderTest
 			{ 1, "spain", 121.1d },
 			{ 2, "portugal", 122.2d },
 			{ 3, "italy", 123.3d },
+			{ 4, "france", 124.4d },
+			{ 5, "germany", 125.5d },
 			// @formatter:on
 		};
 		executeQuery(sql, createContext(), expected);
@@ -155,12 +172,45 @@ public class EngineAndProviderTest
 	}
 
 	@Test
-	public void executeQueryWithWhere()
+	public void executeQueryWithWhereReturningOneRow()
 		throws RodasException,
 		IOException
 	{
-		String sql="SELECT idCountry, name, 121 FROM country WHERE name='spain' AND idCountry=1";
-		executeQuery(sql);
+		String sql="SELECT idCountry, name, 400 FROM country WHERE name='spain' AND idCountry=1";
+		List<Object[]> result=executeQuery(sql);
+		assertEquals(1, result.size());
+		assertEquals(1, result.get(0)[0]);
+		assertEquals("spain", result.get(0)[1]);
+		assertEquals(400L, result.get(0)[2]);
+	}
+
+	@Test
+	public void executeQueryWithWhereGreaterThan()
+		throws RodasException,
+		IOException
+	{
+		String sql="SELECT idCountry, name, 400 FROM country WHERE idCountry=3";
+		List<Object[]> result=executeQuery(sql);
+		assertEquals(1, result.size());
+		assertEquals(3, result.get(0)[0]);
+		assertEquals("italy", result.get(0)[1]);
+		assertEquals(400L, result.get(0)[2]);
+	}
+
+	@Test
+	public void executeQueryWithWhereReturningTwoRows()
+		throws RodasException,
+		IOException
+	{
+		String sql="SELECT idCountry, name, 500 FROM country WHERE idCountry >=2";
+		List<Object[]> result=executeQuery(sql);
+		assertEquals(2, result.size());
+		assertEquals(2, result.get(0)[0]);
+		assertEquals("portugal", result.get(0)[1]);
+		assertEquals(500L, result.get(0)[2]);
+		assertEquals(3, result.get(1)[0]);
+		assertEquals("italy", result.get(1)[1]);
+		assertEquals(500L, result.get(1)[2]);
 	}
 
 	@Test
@@ -168,8 +218,10 @@ public class EngineAndProviderTest
 		throws RodasException,
 		IOException
 	{
-		String sql="SELECT name FROM (SELECT idCountry, name, 121 FROM country WHERE name='spain' OR name='portugal')";
-		executeQuery(sql);
+		String sql="SELECT name FROM (SELECT idCountry, name, 121 FROM country WHERE name='spain' OR name='portugal') WHERE name='portugal'";
+		List<Object[]> result=executeQuery(sql);
+		assertEquals(1, result.size());
+		assertEquals("portugal", result.get(0)[0]);
 	}
 
 	@Test

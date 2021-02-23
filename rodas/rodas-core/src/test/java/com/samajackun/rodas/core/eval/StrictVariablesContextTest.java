@@ -14,10 +14,10 @@ public class StrictVariablesContextTest
 	{
 		StrictVariablesContext context=new StrictVariablesContext();
 		Name name=Name.instanceOf("id");
+		@SuppressWarnings("unchecked")
 		Supplier<Object> supplier1=Mockito.mock(Supplier.class);
 		Mockito.when(supplier1.get()).thenReturn(120L);
 		Object v1=context.setIfAbsent(name, supplier1);
-		Object v2=context.setIfAbsent(name, supplier1);
 		Mockito.verify(supplier1, Mockito.times(1)).get();
 		assertEquals(120L, v1);
 	}

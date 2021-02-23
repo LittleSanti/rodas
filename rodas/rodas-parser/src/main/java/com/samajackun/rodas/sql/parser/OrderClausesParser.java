@@ -43,17 +43,17 @@ public class OrderClausesParser extends AbstractParser<List<OrderClause>>
 						switch (token.getType())
 						{
 							case SqlTokenTypes.KEYWORD_ASC:
-								OrderClause clause=new OrderClause(expression, true);
+								OrderClause clause=new OrderClause(expression, OrderClause.Direction.ASCENDING);
 								clauses.add(clause);
 								state=State.READ_CLAUSE;
 								break;
 							case SqlTokenTypes.COMMA:
-								OrderClause clause2=new OrderClause(expression, true);
+								OrderClause clause2=new OrderClause(expression, OrderClause.Direction.ASCENDING);
 								clauses.add(clause2);
 								state=State.EXPECTING_CLAUSE;
 								break;
 							case SqlTokenTypes.KEYWORD_DESC:
-								OrderClause clause3=new OrderClause(expression, false);
+								OrderClause clause3=new OrderClause(expression, OrderClause.Direction.DESCENDING);
 								clauses.add(clause3);
 								state=State.READ_CLAUSE;
 								break;
@@ -66,7 +66,7 @@ public class OrderClausesParser extends AbstractParser<List<OrderClause>>
 					}
 					else
 					{
-						OrderClause clause=new OrderClause(expression, true);
+						OrderClause clause=new OrderClause(expression, OrderClause.Direction.ASCENDING);
 						clauses.add(clause);
 					}
 					break;

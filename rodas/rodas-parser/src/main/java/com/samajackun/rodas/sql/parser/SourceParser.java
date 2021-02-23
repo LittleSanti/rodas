@@ -23,21 +23,9 @@ import com.samajackun.rodas.sql.tokenizer.Token;
 
 public class SourceParser extends AbstractParser<Source>
 {
-	private static final SourceParser INSTANCE=new SourceParser();
-
-	private SourceParser(ParserFactory parserFactory)
+	public SourceParser(ParserFactory parserFactory)
 	{
 		super(parserFactory);
-	}
-
-	public static SourceParser getInstance()
-	{
-		return INSTANCE;
-	}
-
-	private SourceParser()
-	{
-		this(DefaultParserFactory.getInstance());
 	}
 
 	private enum State {
@@ -132,7 +120,9 @@ public class SourceParser extends AbstractParser<Source>
 								state=State.READ_SOURCE;
 								break;
 							default:
-								throw new UnexpectedTokenException(token);
+								source=unexpectedTokenAfterFrom(tokenizer, parserContext, token);
+								state=State.READ_SOURCE;
+								break;
 						}
 						break;
 					case READ_SOURCE:
@@ -246,5 +236,12 @@ public class SourceParser extends AbstractParser<Source>
 		{
 			throw new BooleanExpressionExpectedException(null);
 		}
+	}
+
+	protected Source unexpectedTokenAfterFrom(AbstractMatchingTokenizer tokenizer, ParserContext parserContext, Token unexpectedToken)
+		throws ParserException,
+		IOException
+	{
+		throw new UnexpectedTokenException(unexpectedToken);
 	}
 }

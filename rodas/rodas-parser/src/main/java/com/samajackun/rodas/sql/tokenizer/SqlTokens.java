@@ -30,9 +30,9 @@ public final class SqlTokens
 
 	public static final Token TOKEN_MINUS=new Token(SqlTokenTypes.OPERATOR_MINUS, "-");
 
-	public static final Token TOKEN_PAREHENTESES_END=new Token(SqlTokenTypes.PARENTHESIS_END, ")");
+	public static final Token TOKEN_PAREHENTESIS_END=new Token(SqlTokenTypes.PARENTHESIS_END, ")");
 
-	public static final Token TOKEN_PAREHENTESES_START=new Token(SqlTokenTypes.PARENTHESIS_START, "(");
+	public static final Token TOKEN_PAREHENTESIS_START=new Token(SqlTokenTypes.PARENTHESIS_START, "(");
 
 	public static final Token TOKEN_PERIOD=new Token(SqlTokenTypes.PERIOD, ".");
 

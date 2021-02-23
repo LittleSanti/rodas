@@ -110,7 +110,7 @@ public class GenericSelectSentenceParser extends AbstractParser<SelectSentence> 
 					switch (token.getType())
 					{
 						case SqlTokenTypes.KEYWORD_FROM:
-							Source source=SourceParser.getInstance().parse(tokenizer, parserContext);
+							Source source=getParserFactory().getSourceParser().parse(tokenizer, parserContext);
 							selectSentence.setSource(source);
 							state=State.READ_FROM_CLAUSE;
 							break;

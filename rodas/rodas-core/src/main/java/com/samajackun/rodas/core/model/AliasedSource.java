@@ -55,26 +55,4 @@ public class AliasedSource implements Source
 	{
 		return this.source.execute(engine, context);
 	}
-
-	// @Override
-	// public boolean hasColumn(String column)
-	// throws ProviderException
-	// {
-	// return this.source.hasColumn(column);
-	// }
-	//
-	// @Override
-	// public List<String> getColumnNames()
-	// throws ProviderException
-	// {
-	// return this.source.getColumnNames();
-	// }
-	//
-	// @Override
-	// public ColumnMetadata getColumnMetadata(int column, Context context, EvaluatorFactory evaluatorFactory)
-	// throws MetadataException,
-	// ProviderException
-	// {
-	// return this.source.getColumnMetadata(column, context, evaluatorFactory);
-	// }
 }

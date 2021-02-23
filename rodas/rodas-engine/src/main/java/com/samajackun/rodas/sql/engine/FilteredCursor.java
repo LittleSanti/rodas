@@ -10,10 +10,8 @@ import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.RowData;
 
-public class FilteredCursor extends AbstractComposedCursor
+public class FilteredCursor extends AbstractNestedCursor
 {
-	private final Context context;
-
 	private final EvaluatorFactory evaluatorFactory;
 
 	private final Expression filterExpression;
@@ -28,8 +26,7 @@ public class FilteredCursor extends AbstractComposedCursor
 		throws CursorException,
 		EvaluationException
 	{
-		super(src);
-		this.context=context;
+		super(src, context);
 		this.evaluatorFactory=evaluatorFactory;
 		this.filterExpression=filterExpression;
 		fetch();
@@ -38,6 +35,7 @@ public class FilteredCursor extends AbstractComposedCursor
 	private void fetch()
 		throws CursorException
 	{
+		// this.context.getVariablesManager().pushLocalContext(new StrictVariablesContext());
 		try
 		{
 			boolean looping=true;
@@ -46,7 +44,7 @@ public class FilteredCursor extends AbstractComposedCursor
 				if (super.hasNext())
 				{
 					super.next();
-					Object value=this.filterExpression.evaluate(this.context, this.evaluatorFactory);
+					Object value=this.filterExpression.evaluate(getContext(), this.evaluatorFactory);
 					boolean match=LogicalUtils.toBoolean(value);
 					if (match)
 					{

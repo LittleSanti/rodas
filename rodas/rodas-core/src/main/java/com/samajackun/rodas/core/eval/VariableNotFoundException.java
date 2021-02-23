@@ -6,6 +6,12 @@ public class VariableNotFoundException extends EvaluationException
 
 	private final Name name;
 
+	public VariableNotFoundException(Name name, Exception cause)
+	{
+		super("Variable '" + name.asString() + "' not found because " + cause.toString(), cause);
+		this.name=name;
+	}
+
 	public VariableNotFoundException(Name name)
 	{
 		super("Variable '" + name.asString() + "' not found");

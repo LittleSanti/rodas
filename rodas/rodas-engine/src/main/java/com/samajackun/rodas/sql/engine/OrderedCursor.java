@@ -1,26 +1,22 @@
 package com.samajackun.rodas.sql.engine;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import com.samajackun.rodas.core.eval.Context;
-import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.execution.CachedCursor;
 import com.samajackun.rodas.core.execution.Cursor;
 import com.samajackun.rodas.core.execution.CursorException;
 import com.samajackun.rodas.core.execution.ExhaustedCursorException;
 import com.samajackun.rodas.core.model.ColumnMetaData;
-import com.samajackun.rodas.core.model.Expression;
 import com.samajackun.rodas.core.model.OrderClause;
 import com.samajackun.rodas.core.model.RowData;
 
-public class OrderedCursor implements Cursor
+public class OrderedCursor implements Cursor // extends AbstractNestedCursor
 {
+	private final Context producerContext;
+
 	private final CachedCursor src;
 
 	private final List<Integer> index;
@@ -29,68 +25,17 @@ public class OrderedCursor implements Cursor
 
 	private boolean closed;
 
-	public OrderedCursor(Cursor src, Context context, EvaluatorFactory evaluatorFactory, List<OrderClause> orderClauses)
+	public OrderedCursor(Cursor src, Context producerContext, EvaluatorFactory evaluatorFactory, List<OrderClause> orderClauses)
 		throws CursorException
 	{
+		// super(src, context);
+		this.producerContext=producerContext;
 		this.src=src.toCachedCursor();
-		this.index=index(this.src, context, evaluatorFactory, orderClauses);
+		RowDataContext rowDataContext=new RowDataContext(this.producerContext.getVariablesManager().peekLocalContext(), src.getColumnMap());
+		this.producerContext.getVariablesManager().pushLocalContext(rowDataContext);
+		this.index=ComparatorUtils.index(this.src, this.producerContext, rowDataContext, evaluatorFactory, orderClauses);
 	}
 
-	private Comparator<RowData> createComparator(Context context, EvaluatorFactory evaluatorFactory, List<OrderClause> orderClauses, RowDataVariablesContext rowDataVariablesContext)
-		throws CursorException
-	{
-		Comparator<RowData> comparator=null;
-		for (OrderClause clause : orderClauses)
-		{
-			Expression exp=clause.getExpression();
-			@SuppressWarnings({
-				"unchecked",
-				"rawtypes"
-			})
-			Comparator<RowData> comparatorStep=Comparator.comparing(r -> {
-				Object value;
-				try
-				{
-					// rowDataVariablesContext.setRowData(r);
-					value=exp.evaluate(context, evaluatorFactory);
-				}
-				catch (EvaluationException e)
-				{
-					// FIXME
-					value="???ERROR???";
-				}
-				return (Comparable)value;
-			});
-			if (!clause.isAscending())
-			{
-				comparatorStep=comparatorStep.reversed();
-			}
-			comparator=(comparator == null)
-				? comparatorStep
-				: comparator.thenComparing(comparatorStep);
-		}
-		// Este último comparator es para evitar que se produzcan duplicados en el índice:
-		comparator=comparator.thenComparing(Comparator.comparing(r -> r.position()));
-		return comparator;
-	}
-
-	private List<Integer> index(CachedCursor src, Context context, EvaluatorFactory evaluatorFactory, List<OrderClause> orderClauses)
-		throws CursorException
-	{
-		RowDataVariablesContext rowDataVariablesContext=new RowDataVariablesContext(context.getVariablesManager().peekLocalContext(), src.getColumnMap());
-		Comparator<RowData> comparator=createComparator(context, evaluatorFactory, orderClauses, rowDataVariablesContext);
-		SortedMap<RowData, Integer> map=new TreeMap<>(comparator);
-		context.getVariablesManager().pushLocalContext(rowDataVariablesContext);
-		for (int n=0; n < src.size(); n++)
-		{
-			RowData row=src.getRowData(n);
-			map.put(row, n);
-		}
-		context.getVariablesManager().popLocalContext();
-		List<Integer> list=new ArrayList<>(src.size());
-		list.addAll(map.values());
-		return list;
-	}
 	// private List<Integer> index(Cursor src, Context context, EvaluatorFactory evaluatorFactory, List<OrderClause> orderClauses)
 	// throws CursorException
 	// {
@@ -185,6 +130,7 @@ public class OrderedCursor implements Cursor
 	public void close()
 		throws CursorException
 	{
+		this.producerContext.getVariablesManager().popLocalContext();
 		this.closed=true;
 	}
 

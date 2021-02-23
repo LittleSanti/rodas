@@ -14,6 +14,21 @@ public class DefaultContext implements Context
 
 	private EvaluatorFactory evaluatorFactory;
 
+	public DefaultContext()
+	{
+	}
+
+	public static DefaultContext createNestedContext(Context src, VariablesContext variablesContext)
+	{
+		DefaultContext ctx=new DefaultContext();
+		ctx.setEvaluatorFactory(src.getEvaluatorFactory());
+		ctx.setProvider(src.getProvider());
+		ctx.setRuntime(src.getRuntime());
+		StrictVariablesManager vm=new StrictVariablesManager(variablesContext);
+		ctx.setVariablesManager(vm);
+		return ctx;
+	}
+
 	@Override
 	public VariablesManager getVariablesManager()
 	{

@@ -51,6 +51,7 @@ public interface Cursor
 	public default CachedCursor toCachedCursor()
 		throws CursorException
 	{
+		// FIXME En realidad solo es válida la primera vez que se llama; luego, el cursor ya está agotado.
 		return new DefaultCachedCursor(this);
 	}
 }

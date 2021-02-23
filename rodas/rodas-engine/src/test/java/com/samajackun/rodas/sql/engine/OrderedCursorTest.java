@@ -10,9 +10,9 @@ import java.util.List;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.context.TestUtils;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
@@ -36,7 +36,7 @@ public class OrderedCursorTest
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		List<OrderClause> clauses=new ArrayList<>();
-		clauses.add(new OrderClause(new IdentifierExpression("name"), true));
+		clauses.add(new OrderClause(new IdentifierExpression("name"), OrderClause.Direction.ASCENDING));
 		cursor=new OrderedCursor(cursor, context, evaluatorFactory, clauses);
 		assertListEquals(cursor, 1, Arrays.asList("abril", "agosto", "diciembre", "enero", "febrero", "julio", "junio", "marzo", "mayo", "noviembre", "octubre", "septiembre", "triciembre"));
 	}
@@ -64,7 +64,7 @@ public class OrderedCursorTest
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		List<OrderClause> clauses=new ArrayList<>();
-		clauses.add(new OrderClause(new IdentifierExpression("id"), true));
+		clauses.add(new OrderClause(new IdentifierExpression("id"), OrderClause.Direction.ASCENDING));
 		cursor=new OrderedCursor(cursor, context, evaluatorFactory, clauses);
 		assertListEquals(cursor, 1, Arrays.asList("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre", "triciembre"));
 	}
@@ -81,13 +81,13 @@ public class OrderedCursorTest
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		List<OrderClause> clauses=new ArrayList<>();
-		clauses.add(new OrderClause(new IdentifierExpression("days"), true));
+		clauses.add(new OrderClause(new IdentifierExpression("days"), OrderClause.Direction.ASCENDING));
 		cursor=new OrderedCursor(cursor, context, evaluatorFactory, clauses);
 		assertListEquals(cursor, 1, Arrays.asList("febrero", "abril", "junio", "septiembre", "noviembre", "enero", "marzo", "mayo", "julio", "agosto", "octubre", "diciembre", "triciembre"));
 	}
 
 	@Test
-	public void orderByOneIntColumnNonUniqueAndOneReverseString()
+	public void orderByOneIntColumnNonUniqueAndOneStringAscending()
 		throws CursorException,
 		ProviderException,
 		EvaluationException
@@ -98,9 +98,10 @@ public class OrderedCursorTest
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 		EvaluatorFactory evaluatorFactory=new DefaultEvaluatorFactory();
 		List<OrderClause> clauses=new ArrayList<>();
-		clauses.add(new OrderClause(new IdentifierExpression("days"), true));
-		clauses.add(new OrderClause(new IdentifierExpression("name"), false));
+		clauses.add(new OrderClause(new IdentifierExpression("days"), OrderClause.Direction.ASCENDING));
+		clauses.add(new OrderClause(new IdentifierExpression("name"), OrderClause.Direction.ASCENDING));
+
 		cursor=new OrderedCursor(cursor, context, evaluatorFactory, clauses);
-		assertListEquals(cursor, 1, Arrays.asList("febrero", "septiembre", "noviembre", "junio", "abril", "octubre", "mayo", "marzo", "julio", "enero", "diciembre", "agosto", "triciembre"));
+		assertListEquals(cursor, 1, Arrays.asList("febrero", "abril", "junio", "noviembre", "septiembre", "agosto", "diciembre", "enero", "julio", "marzo", "mayo"));
 	}
 }

@@ -485,7 +485,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src="(";
-		Token[] expectedTokens= { SqlTokens.TOKEN_PAREHENTESES_START };
+		Token[] expectedTokens= { SqlTokens.TOKEN_PAREHENTESIS_START };
 		test(src, expectedTokens);
 	}
 
@@ -494,7 +494,7 @@ public class SqlTokenizerTest
 		throws IOException
 	{
 		String src=")";
-		Token[] expectedTokens= { SqlTokens.TOKEN_PAREHENTESES_END };
+		Token[] expectedTokens= { SqlTokens.TOKEN_PAREHENTESIS_END };
 		test(src, expectedTokens);
 	}
 

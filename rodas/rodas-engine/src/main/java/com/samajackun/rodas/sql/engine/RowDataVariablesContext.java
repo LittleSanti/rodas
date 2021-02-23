@@ -71,9 +71,7 @@ class RowDataVariablesContext implements VariablesContext
 				}
 				catch (CursorException e)
 				{
-					// FIXME
-					e.printStackTrace();
-					throw new VariableNotFoundException(name);
+					throw new VariableNotFoundException(name, e);
 				}
 			}
 		}

@@ -8,18 +8,18 @@ import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.execution.Cursor;
-import com.samajackun.rodas.core.execution.DefaultCursor;
-import com.samajackun.rodas.core.model.AliasedSource;
+import com.samajackun.rodas.core.execution.TableCursor;
 import com.samajackun.rodas.core.model.ColumnMetaData;
 import com.samajackun.rodas.core.model.CrossSource;
 import com.samajackun.rodas.core.model.Engine;
 import com.samajackun.rodas.core.model.EngineException;
 import com.samajackun.rodas.core.model.OnJoinedSource;
-import com.samajackun.rodas.core.model.ParehentesizedSource;
+import com.samajackun.rodas.core.model.OneRowSource;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.SelectSentence;
 import com.samajackun.rodas.core.model.Source;
 import com.samajackun.rodas.core.model.TableData;
+import com.samajackun.rodas.core.model.TableMetaData;
 import com.samajackun.rodas.core.model.TableSource;
 
 public class SqlEngine implements Engine
@@ -37,8 +37,9 @@ public class SqlEngine implements Engine
 		// Y lo vamos a resolver mediante el paradigma de las COMPOSICIONES SUCESIVAS:
 
 		// 1-Cursor inicial:
+		Cursor cursor=createCursor(getNonNullSource(selectSource.getSource()), context);
 		// Hay que crear aquí un nuevo VariablesContext y pasárselo a createCursor.
-		Cursor cursor=createCursor(selectSource.getSource(), context);
+		// context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
 
 		// Map<String, Cursor> cursorMap=new HashMap<>();
 		// cursorMap.put("x", cursor); // FIXME
@@ -73,9 +74,16 @@ public class SqlEngine implements Engine
 
 		// PoppingVariablesContextCursor sirve para hacer el popLocalContext en Cursor.close().
 		// No se debe hacer antes, pues entonces perdemos el CursorMapVariablesContext que hemos "pushado" al comienzo deste método.
-		cursor=new PoppingVariablesContextCursor(cursor, context);
+		// cursor=new PoppingVariablesContextCursor(cursor, context);
 
 		return cursor;
+	}
+
+	private Source getNonNullSource(Source source)
+	{
+		return source == null
+			? OneRowSource.getInstance()
+			: source;
 	}
 
 	private Cursor createCursor(Source source, Context context)
@@ -83,40 +91,7 @@ public class SqlEngine implements Engine
 		EvaluationException,
 		ProviderException
 	{
-		// FIXME Hay que reemplazar esta implementación por una simple return source.execute(this, context)
-		Cursor cursor;
-		if (source == null)
-		{
-			cursor=new SingleRowCursor();
-		}
-		else if (source instanceof TableSource)
-		{
-			cursor=execute((TableSource)source, context);
-		}
-		else if (source instanceof SelectSentence)
-		{
-			cursor=execute((SelectSentence)source, context);
-		}
-		else if (source instanceof CrossSource)
-		{
-			cursor=execute((CrossSource)source, context);
-		}
-		else if (source instanceof OnJoinedSource)
-		{
-			cursor=execute((OnJoinedSource)source, context);
-		}
-		else if (source instanceof ParehentesizedSource)
-		{
-			cursor=createCursor(((ParehentesizedSource)source).getSource(), context);
-		}
-		else if (source instanceof AliasedSource)
-		{
-			cursor=createCursor(((AliasedSource)source).getSource(), context);
-		}
-		else
-		{
-			throw new IllegalArgumentException(source.getClass().getName());
-		}
+		Cursor cursor=source.execute(this, context);
 		RowDataVariablesContext newVariablesContext=new RowDataVariablesContext(context.getVariablesManager().peekLocalContext(), cursor.getColumnMap());
 		newVariablesContext.setCurrentCursor(cursor);
 		context.getVariablesManager().pushLocalContext(newVariablesContext);
@@ -140,9 +115,10 @@ public class SqlEngine implements Engine
 		EvaluationException,
 		ProviderException
 	{
-		TableData tableData=context.getProvider().getTableMetaData(source.getTable()).getTableData();
-		List<ColumnMetaData> metadata=context.getProvider().getTableMetaData(source.getTable()).getListOfColumnMetadata();
-		Cursor cursor=new DefaultCursor(metadata, tableData);
+		TableMetaData metaData=context.getProvider().getTableMetaData(source.getTable());
+		TableData tableData=metaData.getTableData();
+		List<ColumnMetaData> metadata=metaData.getListOfColumnMetadata();
+		Cursor cursor=new TableCursor(metadata, tableData);
 		return cursor;
 	}
 

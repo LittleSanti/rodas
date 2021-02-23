@@ -39,7 +39,7 @@ public class LogicalUtils
 			}
 			else if (value instanceof Number)
 			{
-				v=((Number)value).intValue() != 0;
+				v=((Number)value).longValue() != 0;
 			}
 			else if (value instanceof String)
 			{

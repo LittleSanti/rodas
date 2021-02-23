@@ -197,7 +197,6 @@ public class SelectSentence implements Source, Sentence, Expression
 		ProviderException
 	{
 		return engine.execute(this, context);
-		// return new Cursor(provider.getColumnNamesFromTable(this.table), provider.getTableData(this.table));
 	}
 
 	@Override

@@ -6,13 +6,17 @@ public class OrderClause implements Codeable
 
 	private final Expression expression;
 
-	private final boolean ascending;
+	public enum Direction {
+		ASCENDING, DESCENDING
+	};
 
-	public OrderClause(Expression expression, boolean ascending)
+	private final Direction direction;
+
+	public OrderClause(Expression expression, Direction direction)
 	{
 		super();
 		this.expression=expression;
-		this.ascending=ascending;
+		this.direction=direction;
 	}
 
 	public Expression getExpression()
@@ -22,14 +26,14 @@ public class OrderClause implements Codeable
 
 	public boolean isAscending()
 	{
-		return this.ascending;
+		return this.direction == Direction.ASCENDING;
 	}
 
 	@Override
 	public String toCode()
 	{
 		String s=this.expression.toCode();
-		if (!this.ascending)
+		if (this.direction == Direction.DESCENDING)
 		{
 			s+=" DESC";
 		}

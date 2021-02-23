@@ -8,7 +8,7 @@ import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
 import com.samajackun.rodas.core.execution.Cursor;
-import com.samajackun.rodas.core.execution.DefaultCursor;
+import com.samajackun.rodas.core.execution.TableCursor;
 
 public class MyEngine implements Engine
 {
@@ -32,7 +32,7 @@ public class MyEngine implements Engine
 			metadata.add(columnMetadata);
 		}
 		IterableTableData tableData=null;
-		Cursor cursor=new DefaultCursor(metadata, tableData);
+		Cursor cursor=new TableCursor(metadata, tableData);
 		return cursor;
 	}
 
@@ -53,7 +53,7 @@ public class MyEngine implements Engine
 	{
 		TableData tableData=context.getProvider().getTableMetaData(source.getTable()).getTableData();
 		List<ColumnMetaData> metadata=context.getProvider().getTableMetaData(source.getTable()).getListOfColumnMetadata();
-		Cursor cursor=new DefaultCursor(metadata, tableData);
+		Cursor cursor=new TableCursor(metadata, tableData);
 		return cursor;
 	}
 

@@ -18,6 +18,8 @@ public final class DefaultParserFactory implements ParserFactory
 
 	private GenericSelectSentenceParser selectSentenceParser;
 
+	private SourceParser sourceParser;
+
 	private static final DefaultParserFactory INSTANCE=new DefaultParserFactory();
 
 	public static DefaultParserFactory getInstance()
@@ -155,6 +157,23 @@ public final class DefaultParserFactory implements ParserFactory
 			}
 		}
 		return this.selectSentenceParser;
+	}
+
+	@Override
+	public SourceParser getSourceParser()
+	{
+		if (this.sourceParser == null)
+		{
+			synchronized (this)
+			{
+				if (this.sourceParser == null)
+				{
+					this.sourceParser=new SourceParser(this);
+				}
+			}
+		}
+		return this.sourceParser;
+
 	}
 
 }

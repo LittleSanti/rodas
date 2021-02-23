@@ -15,25 +15,4 @@ public interface Source extends Codeable
 	{
 		return null;
 	}
-
-	// public boolean hasColumn(String column)
-	// throws ProviderException;
-	//
-	// public List<String> getColumnNames()
-	// throws ProviderException;
-	//
-	// public ColumnMetadata getColumnMetadata(int column, Context context, EvaluatorFactory evaluatorFactory)
-	// throws MetadataException,
-	// ProviderException;
-	//
-	// public default Map<String, Integer> getColumnNamesMap()
-	// throws ProviderException
-	// {
-	// List<String> names=getColumnNames();
-	// Map<String, Integer> map=new HashMap<>((int)(1.7d * names.size()));
-	// AtomicInteger index=new AtomicInteger(-1);
-	// names.stream().forEachOrdered(s -> map.put(s, index.incrementAndGet()));
-	// return map;
-	// }
-	//
 }

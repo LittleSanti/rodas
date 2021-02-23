@@ -10,7 +10,7 @@ import com.samajackun.rodas.core.model.IterableTableData;
 import com.samajackun.rodas.core.model.ProviderException;
 import com.samajackun.rodas.core.model.RowData;
 
-public class DefaultCursor implements Cursor
+public class TableCursor implements Cursor
 {
 	private final Map<String, Integer> columnMap;
 
@@ -27,19 +27,19 @@ public class DefaultCursor implements Cursor
 		@Override
 		public Object get(int column)
 		{
-			return DefaultCursor.this.iteratorRowData.get(column);
+			return TableCursor.this.iteratorRowData.get(column);
 		}
 
 		@Override
 		public long position()
 		{
-			return DefaultCursor.this.iteratorRowData.position();
+			return TableCursor.this.iteratorRowData.position();
 		}
 	}
 
 	private final List<ColumnMetaData> metadata;
 
-	public DefaultCursor(List<ColumnMetaData> metadata, IterableTableData iterable)
+	public TableCursor(List<ColumnMetaData> metadata, IterableTableData iterable)
 		throws ProviderException
 	{
 		super();

@@ -16,13 +16,11 @@ import com.samajackun.rodas.core.model.Datatype;
 import com.samajackun.rodas.core.model.MetadataException;
 import com.samajackun.rodas.core.model.RowData;
 
-public class SelectingCursor extends AbstractComposedCursor
+public class SelectingCursor extends AbstractNestedCursor
 {
 	private final List<ColumnMetaData> metadata;
 
 	private final Map<String, Integer> columnMap;
-
-	private final Context context;
 
 	private final List<AliasedExpression> selectExpressions;
 
@@ -33,7 +31,7 @@ public class SelectingCursor extends AbstractComposedCursor
 	public SelectingCursor(Cursor src, Context context, EvaluatorFactory evaluatorFactory, List<AliasedExpression> selectExpressions)
 		throws MetadataException
 	{
-		super(src);
+		super(src, context);
 		List<ColumnMetaData> metadata=new ArrayList<>(selectExpressions.size());
 		Map<String, Integer> columnMap=new HashMap<>((int)(1.7d * selectExpressions.size()));
 		int p=0;
@@ -48,7 +46,6 @@ public class SelectingCursor extends AbstractComposedCursor
 		}
 		this.metadata=metadata;
 		this.columnMap=columnMap;
-		this.context=context;
 		this.evaluatorFactory=evaluatorFactory;
 		this.selectExpressions=selectExpressions;
 		this.rowData=new MyRowData();
@@ -88,7 +85,7 @@ public class SelectingCursor extends AbstractComposedCursor
 		{
 			try
 			{
-				return SelectingCursor.this.selectExpressions.get(column).evaluate(SelectingCursor.this.context, SelectingCursor.this.evaluatorFactory);
+				return SelectingCursor.this.selectExpressions.get(column).evaluate(getContext(), SelectingCursor.this.evaluatorFactory);
 			}
 			catch (EvaluationException e)
 			{
@@ -103,5 +100,4 @@ public class SelectingCursor extends AbstractComposedCursor
 			return getCurrentPosition();
 		}
 	}
-
 }

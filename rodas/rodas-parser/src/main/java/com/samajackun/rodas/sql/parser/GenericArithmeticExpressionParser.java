@@ -91,35 +91,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 							state=State.COMPLETE;
 							break;
 						case SqlTokenTypes.IDENTIFIER:
-							// Lookahead
-							Token token2=tokenizer.nextOptionalUsefulToken();
-							if (token2 != null)
-							{
-								if (token2.getType().equals(SqlTokenTypes.PARENTHESIS_START))
-								{
-									ExpressionCollection argumentsExpressions=getParserFactory().getExpressionCollectionParser().parse(tokenizer, parserContext);
-									FunctionCallExpression functionExpression=new FunctionCallExpression(new IdentifierExpression(token.getValue()), argumentsExpressions.getExpressions());
-									tokenizer.matchToken(SqlTokenTypes.PARENTHESIS_END);
-									expression=functionExpression;
-								}
-								else if (token2.getType().equals(SqlTokenTypes.PERIOD))
-								{
-									expression=parsePrefixedExpression(tokenizer, token.getValue());
-								}
-								else
-								{
-									expression=unexpectedTokenAfterIdentifier(tokenizer, parserContext, token, token2);
-									if (expression == null)
-									{
-										expression=new IdentifierExpression(token.getValue());
-										tokenizer.pushBack(token2);
-									}
-								}
-							}
-							else
-							{
-								expression=new IdentifierExpression(token.getValue());
-							}
+							expression=parseIdentifier(token, tokenizer, parserContext);
 							state=State.COMPLETE;
 							break;
 						case SqlTokenTypes.NAMED_PARAMETER:
@@ -140,7 +112,7 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 							tokenizer.pushBack(token);
 							// TODO Aquí hay que comprobar si SelectSentenceParser podría necesitar delgar sobre SumaParser,
 							// si dentro de la select aparecieran fórmulas sintácticas de SumaScript.
-							expression=SelectSentenceParser.getInstance().parse(tokenizer, parserContext);
+							expression=getParserFactory().getSelectSentenceParser().parse(tokenizer, parserContext);
 							state=State.COMPLETE;
 							break;
 						default:
@@ -185,6 +157,43 @@ public class GenericArithmeticExpressionParser extends AbstractParser<Expression
 		if (expression == null)
 		{
 			throw new ParserException("End of stream");
+		}
+		return expression;
+	}
+
+	protected Expression parseIdentifier(Token token, AbstractMatchingTokenizer tokenizer, ParserContext parserContext)
+		throws IOException,
+		ParserException
+	{
+		Expression expression;
+		// Lookahead
+		Token token2=tokenizer.nextOptionalUsefulToken();
+		if (token2 != null)
+		{
+			if (token2.getType().equals(SqlTokenTypes.PARENTHESIS_START))
+			{
+				ExpressionCollection argumentsExpressions=getParserFactory().getExpressionCollectionParser().parse(tokenizer, parserContext);
+				FunctionCallExpression functionExpression=new FunctionCallExpression(new IdentifierExpression(token.getValue()), argumentsExpressions.getExpressions());
+				tokenizer.matchToken(SqlTokenTypes.PARENTHESIS_END);
+				expression=functionExpression;
+			}
+			else if (token2.getType().equals(SqlTokenTypes.PERIOD))
+			{
+				expression=parsePrefixedExpression(tokenizer, token.getValue());
+			}
+			else
+			{
+				expression=unexpectedTokenAfterIdentifier(tokenizer, parserContext, token, token2);
+				if (expression == null)
+				{
+					expression=new IdentifierExpression(token.getValue());
+					tokenizer.pushBack(token2);
+				}
+			}
+		}
+		else
+		{
+			expression=new IdentifierExpression(token.getValue());
 		}
 		return expression;
 	}

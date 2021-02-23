@@ -3,28 +3,27 @@ package com.samajackun.rodas.core.model;
 import com.samajackun.rodas.core.eval.Context;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.execution.Cursor;
+import com.samajackun.rodas.core.execution.OneRowCursor;
 
-public class TableSource implements Source
+public class OneRowSource implements Source
 {
-	private static final long serialVersionUID=3785987493745142450L;
+	private static final long serialVersionUID=1864556483967623653L;
 
-	private final String table;
+	private static final OneRowSource INSTANCE=new OneRowSource();
 
-	public TableSource(String table)
+	public static OneRowSource getInstance()
 	{
-		super();
-		this.table=table;
+		return INSTANCE;
 	}
 
-	public String getTable()
+	private OneRowSource()
 	{
-		return this.table;
 	}
 
 	@Override
 	public String toCode()
 	{
-		return this.table;
+		return "";
 	}
 
 	@Override
@@ -33,6 +32,6 @@ public class TableSource implements Source
 		EvaluationException,
 		ProviderException
 	{
-		return engine.execute(this, context);
+		return new OneRowCursor();
 	}
 }

@@ -187,11 +187,11 @@ public class SqlTokenizer extends AbstractTokenizer
 					}
 					else if (c == '(')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PAREHENTESES_START);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PAREHENTESIS_START);
 					}
 					else if (c == ')')
 					{
-						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PAREHENTESES_END);
+						token=createNewTokenIfNecessary(trailingText, SqlTokens.TOKEN_PAREHENTESIS_END);
 					}
 					else if (c == '+')
 					{

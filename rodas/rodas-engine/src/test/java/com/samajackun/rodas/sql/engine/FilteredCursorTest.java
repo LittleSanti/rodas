@@ -7,9 +7,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.context.TestUtils;
+import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.EvaluationException;
 import com.samajackun.rodas.core.eval.EvaluatorFactory;
-import com.samajackun.rodas.core.eval.DefaultContext;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
@@ -106,7 +106,7 @@ public class FilteredCursorTest
 		EvaluationException
 	{
 		Cursor cursor=TestUtils.createCursor("month");
-		Expression expression=new EqualsExpression("=", new IdentifierExpression("name"), new TextConstantExpression("marzo"));
+		Expression expression=new EqualsExpression("=", new IdentifierExpression("name"), new TextConstantExpression("enero"));
 		DefaultContext context=new DefaultContext();
 		context.setVariablesManager(new StrictVariablesManager(new StrictVariablesContext()));
 		context.getVariablesManager().pushLocalContext(new CursorVariablesContext(context.getVariablesManager().peekLocalContext(), cursor));
@@ -115,7 +115,7 @@ public class FilteredCursorTest
 
 		assertTrue(cursor.hasNext());
 		cursor.next();
-		assertEquals("marzo", cursor.getRowData().get(1));
+		assertEquals("enero", cursor.getRowData().get(1));
 		assertFalse(cursor.hasNext());
 
 		assertFalse(cursor.hasNext());

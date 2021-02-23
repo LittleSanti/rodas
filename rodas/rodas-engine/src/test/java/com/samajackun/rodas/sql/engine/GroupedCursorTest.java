@@ -1,8 +1,5 @@
 package com.samajackun.rodas.sql.engine;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,8 +8,8 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.samajackun.rodas.core.context.TestUtils;
-import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.DefaultContext;
+import com.samajackun.rodas.core.eval.EvaluatorFactory;
 import com.samajackun.rodas.core.eval.StrictVariablesContext;
 import com.samajackun.rodas.core.eval.StrictVariablesManager;
 import com.samajackun.rodas.core.eval.evaluators.DefaultEvaluatorFactory;
@@ -48,15 +45,15 @@ public class GroupedCursorTest
 		}
 	}
 
-	private static void assertListEquals(Cursor cursor, int column, List<Object> expectedValues)
-		throws CursorException
-	{
-		for (Object expectedValue : expectedValues)
-		{
-			assertTrue(cursor.hasNext());
-			cursor.next();
-			assertEquals(expectedValue, cursor.getRowData().get(column));
-		}
-	}
+	// private static void assertListEquals(Cursor cursor, int column, List<Object> expectedValues)
+	// throws CursorException
+	// {
+	// for (Object expectedValue : expectedValues)
+	// {
+	// assertTrue(cursor.hasNext());
+	// cursor.next();
+	// assertEquals(expectedValue, cursor.getRowData().get(column));
+	// }
+	// }
 
 }
