@@ -35,7 +35,6 @@ public class FilteredCursor extends AbstractNestedCursor
 	private void fetch()
 		throws CursorException
 	{
-		// this.context.getVariablesManager().pushLocalContext(new StrictVariablesContext());
 		try
 		{
 			boolean looping=true;

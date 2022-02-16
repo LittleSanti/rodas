@@ -25,17 +25,13 @@ final class ComparatorUtils
 	public static List<Integer> index(CachedCursor src, Context context, RowDataContext rowDataContext, EvaluatorFactory evaluatorFactory, List<OrderClause> orderClauses)
 		throws CursorException
 	{
-		// RowDataVariablesContext rowDataVariablesContext=new RowDataVariablesContext(getContext().getVariablesManager().peekLocalContext(), src.getColumnMap());
-		// rowDataVariablesContext.setCurrentCursor(this);
 		Comparator<RowData> comparator=ComparatorUtils.createComparator(context, rowDataContext, evaluatorFactory, orderClauses);
 		SortedMap<RowData, Integer> map=new TreeMap<>(comparator);
-		// getContext().getVariablesManager().pushLocalContext(rowDataVariablesContext);
 		for (int n=0; n < src.size(); n++)
 		{
 			RowData row=src.getRowData(n);
 			map.put(row, n);
 		}
-		// getContext().getVariablesManager().popLocalContext();
 		List<Integer> list=new ArrayList<>(src.size());
 		list.addAll(map.values());
 		return list;
